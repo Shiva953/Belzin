@@ -1,0 +1,1 @@
+// chat popup(common in both DM and public GC), should supports blinks(unfurl + tx)

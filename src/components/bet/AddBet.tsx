@@ -1,0 +1,1 @@
+// add the bet component(invoked while clicking in the +(beside the chat message input) -> create bet button), bet added to db

@@ -1,0 +1,1 @@
+// user profile(wallet address, sol balance, pfp, username, description)
