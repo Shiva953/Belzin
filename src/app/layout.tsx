@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SolanaProvider } from "@/components/ContextProvider";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -28,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <SolanaProvider>
         {children}
+        </SolanaProvider>
       </body>
     </html>
   );
