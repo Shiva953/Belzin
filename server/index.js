@@ -1,14 +1,15 @@
 import express from 'express';
-import { createServer } from "node:http";
-import next from "next";
+import { createServer } from "http";
+import { randomBytes } from 'crypto';
+// import next from "next";
 import { Server } from "socket.io";
 
-const dev = process.env.NODE_ENV !== "production";
+// const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
-const port = 3000;
+const port = 3001;
 // when using middleware `hostname` and `port` must be provided below
 const app = express()
-const handler = app.getRequestHandler();
+// const handler = app.getRequestHandler();
 
 
   const httpServer = createServer(app);
@@ -36,8 +37,7 @@ const handler = app.getRequestHandler();
         senderId: userId,
         timestamp: new Date()
       };
-      room.messages.push(messageData);
-      io.to(roomCode).emit('new-message', messageData);
+      io.emit('new-message', messageData);
     })
   });
 
