@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { PublicGroupChat } from './public-group-chat'
-import { PrivateDMs } from './private-dms'
+import { PrivateDMRoomChat } from './private-dms'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 export function ChatArea() {
@@ -24,7 +24,7 @@ export function ChatArea() {
       {pathname === '/' ? (
         <PublicGroupChat onStartDM={setSelectedUser} />
       ) : (
-        <PrivateDMs selectedUser={selectedUser} />
+        <PrivateDMRoomChat/>
       )}
     </div>
   )
