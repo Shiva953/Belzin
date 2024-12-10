@@ -9,7 +9,7 @@ import { MessageCircle, Copy } from 'lucide-react'
 import { createHash } from 'crypto'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { io, Socket } from 'socket.io-client'
-import { Card, CardContent } from './ui/card'
+import { CardContent } from './ui/card'
 
 interface Message {
   id: string
@@ -283,15 +283,6 @@ export function PrivateDMRoomChat(){
       </div>
     </>
   )
-}
-
-function generateRoomCode(length: number = 6): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let result = '';
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
 }
 
 const copyToClipboard = (text: string) => {
