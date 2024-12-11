@@ -15,15 +15,20 @@ import { useEffect, useState } from "react";
 import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
+import CreateUserProfile from '../user-profile';
 
 export function WalletLoginInterface(){
-  // const { data: session, status } = useSession();
-  // const loading = status === "loading";
   const { status } = useSession();
   const wallet = useWallet();
   const { signMessage } = useWallet()
   const walletModal = useWalletModal()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const [userProfile, setUserProfile] = useState<{
+    username: string | null, 
+    walletPublicKey: string 
+  } | null>(null);
+  const [showProfileCreation, setShowProfileCreation] = useState(false);
 
   // const handleSignIn = async () => {
   //   try {
@@ -73,10 +78,7 @@ export function WalletLoginInterface(){
       walletModal.setVisible(true);
       return;
     }
-    // if (!wallet.signIn) {
-    //   console.warn("Wallet not supported!");
-    //   return;
-    // }
+    
     if (!wallet.publicKey || !wallet.signMessage || !wallet.signIn) return;
 
     // Creation of SignInInput to be passed to wallet.signIn
@@ -103,9 +105,9 @@ export function WalletLoginInterface(){
 
   // Simple handler for NextAuth.js signOut()
   const handleSignOut = async () => {
-    const result = await signOut({
-        redirect: false
-    });
+    await signOut({ redirect: false });
+    setUserProfile(null);
+    setIsAuthenticated(false);
   }
 
   const signInWallet = async (jsonInput: string, jsonOutput: string) => {
@@ -119,6 +121,7 @@ export function WalletLoginInterface(){
       console.log(result)
       if(result?.ok == true){
         setIsAuthenticated(true);
+        await fetchUserProfile();
       }
       if (result?.ok != true) {
         throw new Error("Failed to sign in");
@@ -126,6 +129,26 @@ export function WalletLoginInterface(){
     } catch (error) {
       console.log(error);
     }
+  }
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch('/api/getProfile');
+      const data = await response.json();
+
+      if (data.exists) {
+        setUserProfile(data.user);
+      } else {
+        setShowProfileCreation(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user profile', error);
+    }
+  }
+
+  const handleProfileCreated = () => {
+    setShowProfileCreation(false);
+    fetchUserProfile();
   }
 
   useEffect(() => {
@@ -139,78 +162,73 @@ export function WalletLoginInterface(){
     // console.log(status)
   }, [wallet.connected, status]);
 
-  // useEffect(() => {
-  //   if (status === "authenticated") {
-  //     console.log("User is authenticated:", session);
-  //   } else if (status === "unauthenticated") {
-  //     console.log("User is not authenticated");
-  //   }
-  // }, [session, status]);
-
-  // console.log("Session: ", session)
-  // console.log("Status: ", status)
   return (
-    <header>
-      <noscript>
-        <style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
-      </noscript>
-      <div className={styles.signedInStatus}>
-        <p
-          className={`nojs-show ${
-            (status === "loading") ? styles.loading : styles.loaded
-          }`}
-        >
-          {!isAuthenticated && (
-            <>
-              <span className={styles.notSignedInText}>
-                You are not signed in
-              </span>
-              <span className={styles.buttonPrimary} onClick={handleSignIn}>
-                Sign in
-              </span>
-            </>
-          )}
-          {isAuthenticated && (
-            <>
-              {/* {session.user.image && (
-                <span
-                  style={{ backgroundImage: `url('${session.user.image}')` }}
-                  className={styles.avatar}
-                />
-              )} */}
-              <a
-                href={`/api/auth/signout`}
-                className={styles.button}
-                onClick={(e) => {
-                  e.preventDefault();
-                  signOut();
-                }}
-              >
-                Sign out
-              </a>
-            </>
-          )}
-        </p>
-      </div>
-      <nav>
-        <ul className={styles.navItems}>
-          <li className={styles.navItem}>
-            <Link legacyBehavior href="/">
-              <a>Home</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link legacyBehavior href="/api/userProfile">
-              <a>Protected User Profile Route</a>
-            </Link>
-          </li>
-          <li className={styles.navItem}>
-            <Link legacyBehavior href="/me">
-              <a>Me</a>
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
+    <>
+      {showProfileCreation && (
+        <CreateUserProfile onProfileCreated={handleProfileCreated} />
+      )}
+      <header>
+        <noscript>
+          <style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
+        </noscript>
+        <div className={styles.signedInStatus}>
+          <p
+            className={`nojs-show ${
+              (status === "loading") ? styles.loading : styles.loaded
+            }`}
+          >
+            {!isAuthenticated && (
+              <>
+                <span className={styles.notSignedInText}>
+                  You are not signed in
+                </span>
+                <span className={styles.buttonPrimary} onClick={handleSignIn}>
+                  Sign in
+                </span>
+              </>
+            )}
+            {isAuthenticated && userProfile && (
+              <>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
+                    {userProfile.username?.[0]?.toUpperCase() || ''}
+                  </div>
+                  <span className="mr-4">{userProfile.username}</span>
+                  <a
+                    href={`/api/auth/signout`}
+                    className={styles.button}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleSignOut();
+                    }}
+                  >
+                    Sign out
+                  </a>
+                </div>
+              </>
+            )}
+          </p>
+        </div>
+        <nav>
+          <ul className={styles.navItems}>
+            <li className={styles.navItem}>
+              <Link legacyBehavior href="/">
+                <a>Home</a>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link legacyBehavior href="/api/userProfile">
+                <a>Protected User Profile Route</a>
+              </Link>
+            </li>
+            <li className={styles.navItem}>
+              <Link legacyBehavior href="/me">
+                <a>Me</a>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+    </>
   );
 }

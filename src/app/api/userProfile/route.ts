@@ -75,6 +75,7 @@ import { authOptions } from "@/app/lib/auth";
 export const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const session = await getServerSession(authOptions);
+    
 
     return NextResponse.json({ message: 'If you see this, you are authenticated!', session: session }, { status: 200 });
 }

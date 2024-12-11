@@ -1,7 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
 model User {
-  id               String    @id @default(cuid())
-  walletPublicKey  String    @unique
-  username         String?
-  createdAt        DateTime  @default(now())
-  lastLogin        DateTime?
+  id              Int     @id(map: "users_pkey") @default(autoincrement())
+  walletPublicKey String?
+  username        String?
 }
