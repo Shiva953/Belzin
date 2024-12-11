@@ -8,7 +8,7 @@ import {
   WalletProvider,
 } from '@solana/wallet-adapter-react'
 import { getSession, SessionProvider } from "next-auth/react"
-import { Session } from 'next-auth'
+import { Session, getServerSession } from 'next-auth'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { ReactNode, useMemo, useState, useEffect } from 'react'
@@ -28,16 +28,16 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
   const endpoint = useMemo(() => clusterApiUrl(cluster), [cluster]);
   // const session = await getSession();
 
-  // const [session, setSession] = useState<Session|null>(null);
+  const [session, setSession] = useState<Session|null>(null);
   
-  //   useEffect(() => {
-  //     const fetchSession = async () => {
-  //       const fetchedSession = await getSession();
-  //       setSession(fetchedSession);
-  //     };
+    useEffect(() => {
+      const fetchSession = async () => {
+        const fetchedSession = await getServerSession();
+        setSession(fetchedSession);
+      };
       
-  //     fetchSession();
-  //   }, []);
+      fetchSession();
+    }, []);
 
   const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
 
@@ -45,7 +45,7 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect={true}>
         <WalletModalProvider>
-          <SessionProvider>
+          <SessionProvider session={session}>
           {children}
           </SessionProvider>
           </WalletModalProvider>

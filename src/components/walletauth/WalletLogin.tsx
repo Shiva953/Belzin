@@ -18,9 +18,8 @@ import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile from '../user-profile';
 
 export function WalletLoginInterface(){
-  const { status } = useSession();
+  const { data: session, status } = useSession();
   const wallet = useWallet();
-  const { signMessage } = useWallet()
   const walletModal = useWalletModal()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -78,7 +77,7 @@ export function WalletLoginInterface(){
       walletModal.setVisible(true);
       return;
     }
-    
+
     if (!wallet.publicKey || !wallet.signMessage || !wallet.signIn) return;
 
     // Creation of SignInInput to be passed to wallet.signIn

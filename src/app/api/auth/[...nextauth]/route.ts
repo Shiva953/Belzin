@@ -164,7 +164,6 @@ import { deserializeData } from "@/app/lib/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { authOptions } from "@/app/lib/auth";
 
-
 // export const authOptions: NextAuthOptions = {
 //   providers: [
 //     CredentialsProvider({

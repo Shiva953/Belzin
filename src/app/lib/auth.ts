@@ -22,7 +22,6 @@ export const providers = [
       },
         async authorize(credentials, req) {
           try {
-
             const { input, output }: {
               input: SolanaSignInInput,
               output: SolanaSignInOutput
@@ -52,18 +51,27 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     providers,
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET!,
     pages: {
         signIn: "/",
     },
     callbacks: {
-        async session({ session, token }) {
-        // @ts-ignore
-        session.publicKey = token.sub;
-        if (session.user) {
-            session.user.name = token.sub;
-        }
-        return session;
-        }
-    }
+      async jwt({ token, user }) {
+          // Add publicKey to token if it exists
+          if (user?.id) {
+              token.sub = user.id;
+          }
+          return token;
+      },
+      async session({ session, token }) {
+          // Add publicKey to session
+          if (token.sub) {
+              session.publicKey = token.sub;
+              if (session.user) {
+                  session.user.name = token.sub;
+              }
+          }
+          return session;
+      }
+  }
 }

@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma'
 export async function POST(req: NextRequest) {
     try {
       const session = await getServerSession(authOptions)
-      
+      console.log("Session: ",session);
       if (!session?.publicKey) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
