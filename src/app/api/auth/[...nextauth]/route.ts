@@ -5,8 +5,6 @@
 // import { getCsrfToken } from "next-auth/react";
 // import { SigninMessage } from "@/app/lib/signMessage";
 
-// 2. ADD USER PROFILE CREATION(FOR FIRST TIME SIGN-IN) + USER PROFILE FETCH(IF USER ALREADY EXISTS IN DB), INTEGRATE PRISMA
-// 3. ADD USER PROFILE COMPONENT(CreateUser + UserProfile)
 
 // export default async function auth(req: NextApiRequest, res: NextApiResponse) {
 //   const providers = [
@@ -302,8 +300,9 @@ import { authOptions } from "@/app/lib/auth";
 //     }
 // }
 
-  async function handler(req: NextApiRequest, res: NextApiResponse) {
-    return await NextAuth(req, res, authOptions);
-  }
+  // async function handler(req: NextApiRequest, res: NextApiResponse) {
+  //   return await NextAuth(req, res, authOptions);
+  // }
+  const handler = NextAuth(authOptions);
   
   export { handler as GET, handler as POST };

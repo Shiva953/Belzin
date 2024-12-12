@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -18,13 +19,14 @@ export function UserProfile({ user, onStartDM }: { user: string; onStartDM: () =
 }
 
 interface CreateUserProfileProps {
+  pubkey: string,
   onProfileCreated?: () => void
 }
 
-export default function CreateUserProfile({ onProfileCreated }: CreateUserProfileProps) {
+export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUserProfileProps) {
   const [username, setUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const { data: session } = useSession()
+  // const { data: session } = useSession()
 
   const handleCreateProfile = async () => {
     // Validation
@@ -33,20 +35,15 @@ export default function CreateUserProfile({ onProfileCreated }: CreateUserProfil
       return
     }
 
-    if (!session?.publicKey) {
-      setError('No wallet connected')
-      return
-    }
-
     try {
-      const response = await fetch('/api/userProfile', {
+      const response = await fetch('/api/createProfile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
           username, 
-          walletPublicKey: session.publicKey 
+          walletPublicKey: pubkey
         }),
       })
 

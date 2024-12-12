@@ -4,7 +4,7 @@ import { getCsrfToken } from "next-auth/react";
 import { deserializeData } from "./utils";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bs58 from 'bs58';
+// import bs58 from 'bs58';
 
 export const providers = [
     CredentialsProvider({
@@ -34,9 +34,10 @@ export const providers = [
             if (!verifySignIn(input, output)) {
               throw new Error("Invalid signature");
             }
-
+            console.log("Successfully Verified")
             return {
-              id: bs58.encode(Buffer.from(output.account.publicKey)),
+              // id: bs58.encode(Buffer.from(output.account.publicKey)),
+              name: input.address?.toString()
             };
           } catch (error) {
               console.log(error);
@@ -47,31 +48,39 @@ export const providers = [
   ];
 
 export const authOptions: NextAuthOptions = {
-    session: {                                                                                                                                        
-        strategy: "jwt",
-    },
+    // session: {                                                                                                                                        
+    //     strategy: "jwt",
+    // },
     providers,
     secret: process.env.NEXTAUTH_SECRET!,
     pages: {
         signIn: "/",
     },
-    callbacks: {
-      async jwt({ token, user }) {
-          // Add publicKey to token if it exists
-          if (user?.id) {
-              token.sub = user.id;
-          }
-          return token;
-      },
-      async session({ session, token }) {
-          // Add publicKey to session
-          if (token.sub) {
-              session.publicKey = token.sub;
-              if (session.user) {
-                  session.user.name = token.sub;
-              }
-          }
-          return session;
-      }
-  }
+  //   callbacks: {
+  //     async jwt({ token, user }) {
+  //         // Add publicKey to token if it exists
+  //         console.log("User from next-auth: ",user)
+  //         if (user?.id) {
+  //             token.sub = user.id;
+  //         }
+  //         console.log("Token from NextAuth: ",token)
+  //         return token;
+  //     },
+  //     async session({ session, token }) {
+  //         // Add publicKey to session
+  //         console.log("Session Token: ",token)
+  //         console.log("Session before token.sub check: ", session)
+  //         if (token.sub) {
+  //           console.log("Session before public key init: ",session)
+  //             session.publicKey = token.sub;
+  //             console.log("Session after public key init: ",session)
+  //             if (session.user) {
+  //                 session.user.name = token.sub;
+  //                 console.log("Does username get set in the session: ",session)
+  //             }
+  //             console.log("Do we get the session up until here: ",session)
+  //         }
+  //         return session;
+  //     }
+  // }
 }

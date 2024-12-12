@@ -29,48 +29,6 @@ export function WalletLoginInterface(){
   } | null>(null);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
 
-  // const handleSignIn = async () => {
-  //   try {
-      // if (!wallet.connected) {
-      //   walletModal.setVisible(true);
-      //   return;
-      // }
-  
-  //     const csrf = await getCsrfToken();
-  //     console.log("CSRF: ", csrf)
-      // if (!wallet.publicKey || !csrf || !wallet.signMessage) return;
-  
-  //     // Construct sign-in message
-  //     const message = new SigninMessage({
-  //       domain: window.location.host,
-  //       publicKey: wallet.publicKey?.toBase58(),
-  //       statement: `Sign this message to sign in to the app.`,
-  //       nonce: csrf,
-  //     });
-  //     console.log("SignIn Message: ", message)
-  
-  //     // Sign and send request
-      // const data = new TextEncoder().encode(message.prepare());
-      // const signature = await wallet.signMessage(data);
-      // const serializedSignature = bs58.encode(signature);
-  
-  //     console.log("It does reach here")
-  //     const result = await signIn("credentials", {
-  //       message: JSON.stringify(message),
-  //       signature: serializedSignature,
-  //       redirect: false,
-  //     });
-
-  //     console.log("We get the result")
-  
-  //     if (result?.error) {
-  //       console.error("Sign-in error:", result.error);
-  //     }
-  //     console.log("Result: ", result)
-  //   } catch (error) {
-  //     console.error("Sign-in process error:", error);
-  //   }
-  // }; 
   const handleSignIn = async () => {
 
     if (!wallet.connected) {
@@ -100,6 +58,8 @@ export function WalletLoginInterface(){
 
     // Signing in the user with NextAuth.js signIn()
     await signInWallet(jsonInput, jsonOutput);
+
+    console.log("Session during signIn: ",session)
   }
 
   // Simple handler for NextAuth.js signOut()
@@ -119,8 +79,10 @@ export function WalletLoginInterface(){
 
       console.log(result)
       if(result?.ok == true){
+        console.log("Session when I get apt result: ",session)
         setIsAuthenticated(true);
-        await fetchUserProfile();
+        const publicKey = wallet.publicKey?.toBase58(); // Get the public key from the wallet
+        await fetchUserProfile(publicKey || ''); // Pass the public key to fetch user profile
       }
       if (result?.ok != true) {
         throw new Error("Failed to sign in");
@@ -130,11 +92,22 @@ export function WalletLoginInterface(){
     }
   }
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = async (publicKey: string) => {
     try {
-      const response = await fetch('/api/getProfile');
+      const response = await fetch(`/api/getProfile?pubkey=${publicKey}`);
+      // const response = await fetch('/api/getProfile', {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   credentials: 'include' // Important for sending cookies
+      // });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile');
+      }
+  
       const data = await response.json();
-
+  
       if (data.exists) {
         setUserProfile(data.user);
       } else {
@@ -142,29 +115,41 @@ export function WalletLoginInterface(){
       }
     } catch (error) {
       console.error('Failed to fetch user profile', error);
+      if (error instanceof Error && error.message.includes('401')) {
+        handleSignOut();
+      }
     }
   }
 
   const handleProfileCreated = () => {
     setShowProfileCreation(false);
-    fetchUserProfile();
+    fetchUserProfile(wallet.publicKey?.toBase58() || '');
   }
 
   useEffect(() => {
-    if (wallet.connected && status === "unauthenticated") {
-      handleSignIn();
-      console.log("Status after signIn: ", status)
-    }
-    else if(!wallet.connected && status === "authenticated"){
-      handleSignOut();
-    }
-    // console.log(status)
+    const handleAuth = async () => {
+      if (wallet.connected && status === "unauthenticated") {
+        try {
+          await handleSignIn();
+        } catch (error) {
+          console.error("Sign-in failed", error);
+        }
+      } else if (!wallet.connected && status === "authenticated") {
+        try {
+          await handleSignOut();
+        } catch (error) {
+          console.error("Sign-out failed", error);
+        }
+      }
+    };
+  
+    handleAuth();
   }, [wallet.connected, status]);
 
   return (
     <>
       {showProfileCreation && (
-        <CreateUserProfile onProfileCreated={handleProfileCreated} />
+        <CreateUserProfile pubkey={wallet.publicKey?.toString() || ''} onProfileCreated={handleProfileCreated} />
       )}
       <header>
         <noscript>

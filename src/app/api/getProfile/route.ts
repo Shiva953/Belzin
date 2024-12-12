@@ -1,21 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/auth'
 import prisma from '@/lib/prisma'
+import { getSession } from 'next-auth/react'
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // GET: Fetch user profile
 // checking if exists -> return (username, pubkey) if exists
-export async function GET(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions)
 
-    console.log("Session: ",session)
-    if (!session?.publicKey) {
+// 1. FIX SESSION BUG, CHECK CLIENT -> SERVER SESSION PERSISTENCE & USER STATE
+// 2. INTEGRATE CHAT FINALLY(FIRST COMPLETE PUBLIC CHAT INTEGRATION, USE PUSHER/ABLY FOR CHAT INFRA)
+
+export async function GET(req: NextRequest, res: NextResponse) {
+  try {
+    // const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(req.url);
+    const pubkey = searchParams.get('pubkey'); // Get public key from query parameters
+    if (!pubkey) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // const pubkey = session?.user?.name ?? 'CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E';
     const user = await prisma.user.findFirst({
-      where: { walletPublicKey: session.publicKey ?? 'CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E' }
+      where: { walletPublicKey: pubkey }
     })
 
     if (!user) {
@@ -34,3 +43,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
+
+// export {handler as GET}
