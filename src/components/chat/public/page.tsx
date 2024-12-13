@@ -57,12 +57,6 @@ export function PublicChat({ userId } : { userId: string }){
 
     //for publishing/subscribing messages to channel(in this case global chatroom) + db insertion -> req to /message/send
     return (
-        // <div className='w-full h-full'>
-        //   <div className='flex-1 justify-between flex flex-col h-full w-full'>
-        //     {(initialMessages.length > 0) && <Messages initialMessages={initialMessages} currentUserId={userId}/>}
-        //     <MessageInput/>
-        //   </div>
-        // </div>
         <div className='flex flex-col h-full w-full'>
             <div className='flex-1 overflow-hidden'>
                 {(initialMessages.length > 0) && (

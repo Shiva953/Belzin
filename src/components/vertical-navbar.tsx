@@ -11,7 +11,7 @@ export function VerticalNavbar() {
 
   return (
 
-    <nav className="flex flex-col w-16 h-full bg-secondary">
+    <nav className="fixed flex flex-col w-16 h-[100vh] bg-secondary z-20">
       <div className="flex-1 flex flex-col items-center justify-center space-y-4">
         <Link href="/">
           <Button
