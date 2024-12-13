@@ -35,6 +35,9 @@ export interface Message{
 
 // const initialMessages = await getChatMessages() || [];
 
+//FIX THE SESSION & SIGN-IN BUG: SIGN-IN !== WALLET BEING CONNECTED
+//CURRENTLY YOU'RE TAKING THE USER STATE AS SOON AS IT CONNECTS, WHEREAS ONLY AFTER SIGN-IN YOU SHOULD START CHAT 
+
 export function PublicChat({ userId } : { userId: string }){
     //component tree: Interface(my Messages(right) + other user Messages(left)) + MessageInput + SendMessage + (+)icon in the left(for adding bets)
     const [initialMessages, setInitialMessages] = useState<Message[]>([]);

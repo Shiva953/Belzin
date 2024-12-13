@@ -15,7 +15,6 @@ import dynamic from 'next/dynamic'
 
 export function ChatArea() {
   const pathname = usePathname()
-  const [selectedUser, setSelectedUser] = useState<string | null>(null)
   const { connected, publicKey } = useWallet()
 
   if (!connected) {

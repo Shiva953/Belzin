@@ -11,13 +11,13 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SigninMessage } from "@/app/lib/signMessage";
 import bs58 from "bs58";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile from '../user-profile';
 
-export function WalletLoginInterface(){
+export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const { data: session, status } = useSession();
   const wallet = useWallet();
   const walletModal = useWalletModal()
@@ -165,6 +165,7 @@ export function WalletLoginInterface(){
             )}
             {isAuthenticated && userProfile && (
               <>
+              <div>
                 <div className="flex items-center">
                   <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
                     {userProfile.username?.[0]?.toUpperCase() || ''}
@@ -181,28 +182,13 @@ export function WalletLoginInterface(){
                     Sign out
                   </a>
                 </div>
+                {children}
+                </div>
               </>
             )}
           </p>
         </div>
         <nav>
-          <ul className={styles.navItems}>
-            <li className={styles.navItem}>
-              <Link legacyBehavior href="/">
-                <a>Home</a>
-              </Link>
-            </li>
-            <li className={styles.navItem}>
-              <Link legacyBehavior href="/api/userProfile">
-                <a>Protected User Profile Route</a>
-              </Link>
-            </li>
-            <li className={styles.navItem}>
-              <Link legacyBehavior href="/me">
-                <a>Me</a>
-              </Link>
-            </li>
-          </ul>
         </nav>
       </header>
     </>
