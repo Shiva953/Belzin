@@ -1,4 +1,8 @@
 /* Set min-height to avoid page reflow while session loading */
+
+.body {
+  font-family: 'Inter', sans-serif;
+}
 .signedInStatus {
     display: block;
     min-height: 4rem;

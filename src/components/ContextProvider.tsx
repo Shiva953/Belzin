@@ -13,8 +13,6 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
 import { ReactNode, useMemo, useState, useEffect } from 'react'
 import { Cluster, clusterApiUrl } from '@solana/web3.js'
-// import { AuthSessionProvider } from './AuthSessionProvider'
-// import { AuthProvider } from './AuthProvider'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 require('@solana/wallet-adapter-react-ui/styles.css');
@@ -26,19 +24,6 @@ export const WalletButton = dynamic(async () => (await import('@solana/wallet-ad
 export function SolanaProvider({ children, session }: { children: ReactNode, session: Session|null }) {
   const cluster:Cluster  = "devnet"
   const endpoint = useMemo(() => clusterApiUrl(cluster), [cluster]);
-  // const session = await getSession();
-
-  // const [session, setSession] = useState<Session|null>(null);
-  
-  //   useEffect(() => {
-  //     const fetchSession = async () => {
-  //       const fetchedSession = await getSession();
-  //       setSession(fetchedSession);
-  //     };
-      
-  //     fetchSession();
-  //   }, []);
-
   const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
 
   return (

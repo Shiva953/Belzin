@@ -1,7 +1,7 @@
 import { VerticalNavbar } from '@/components/vertical-navbar'
 import { ChatArea } from '@/components/chat-area'
 import { WalletButton } from '@/components/ContextProvider';
-import UserProfile from '@/components/user/Profile';
+// import UserProfile from '@/components/user/Profile';
 import { WalletLoginInterface } from '@/components/walletauth/WalletLogin';
 // import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <WalletLoginInterface/>
        <WalletButton className='z-20 top-4 left-4'/>
-        <UserProfile/>
+        {/* <UserProfile/> */}
         <div className="flex h-screen bg-background">
           {/* check authenticated for not, only then put up the chat */}
         {/* <span>The ONLY Group Chat Betting Dapp - Create Prediction Blinks IN THE CHAT ITSELF

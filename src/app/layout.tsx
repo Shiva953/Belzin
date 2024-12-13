@@ -1,12 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Metadata } from "next";
 import { SolanaProvider } from "@/components/ContextProvider";
+import { Inter } from "next/font/google"
 import localFont from "next/font/local";
 import "./globals.css";
 import { getServerSession } from "next-auth";
 import { getSession } from "next-auth/react";
 import { authOptions } from "./lib/auth";
+import { cn } from "@/lib/utils";
 // import { AuthSessionProvider } from "@/components/AuthSessionProvider";
+
+const inter = Inter({subsets: ["latin"]});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,12 +35,12 @@ export default async function RootLayout({
 }>) {
 
   const session = await getServerSession(authOptions);
-
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          geistSans.className
+        )}>
         <SolanaProvider session={session}>
         {children}
         </SolanaProvider>

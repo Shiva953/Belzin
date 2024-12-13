@@ -58,12 +58,10 @@ export function WalletLoginInterface(){
 
     // Signing in the user with NextAuth.js signIn()
     await signInWallet(jsonInput, jsonOutput);
-
-    console.log("Session during signIn: ",session)
   }
 
-  // Simple handler for NextAuth.js signOut()
   const handleSignOut = async () => {
+    wallet.disconnect();
     await signOut({ redirect: false });
     setUserProfile(null);
     setIsAuthenticated(false);
@@ -95,12 +93,6 @@ export function WalletLoginInterface(){
   const fetchUserProfile = async (publicKey: string) => {
     try {
       const response = await fetch(`/api/getProfile?pubkey=${publicKey}`);
-      // const response = await fetch('/api/getProfile', {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   credentials: 'include' // Important for sending cookies
-      // });
   
       if (!response.ok) {
         throw new Error('Failed to fetch profile');

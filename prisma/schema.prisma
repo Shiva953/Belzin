@@ -12,3 +12,11 @@ model User {
   walletPublicKey String?
   username        String?
 }
+
+model Message {
+  id        Int     @id @default(autoincrement())
+  content   String?
+  sender    String?
+  senderId  String?
+  timestamp String?
+}
