@@ -31,59 +31,39 @@ export function Messages({initialMessages, currentUserId} : {initialMessages: Me
         }
 
     // current user messages -> right, other user messages -> left
+    // <div className='flex h-full flex-1 flex-col-reverse overflow-y-auto px-3 py-2 space-y-3 scrollbar-thin scrollbar-track-background scrollbar-thumb-primary/50'>
     return(
-    <>
-    <div
-      className='flex h-full flex-1 flex-col-reverse gap-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch'>
-      <div ref={scrollDownRef} />
+        <div className='h-full overflow-y-auto'>
+        <div className='flex flex-col-reverse gap-4 p-3'>
+        <div ref={scrollDownRef} />
         {messages.map((message, index) => {
-            const isCurrentUser = message.senderId == currentUserId;
-            const hasNextMessageFromSameUser = messages[index - 1]?.senderId === messages[index].senderId;
-            return(
-                <>
-                <div
-            className='chat-message'
-            key={`${message.id}-${message.timestamp}`}>
-            <div
-              className={cn('flex items-end', {
+          const isCurrentUser = message.senderId == currentUserId;
+          const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
+          return (
+            <div 
+              key={`${message.id}-${message.timestamp}`} 
+              className={cn('flex', {
                 'justify-end': isCurrentUser,
-              })}>
-              <div
-                className={cn(
-                  'flex flex-col space-y-2 text-base max-w-xs mx-2',
-                  {
-                    'order-1 items-end': isCurrentUser,
-                    'order-2 items-start': !isCurrentUser,
-                  }
-                )}>
-                <span
-                  className={cn('px-4 py-2 rounded-lg inline-block', {
-                    'bg-indigo-600 text-white': isCurrentUser,
-                    'bg-gray-200 text-gray-900': !isCurrentUser,
-                    'rounded-br-none':
-                      !hasNextMessageFromSameUser && isCurrentUser,
-                    'rounded-bl-none':
-                      !hasNextMessageFromSameUser && !isCurrentUser,
-                  })}>
-                  {message.content}{' '}
-                  <span className='ml-2 text-xs text-gray-400'>
-                    {formatTimestamp(Number(message.timestamp))}
-                  </span>
-                </span>
-              </div>
-
-              <div
-                className={cn('relative w-6 h-6', {
-                  'order-2': isCurrentUser,
-                  'order-1': !isCurrentUser,
-                  invisible: hasNextMessageFromSameUser,
-                })}>
+                'justify-start': !isCurrentUser
+              })}
+            >
+              <div 
+                className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative', {
+                  'bg-primary text-primary-foreground': isCurrentUser,
+                  'bg-secondary text-secondary-foreground': !isCurrentUser,
+                  'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
+                  'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
+                })}
+              >
+                <div className="break-words">{message.content}</div>
+                <div className="text-xs text-foreground/50 mt-1 text-right">
+                  {formatTimestamp(Number(message.timestamp))}
+                </div>
               </div>
             </div>
-          </div>
-        </>
-            )
+          );
         })}
-    </div>
-    </>)
+      </div>
+      </div>
+    );
 }

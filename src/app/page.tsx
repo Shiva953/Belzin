@@ -5,18 +5,17 @@ import { WalletLoginInterface } from '@/components/walletauth/WalletLogin';
 // import { useWallet } from '@solana/wallet-adapter-react';
 
 export default function Home() {
-  // const { wallet, publicKey, connect, disconnect, signMessage, signIn } = useWallet();
-  // const message = 'sample wallet login user'
+
   return (
     <>
-    {/* check authenticated for not, only then put up the chat */}
+    <div className="w-full h-screen">
       <WalletLoginInterface>
-        {/* <UserProfile/> */}
-        <div className="flex h-screen bg-background">
+        <div className="flex flex-row h-full w-full bg-background">
           <VerticalNavbar />
           <ChatArea />
         </div>
-    </WalletLoginInterface>
+      </WalletLoginInterface>
+    </div>
     </>
   );
 }

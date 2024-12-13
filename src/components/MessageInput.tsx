@@ -14,14 +14,13 @@ import prisma from '@/lib/prisma';
 import { Message } from './chat/public/page';
 
 export function MessageInput(){
-    const client = pusherClient;
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [input, setInput] = useState<string>('')
     const wallet = useWallet();
     const [sender, setSender] = useState<string>('')
     const [senderId, setSenderId] = useState<string>('')
 
-    const textareaRef = useRef<HTMLInputElement | null>(null); //useRef<HTMLTextAreaElement | null>(null)
+    const textareaRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
         const userPubkey = wallet.publicKey?.toString() || '';
@@ -51,44 +50,39 @@ export function MessageInput(){
       }
 
       const handleKeyPress = (event: any) => {
-        if (event.charCode !== 13 || !input) {
-          return;
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault()
+          sendMessage()
         }
-        sendMessage();
-        event.preventDefault();
       }
 
       const handleSubmission = (event: any) => {
-        event.preventDefault();
-        sendMessage();
+        event.preventDefault()
+        sendMessage()
+        setInput('')
       }
 
       return (
-        <>
-            <Input 
-            ref={textareaRef}
-            onKeyDown={handleKeyPress}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onSubmit={handleSubmission}
-            placeholder='Send Message in Global Chat'
-            className='block w-full resize-none border-0 bg-transparent text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:py-1.5 sm:text-sm sm:leading-6'
-            />
-            <div
-            onClick={() => textareaRef.current?.focus()}
-            className='py-2'
-            aria-hidden='true'>
-                <div className='py-px'>
-                <div className='h-9' />
-                </div>
+          <div className="relative w-full p-3 border-t bg-background">
+            <div className="flex items-center space-x-2">
+              <div className="flex-1">
+                <Input 
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder='Send Message in Global Chat'
+                  className="w-full rounded-full px-4 py-2 border focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+              <Button 
+                onClick={sendMessage} 
+                disabled={!input.trim()}
+                className="rounded-full px-4 py-2 transition-all hover:bg-primary/90 disabled:opacity-50"
+              >
+                Send
+              </Button>
             </div>
-            <div className='absolute right-0 bottom-0 flex justify-between py-2 pl-3 pr-2'>
-          <div className='flex-shrin-0'>
-            <Button onClick={sendMessage} type='submit'>
-              Send
-            </Button>
           </div>
-        </div>
-         </>
       );
 }

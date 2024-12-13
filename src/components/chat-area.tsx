@@ -19,7 +19,7 @@ export function ChatArea() {
 
   if (!connected) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex-1 w-full flex items-center justify-center">
         <p className="text-lg text-muted-foreground">Please connect your wallet to start chatting.</p>
       </div>
     )

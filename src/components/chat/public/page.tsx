@@ -15,6 +15,10 @@ import { MessageInput } from '@/components/MessageInput';
 // validate the user session -> if user signed in && logged in -> Show Public Chat
 // Public Chat: Real time messaging(using pusher pub/sub) <-> storing new messages/fetching existing messages in DB
 
+//ASK IMAGE + USERNAME FOR SETTING FIRST TIME PROFILE, MAKE THE USER PROFILE COMPONENT MORE DYNAMIC(PFP + USERNAME + (WALLET ADDRESS) IN DROP DOWN)
+//ADD PROFILE BESIDE THE CHAT MESSAGE(USERNAME + PFP, ALONG WITH WALLET ADDRESS AND HYPERLINK IN DROPDOWN MENU)
+//MAKE THE APP MORE STATEFUL(IMPROVE UI = F(STATE, DESIGN))
+
 export interface Message{
     id: string | number,
     content: string | null,
@@ -22,21 +26,6 @@ export interface Message{
     senderId: string | null,
     timestamp: string | null
 }
-
-// async function getChatMessages(){
-//     try{
-//         const res = await fetch('/api/getMessages');
-//         const messages = await res.json();
-//         return messages;
-//     } catch(error){
-//         console.log("Error fetching messages: ",error)
-//     }
-// }
-
-// const initialMessages = await getChatMessages() || [];
-
-//FIX THE SESSION & SIGN-IN BUG: SIGN-IN !== WALLET BEING CONNECTED
-//CURRENTLY YOU'RE TAKING THE USER STATE AS SOON AS IT CONNECTS, WHEREAS ONLY AFTER SIGN-IN YOU SHOULD START CHAT 
 
 export function PublicChat({ userId } : { userId: string }){
     //component tree: Interface(my Messages(right) + other user Messages(left)) + MessageInput + SendMessage + (+)icon in the left(for adding bets)
@@ -68,13 +57,24 @@ export function PublicChat({ userId } : { userId: string }){
 
     //for publishing/subscribing messages to channel(in this case global chatroom) + db insertion -> req to /message/send
     return (
-        <>
-            <div className='flex-1 justify-between flex flex-col h-full w-full'>
-            {/* All the previous messages fetched from the server */}
-            {(initialMessages.length > 0) && <Messages initialMessages={initialMessages} currentUserId={userId}/>}
-            {/* The Chat Input + Send Message */}
-            <MessageInput/>
+        // <div className='w-full h-full'>
+        //   <div className='flex-1 justify-between flex flex-col h-full w-full'>
+        //     {(initialMessages.length > 0) && <Messages initialMessages={initialMessages} currentUserId={userId}/>}
+        //     <MessageInput/>
+        //   </div>
+        // </div>
+        <div className='flex flex-col h-full w-full'>
+            <div className='flex-1 overflow-hidden'>
+                {(initialMessages.length > 0) && (
+                <Messages 
+                    initialMessages={initialMessages} 
+                    currentUserId={userId}
+                />
+                )}
             </div>
-         </>
+            <div className='sticky bottom-0 w-full'>
+                <MessageInput />
+            </div>
+        </div>
       );
 }

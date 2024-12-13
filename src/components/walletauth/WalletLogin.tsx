@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
-import CreateUserProfile from '../user-profile';
+import CreateUserProfile, { UserProfile } from '../user-profile';
 
 export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const { data: session, status } = useSession();
@@ -24,7 +24,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const [userProfile, setUserProfile] = useState<{
-    username: string | null, 
+    username: string, 
     walletPublicKey: string 
   } | null>(null);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
@@ -140,57 +140,52 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
   return (
     <>
-      {showProfileCreation && (
-        <CreateUserProfile pubkey={wallet.publicKey?.toString() || ''} onProfileCreated={handleProfileCreated} />
-      )}
-      <header>
-        <noscript>
-          <style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
-        </noscript>
-        <div className={styles.signedInStatus}>
-          <p
-            className={`nojs-show ${
-              (status === "loading") ? styles.loading : styles.loaded
-            }`}
-          >
-            {!isAuthenticated && (
-              <>
-                <span className={styles.notSignedInText}>
-                  You are not signed in
-                </span>
-                <span className={styles.buttonPrimary} onClick={handleSignIn}>
-                  Sign in
-                </span>
-              </>
-            )}
-            {isAuthenticated && userProfile && (
-              <>
-              <div>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white mr-2">
-                    {userProfile.username?.[0]?.toUpperCase() || ''}
-                  </div>
-                  <span className="mr-4">{userProfile.username}</span>
-                  <a
-                    href={`/api/auth/signout`}
-                    className={styles.button}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSignOut();
-                    }}
+      <div className="min-h-screen flex flex-col">
+          {showProfileCreation && (
+            <CreateUserProfile 
+              pubkey={wallet.publicKey?.toString() || ''} 
+              onProfileCreated={handleProfileCreated} 
+            />
+          )}
+          
+          {/* <header className="p-4 bg-background shadow-sm">
+            <div className="container mx-auto flex justify-between items-center"> */}
+            <header className="fixed top-0 left-0 right-0 h-16 p-4 mb-32 bg-background shadow-sm z-20">
+              <div className="container mx-auto flex justify-between items-center h-full">
+              {isAuthenticated && userProfile && (
+                <UserProfile user={userProfile}/>
+              )}
+
+              {!isAuthenticated && (
+                <div className="flex items-center space-x-4">
+                  <span className="text-muted-foreground">
+                    You are not signed in
+                  </span>
+                  <button 
+                    onClick={handleSignIn} 
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
                   >
-                    Sign out
-                  </a>
+                    Sign in
+                  </button>
                 </div>
-                {children}
-                </div>
-              </>
-            )}
-          </p>
-        </div>
-        <nav>
-        </nav>
-      </header>
+              )}
+
+              {isAuthenticated && userProfile && (
+                <button
+                  onClick={handleSignOut}
+                  className="px-3 py-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                >
+                  Sign out
+                </button>
+              )}
+            </div>
+          </header>
+        {isAuthenticated && userProfile && (
+          <main className="flex flex-1">
+            {children}
+          </main>
+        )}
+      </div>
     </>
   );
 }

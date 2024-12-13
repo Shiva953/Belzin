@@ -6,15 +6,20 @@ import { Button } from '@/components/ui/button'
 import { MessageSquare } from 'lucide-react'
 import { useSession } from 'next-auth/react';
 
-export function UserProfile({ user, onStartDM }: { user: string; onStartDM: () => void }) {
+type UserT = {
+  username: string,
+  walletPublicKey: string
+}
+
+export function UserProfile({ user }: { user: UserT|null}) {
   return (
-    <div className="flex items-center justify-between p-2 hover:bg-accent rounded-md">
-      <span>{user}</span>
-      <Button variant="ghost" size="sm" onClick={onStartDM}>
-        <MessageSquare className="h-4 w-4 mr-2" />
-        Start DM
-      </Button>
-    </div>
+    //modify to be more dynamic, add wallet address button(right) + PFP(avatar + [username](dropdown)left) 
+    <div className="flex items-center space-x-4">
+          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
+              {user?.username?.[0]?.toUpperCase() || ''}
+          </div>
+        <span className="font-medium">{user?.username || 'Invalid User'}</span>
+      </div>
   )
 }
 
