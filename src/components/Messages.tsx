@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 export function Messages({initialMessages, currentUserId} : {initialMessages: Message[], currentUserId: string}){
     // fetch all messages from the db = initialMessages
     // instead of [] -> initialMessages
-    const [messages, setMessages] = useState<Message[]>([])
+    const [messages, setMessages] = useState<Message[]>(initialMessages)
     const client = pusherClient;
 
     useEffect(() => {

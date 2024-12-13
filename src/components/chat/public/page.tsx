@@ -45,11 +45,13 @@ export function PublicChat({ userId } : { userId: string }){
                 const res = await fetch('/api/getMessages');
                 const messages = await res.json();
                 setInitialMessages(messages)
+                console.log(messages)
                 return messages;
             } catch(error){
                 console.log("Error fetching messages: ",error)
             }
         }
+        getChatMessages();
     }, [])
 
     //1. check user session
@@ -66,7 +68,7 @@ export function PublicChat({ userId } : { userId: string }){
         <>
             <div className='flex-1 justify-between flex flex-col h-full w-full'>
             {/* All the previous messages fetched from the server */}
-            {initialMessages && <Messages initialMessages={initialMessages} currentUserId={userId}/>}
+            {(initialMessages.length > 0) && <Messages initialMessages={initialMessages} currentUserId={userId}/>}
             {/* The Chat Input + Send Message */}
             <MessageInput/>
             </div>
