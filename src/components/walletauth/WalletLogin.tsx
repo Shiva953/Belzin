@@ -138,54 +138,6 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
     handleAuth();
   }, [wallet.connected, status]);
 
-  // return (
-  //   <>
-  //     <div className="min-h-screen flex flex-col">
-  //         {showProfileCreation && (
-  //           <CreateUserProfile 
-  //             pubkey={wallet.publicKey?.toString() || ''} 
-  //             onProfileCreated={handleProfileCreated} 
-  //           />
-  //         )}
-
-  //           <header className="fixed top-0 left-0 right-0 h-16 p-4 mb-32 bg-background shadow-sm z-20">
-  //             <div className="container mx-auto flex justify-between items-center h-full">
-  //             {isAuthenticated && userProfile && (
-  //               <UserProfile user={userProfile}/>
-  //             )}
-
-  //             {!isAuthenticated && (
-  //               <div className="flex items-center space-x-4">
-  //                 <span className="text-muted-foreground">
-  //                   You are not signed in
-  //                 </span>
-  //                 <button 
-  //                   onClick={handleSignIn} 
-  //                   className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-  //                 >
-  //                   Sign in
-  //                 </button>
-  //               </div>
-  //             )}
-
-  //             {isAuthenticated && userProfile && (
-  //               <button
-  //                 onClick={handleSignOut}
-  //                 className="px-3 py-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-  //               >
-  //                 Sign out
-  //               </button>
-  //             )}
-  //           </div>
-  //         </header>
-  //       {isAuthenticated && userProfile && (
-  //         <main className="flex flex-1">
-  //           {children}
-  //         </main>
-  //       )}
-  //     </div>
-  //   </>
-  // );
   return (
     <>
       <div className="min-h-screen flex flex-col">
