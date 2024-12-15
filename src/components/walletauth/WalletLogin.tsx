@@ -16,6 +16,7 @@ import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile, { UserProfile } from '../user-profile';
+import { UserT } from '../user-profile';
 
 export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const { data: session, status } = useSession();
@@ -23,10 +24,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const walletModal = useWalletModal()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const [userProfile, setUserProfile] = useState<{
-    username: string, 
-    walletPublicKey: string 
-  } | null>(null);
+  const [userProfile, setUserProfile] = useState<UserT|null>(null);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
 
   const handleSignIn = async () => {
@@ -171,7 +169,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
               {isAuthenticated && userProfile && (
                 <button
                   onClick={handleSignOut}
-                  className="px-3 py-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                  className="px-3 py-2 bg-purple-500 text-white hover:bg-destructive/30 rounded-md transition-colors"
                 >
                   Sign out
                 </button>

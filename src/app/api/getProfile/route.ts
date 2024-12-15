@@ -35,7 +35,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
       exists: true, 
       user: { 
         username: user.username, 
-        walletPublicKey: user.walletPublicKey 
+        walletPublicKey: user.walletPublicKey,
+        imageUrl: user.imageUrl
       } 
     }, { status: 200 })
   } catch (error) {

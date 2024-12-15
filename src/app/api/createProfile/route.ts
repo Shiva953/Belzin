@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       // }
   
-      const { username, walletPublicKey  } = await req.json();
+      const { username, walletPublicKey, imageUrl  } = await req.json();
 
       if(!username || !walletPublicKey){
         return NextResponse.json({error: 'Invalid Username/PublicKey'}, {status: 400});
@@ -35,6 +35,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         data: {
           walletPublicKey: walletPublicKey || 'CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E',
           username,
+          imageUrl: imageUrl || ''
         }
       })
   

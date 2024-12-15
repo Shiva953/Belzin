@@ -11,6 +11,7 @@ model User {
   id              Int     @id(map: "users_pkey") @default(autoincrement())
   walletPublicKey String?
   username        String?
+  imageUrl        String?
 }
 
 model Message {
