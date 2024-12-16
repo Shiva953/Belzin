@@ -62,7 +62,7 @@ export async function fetchProfile(pubkey: string, userId: number) {
   const res = await fetch(`/api/getProfile`, {
       method: 'POST',
       body: JSON.stringify({ pubkey, userId }),
-      headers: { 'Content-Type': 'application/json' } // Ensure correct content type
+      headers: { 'Content-Type': 'application/json' }
   });
   return await res.json();
 }

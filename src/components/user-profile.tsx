@@ -22,7 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 // import { SignOutButton } from "./sign-out-button"
 
 
-export type UserT = {
+export interface UserT {
   username: string,
   walletPublicKey: string
   imageUrl: string
