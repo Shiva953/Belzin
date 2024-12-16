@@ -37,6 +37,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
     const [partner, setPartner] = useState<UserT|null>();
     const chatPartnerid = userid == userid1 ? userid2 : userid1
+
     const event_name = `incoming-message-${id}`
     const channel_name = `chat-room-${id}`
 
@@ -100,18 +101,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
 
     console.log("Initial Messages: ", initialMessages)
 
-    // if(!userid){
-    //     return (
-    //         <>
-    //         <div>Invalid User, Not Found!</div>
-    //         </>
-    //     )
-    // }
-
-    // if(userid!==userid1 || userid!=userid2){
-    //     notFound()
-    // }
-    // const checkingUserSession = userid===userid1 || userid===userid2
+    // make user id check more robust
     return (
         <>
         <WalletLoginInterface>
@@ -121,10 +111,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 </div>
             )}
         {
-        (userid==userid1 || userid==userid2) && (<div className='flex-1 justify-between flex flex-col h-full max-h-[calc(100vh-6rem)]'>
-        <div className='flex sm:items-center justify-between py-3 border-b-2 border-gray-200'>
+            //LEFT -> CONTAINS FRIEND LIST FOR GIVEN USER(VERTICAL COLUMN, 30% OF SCREEN WIDTH)
+            //ON CLICKING A FRIEND -> /CONVERSATION/[FRIENDID] ON RIGHT(70% OF SCREEN WIDTH)
+        (userid==userid1 || userid==userid2) && (
+        <div className='flex flex-col h-full w-full'>
         {/* 1. TOP BAR SHOWING THE PARTNER PFP AND USERNAME */}
-        <div className='relative'>
+        {partner && (
+            <div className='relative'>
             <div className='relative w-8 sm:w-12 h-8 sm:h-12'>
               <Image
                 fill
@@ -134,13 +127,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 className='rounded-full'
               />
             </div>
+            </div>)}
+            <div className='flex-1 overflow-hidden'>
+            {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
+            {initialMessages.length>0 && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
             </div>
-        {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
-        {initialMessages.length>0 && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
-        {/* 3. CHAT INPUT */}
-        <MessageInput chatId={id}/>
+            {/* 3. CHAT INPUT */}
+            <div className='sticky bottom-0 w-full'>
+            <MessageInput chatId={id}/>
+            </div>
         </div>
-        </div>)
+        )
             }
         </WalletLoginInterface>
         </>

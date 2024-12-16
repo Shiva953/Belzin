@@ -38,7 +38,11 @@ export function MessageInput({chatId} : {chatId?: string}){
             })
             const data = await res.json();
             const user = data.user;
-            setSender(user?.username || 'InvalidUser')
+            const username = user?.username || 'InvalidUser';
+            setSender(username)
+            const senderId = user?.id || 0;
+            const senderIdToString = senderId.toString()
+            setSenderId(senderIdToString);
         }
         getUser(userPubkey);
     }, [wallet.publicKey])

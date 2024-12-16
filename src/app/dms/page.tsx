@@ -32,7 +32,7 @@ export default function Home(){
             imageUrl: "",
             walletPublicKey: "9JxBhWbrwkqX2heLq1mA3YXWKsbkCH8rE5gaVxzH7Foo",
             lastMessage: {
-                senderId: "9JxBhWbrwkqX2heLq1mA3YXWKsbkCH8rE5gaVxzH7Foo",
+                senderId: "7",
                 content: "testing dm"
             }
         }
