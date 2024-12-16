@@ -16,12 +16,21 @@ import { fetchProfile } from "@/app/lib/utils"
 import { WalletLoginInterface } from "@/components/walletauth/WalletLogin"
 import { useRouter } from 'next/router'
 import { ChatMessage } from "@prisma/client"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent } from "@/components/ui/card"
 
 export interface DMProps{
     params: {
         id: string,
     },
 }
+
+interface ChatHeaderProps {
+    partner?: {
+      username: string
+      imageUrl: string
+    }
+  }
 
 
 export default function Page({ params }: { params: Promise<{ id: string }> }){
@@ -35,7 +44,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
 
     const [userid, setUserid] = useState('')
     const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
-    const [partner, setPartner] = useState<UserT|null>();
+    const [partner, setPartner] = useState<UserT|null>(null);
     const chatPartnerid = userid == userid1 ? userid2 : userid1
 
     const event_name = `incoming-message-${id}`
@@ -111,23 +120,43 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 </div>
             )}
         {
-            //LEFT -> CONTAINS FRIEND LIST FOR GIVEN USER(VERTICAL COLUMN, 30% OF SCREEN WIDTH)
-            //ON CLICKING A FRIEND -> /CONVERSATION/[FRIENDID] ON RIGHT(70% OF SCREEN WIDTH)
         (userid==userid1 || userid==userid2) && (
         <div className='flex flex-col h-full w-full'>
         {/* 1. TOP BAR SHOWING THE PARTNER PFP AND USERNAME */}
         {partner && (
-            <div className='relative'>
-            <div className='relative w-8 sm:w-12 h-8 sm:h-12'>
-              <Image
-                fill
-                referrerPolicy='no-referrer'
-                src={partner?.imageUrl || ''}
-                alt={`${partner?.username.substring(0,2)}`}
-                className='rounded-full'
-              />
-            </div>
-            </div>)}
+            <Card className="w-full hover:bg-accent/50 transition-colors">
+            <CardContent className="p-4 flex items-center space-x-4">
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={partner?.imageUrl || ''} alt={partner?.username || 'User'} />
+                <AvatarFallback>{partner?.username?.[0] || 'U'}</AvatarFallback>
+              </Avatar>
+              <div className="flex-grow">
+                <h2 className="font-semibold text-lg">
+                  {partner?.username || 'Chat Partner'}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {partner?.username ? 'Online' : 'Waiting for partner...'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+                // <div className='bg-gray-100 p-3 flex items-center space-x-3 shadow-sm'>
+                //     <div className='relative w-10 h-10'>
+                //         <Image
+                //             fill
+                //             referrerPolicy='no-referrer'
+                //             src={partner?.imageUrl || '/default-avatar.png'}
+                //             alt={partner?.username || 'User'}
+                //             className='rounded-full object-cover'
+                //         />
+                //     </div>
+                //     <div className='flex-grow'>
+                //         <h2 className='font-semibold text-lg text-black'>
+                //             {partner?.username || 'Chat Partner'}
+                //         </h2>
+                //     </div>
+                // </div>
+            )}
             <div className='flex-1 overflow-hidden'>
             {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
             {initialMessages.length>0 && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}

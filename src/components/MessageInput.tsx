@@ -1,17 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 'use client';
-import {pusherClient} from '@/lib/pusher';
 import * as Ably from 'ably';
 import { useState, useEffect, useRef } from 'react';
-import { format } from "date-fns";
-import { AblyProvider, ChannelProvider,useChannel } from 'ably/react';
 import axios from "axios"
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import prisma from '@/lib/prisma';
-import { Message } from './chat/public/page';
 
 export function MessageInput({chatId} : {chatId?: string}){
     const [isLoading, setIsLoading] = useState<boolean>(false)
