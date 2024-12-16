@@ -18,7 +18,7 @@ export default function Home(){
 
     useEffect(() => {
         async function getUserId(){
-            const profile = await fetchProfile(pubkey, '')
+            const profile = await fetchProfile(pubkey, 0)
             const id = profile.id;
             setUserId(id);
         }

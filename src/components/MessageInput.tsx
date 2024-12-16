@@ -33,7 +33,7 @@ export function MessageInput({chatId} : {chatId?: string}){
             },
               body: JSON.stringify({
                 pubkey: pubkey,
-                userId: ''
+                userId: 0
               })
             })
             const data = await res.json();

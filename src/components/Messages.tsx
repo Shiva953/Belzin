@@ -5,8 +5,9 @@ import { useState, useEffect, useRef } from 'react';
 import { format } from "date-fns";
 import { Message } from './chat/public/page';
 import { cn } from '@/lib/utils';
+import { ChatMessage } from '@prisma/client';
 
-export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[], currentUserId: string, channel: string, event: string}){
+export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
 
     useEffect(() => {

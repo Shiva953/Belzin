@@ -58,7 +58,7 @@ export async function deserializeData(jsonInput: string, jsonOutput: string, csr
     return { input, output };
 }
 
-export async function fetchProfile(pubkey: string, userId: string) {
+export async function fetchProfile(pubkey: string, userId: number) {
   const res = await fetch(`/api/getProfile`, {
       method: 'POST',
       body: JSON.stringify({ pubkey, userId }),
@@ -69,5 +69,5 @@ export async function fetchProfile(pubkey: string, userId: string) {
 
 export function chatHrefConstructor(id1: string, id2: string) {
   const sortedIds = [id1, id2].sort()
-  return `${sortedIds[0]}--${sortedIds[1]}`
+  return `${sortedIds[0]}-${sortedIds[1]}`
 }

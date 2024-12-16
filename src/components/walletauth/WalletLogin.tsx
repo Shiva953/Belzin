@@ -103,7 +103,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
         },
         body: JSON.stringify({
             pubkey: publicKey,
-            userId: ''
+            userId: 0
         })
     });
   

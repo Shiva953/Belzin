@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma";
 import { ChatMessage } from "@/components/chat/public/page";
 
-export async function GET(req: Request){
+export async function POST(req: Request){
     try{
         const { chatId } = await req.json();
         const results = await prisma.chatMessage.findMany({
