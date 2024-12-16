@@ -8,10 +8,11 @@ datasource db {
 }
 
 model User {
-  id              Int     @id(map: "users_pkey") @default(autoincrement())
+  id              Int      @id(map: "users_pkey") @default(autoincrement())
   walletPublicKey String?
   username        String?
   imageUrl        String?
+  friendList      String[]
 }
 
 model Message {

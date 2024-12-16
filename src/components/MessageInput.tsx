@@ -69,12 +69,6 @@ export function MessageInput({chatId} : {chatId?: string}){
         }
       }
 
-      const handleSubmission = (event: any) => {
-        event.preventDefault()
-        sendMessage()
-        setInput('')
-      }
-
       return (
           <div className="relative w-full p-3 border-t bg-background">
             <div className="flex items-center space-x-2">
