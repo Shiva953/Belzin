@@ -27,6 +27,15 @@ export interface Message{
     timestamp: string | null
 }
 
+export interface ChatMessage{
+    id: string | number,
+    content: string | null,
+    sender: string | null,
+    senderId: string | null,
+    chatId: string | null,
+    timestamp: string | null
+}
+
 export function PublicChat({ userId } : { userId: string }){
     //component tree: Interface(my Messages(right) + other user Messages(left)) + MessageInput + SendMessage + (+)icon in the left(for adding bets)
     const [initialMessages, setInitialMessages] = useState<Message[]>([]);
@@ -63,6 +72,8 @@ export function PublicChat({ userId } : { userId: string }){
                 <Messages 
                     initialMessages={initialMessages} 
                     currentUserId={userId}
+                    channel={'global-chat'}
+                    event={'incoming-message'}
                 />
                 )}
             </div>

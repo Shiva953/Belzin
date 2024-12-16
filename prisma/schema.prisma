@@ -21,3 +21,12 @@ model Message {
   senderId  String?
   timestamp String?
 }
+
+model ChatMessage {
+  id        Int     @id @default(autoincrement())
+  content   String?
+  sender    String?
+  senderId  String?
+  chatId    String?
+  timestamp String?
+}

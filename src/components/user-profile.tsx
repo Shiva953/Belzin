@@ -13,11 +13,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, ExternalLink, Copy } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+// import { SignOutButton } from "./sign-out-button"
 
 
 export type UserT = {
@@ -26,7 +28,12 @@ export type UserT = {
   imageUrl: string
 }
 
-export function UserProfile({ user }: { user: UserT}) {
+interface UserProfileProps {
+  user: UserT
+  onSignOut: () => void
+}
+
+export function UserProfile({ user, onSignOut }: UserProfileProps) {
   const [copied, setCopied] = useState(false)
 
   const copyToClipboard = () => {
@@ -65,6 +72,10 @@ export function UserProfile({ user }: { user: UserT}) {
             <ExternalLink className="mr-2 h-4 w-4" />
             <span>View Account</span>
           </DropdownMenuItem>
+          {/* <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <SignOutButton onSignOut={onSignOut} />
+          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
 

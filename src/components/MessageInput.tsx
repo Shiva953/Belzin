@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import prisma from '@/lib/prisma';
 import { Message } from './chat/public/page';
 
-export function MessageInput(){
+export function MessageInput({chatId} : {chatId?: string}){
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [input, setInput] = useState<string>('')
     const wallet = useWallet();
@@ -26,7 +26,16 @@ export function MessageInput(){
         const userPubkey = wallet.publicKey?.toString() || '';
         setSenderId(userPubkey);
         async function getUser(pubkey: string){
-            const res = await fetch(`/api/getProfile?pubkey=${pubkey}`)
+            const res = await fetch(`/api/getProfile`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+            },
+              body: JSON.stringify({
+                pubkey: pubkey,
+                userId: ''
+              })
+            })
             const data = await res.json();
             const user = data.user;
             setSender(user?.username || 'InvalidUser')
@@ -39,7 +48,12 @@ export function MessageInput(){
         setIsLoading(true)
     
         try {
-          await axios.post('/api/message/send', { messageContent: input, sender: sender, senderId: senderId})
+          if(!chatId){
+            await axios.post('/api/message/send', { messageContent: input, sender: sender, senderId: senderId})
+          }
+          if(chatId){
+            await axios.post('/api/message/sendToPrivateChat', { messageContent: input, sender: sender, senderId: senderId, chatId: chatId})
+          }
           setInput('')
           textareaRef.current?.focus()
         } catch(err) {

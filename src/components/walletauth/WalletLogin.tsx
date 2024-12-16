@@ -90,7 +90,22 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
   const fetchUserProfile = async (publicKey: string) => {
     try {
-      const response = await fetch(`/api/getProfile?pubkey=${publicKey}`);
+      // const response = await fetch(`/api/getProfile`, {
+      //   body: JSON.stringify({
+      //     pubkey: publicKey,
+      //     userId: ''
+      //   })
+      // });
+      const response = await fetch(`/api/getProfile`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            pubkey: publicKey,
+            userId: ''
+        })
+    });
   
       if (!response.ok) {
         throw new Error('Failed to fetch profile');
@@ -149,7 +164,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
             <header className="fixed top-0 left-0 right-0 h-16 p-4 bg-background shadow-sm z-20">
               <div className="container mx-auto flex justify-between items-center h-full">
               {isAuthenticated && userProfile && (
-                <UserProfile user={userProfile}/>
+                <UserProfile user={userProfile} onSignOut={handleSignOut}/>
               )}
 
               {!isAuthenticated && (
@@ -169,7 +184,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
               {isAuthenticated && userProfile && (
                 <button
                   onClick={handleSignOut}
-                  className="px-3 py-2 bg-purple-500 text-white hover:bg-destructive/30 rounded-md transition-colors"
+                  className="px-3 font-medium py-2 bg-[rgb(46,10,23)] text-[rgb(236,72,153)] hover:text-opacity-70 rounded-md transition-colors"
                 >
                   Sign out
                 </button>

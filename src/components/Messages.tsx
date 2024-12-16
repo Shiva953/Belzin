@@ -6,21 +6,21 @@ import { format } from "date-fns";
 import { Message } from './chat/public/page';
 import { cn } from '@/lib/utils';
 
-export function Messages({initialMessages, currentUserId} : {initialMessages: Message[], currentUserId: string}){
+export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
 
     useEffect(() => {
-        pusherClient.subscribe("global-chat")
+        pusherClient.subscribe(channel)
         const messageHandler = (message: Message) => {
             setMessages((prev) => [message, ...prev])
         }
-        pusherClient.bind('incoming-message', messageHandler)
+        pusherClient.bind(event, messageHandler)
 
         return () => {
           pusherClient.unsubscribe(
-            "global-chat"
+            channel
           )
-          pusherClient.unbind('incoming-message', messageHandler)
+          pusherClient.unbind(event, messageHandler)
         }
     }, [])
 

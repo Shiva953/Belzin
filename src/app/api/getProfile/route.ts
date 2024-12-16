@@ -12,20 +12,33 @@ import { NextApiRequest, NextApiResponse } from 'next';
 // 1. FIX SESSION BUG, CHECK CLIENT -> SERVER SESSION PERSISTENCE & USER STATE
 // 2. INTEGRATE CHAT FINALLY(FIRST COMPLETE PUBLIC CHAT INTEGRATION, USE PUSHER/ABLY FOR CHAT INFRA)
 
-export async function GET(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
   try {
     // const session = await getServerSession(authOptions);
     // const session = await getServerSession(authOptions);
-    const { searchParams } = new URL(req.url);
-    const pubkey = searchParams.get('pubkey'); // Get public key from query parameters
-    if (!pubkey) {
+    // const { searchParams } = new URL(req.url);
+    // const pubkey = searchParams.get('pubkey'); // Get public key from query parameters
+
+    const {pubkey, userId} = await req.json();
+
+    if (!pubkey && !userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    
 
+    let user;
     // const pubkey = session?.user?.name ?? 'CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E';
-    const user = await prisma.user.findFirst({
-      where: { walletPublicKey: pubkey }
-    })
+    if (pubkey && !userId) {
+      user = await prisma.user.findFirst({
+        where: { walletPublicKey: pubkey },
+      });
+    } else if (!pubkey && userId) {
+      user = await prisma.user.findFirst({
+        where: { id: userId },
+      });
+    } else {
+      return NextResponse.json({ error: 'Invalid request: Provide either pubkey or userId' }, { status: 400 });
+    }
 
     if (!user) {
       return NextResponse.json({ exists: false }, { status: 200 })
@@ -34,6 +47,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return NextResponse.json({ 
       exists: true, 
       user: { 
+        id: user.id,
         username: user.username, 
         walletPublicKey: user.walletPublicKey,
         imageUrl: user.imageUrl

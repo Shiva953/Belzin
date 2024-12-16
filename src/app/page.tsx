@@ -5,7 +5,6 @@ import { WalletLoginInterface } from '@/components/walletauth/WalletLogin';
 // import { useWallet } from '@solana/wallet-adapter-react';
 
 export default function Home() {
-
   return (
     // <>
     // <div className="w-full h-screen">
