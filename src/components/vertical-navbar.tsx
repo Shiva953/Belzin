@@ -26,23 +26,20 @@ export function VerticalNavbar() {
             <span className="sr-only">Public Group Chat</span>
           </Button>
         </Link>
-        <Link href="/dms">
+        <Link href="/conversations">
           <Button
             variant="ghost"
             size="icon"
             className={cn(
               'hover:bg-primary/10',
-              pathname === '/dms' && 'bg-primary/10'
+              pathname === '/conversations' && 'bg-primary/10'
             )}
           >
             <MessageSquare className="h-5 w-5" />
-            <span className="sr-only">Private DMs</span>
+            <span className="sr-only">Private Chats</span>
           </Button>
         </Link>
       </div>
-      {/* <div className="p-2">
-        <WalletMultiButtonDynamic className="!bg-primary hover:!bg-primary/90 text-primary-foreground" />
-      </div> */}
     </nav>
   )
 }

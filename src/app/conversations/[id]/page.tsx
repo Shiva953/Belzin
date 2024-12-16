@@ -124,7 +124,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         <div className='flex flex-col h-full w-full'>
         {/* 1. TOP BAR SHOWING THE PARTNER PFP AND USERNAME */}
         {partner && (
-            <Card className="w-full hover:bg-accent/50 transition-colors">
+            <Card className="w-full transition-colors fixed top-0 z-40 mb-4 pb-2">
             <CardContent className="p-4 flex items-center space-x-4">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={partner?.imageUrl || ''} alt={partner?.username || 'User'} />
@@ -140,22 +140,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
               </div>
             </CardContent>
           </Card>
-                // <div className='bg-gray-100 p-3 flex items-center space-x-3 shadow-sm'>
-                //     <div className='relative w-10 h-10'>
-                //         <Image
-                //             fill
-                //             referrerPolicy='no-referrer'
-                //             src={partner?.imageUrl || '/default-avatar.png'}
-                //             alt={partner?.username || 'User'}
-                //             className='rounded-full object-cover'
-                //         />
-                //     </div>
-                //     <div className='flex-grow'>
-                //         <h2 className='font-semibold text-lg text-black'>
-                //             {partner?.username || 'Chat Partner'}
-                //         </h2>
-                //     </div>
-                // </div>
             )}
             <div className='flex-1 overflow-hidden'>
             {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
