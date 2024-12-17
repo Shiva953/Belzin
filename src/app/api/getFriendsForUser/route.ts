@@ -1,7 +1,8 @@
+import { FriendT } from "@/app/conversations/page";
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request){
+export async function POST(req: Request){
     try{
         const { userId } = await req.json();
 
@@ -17,14 +18,47 @@ export async function GET(req: Request){
         const user = await prisma.user.findUnique({
             where: {
                 id: userId
-            }
+            },
+            select: { friendList: true }
         })
+        
         if(!user){
             return NextResponse.json({error: "User Not Found"}, {status: 400})
         }
-        const friendList = user.friendList || [];
+
+        const friends = await prisma.user.findMany({
+            where: {
+                id: {
+                    in: user.friendList.map(Number).filter(id => !isNaN(id))
+                }
+            },
+            select: {
+                id: true,
+                username: true,
+                walletPublicKey: true,
+                imageUrl: true
+            }
+        })
+
+        const friendsList = friends.map((f) => f as FriendT)
+        // const validFriends = user.friendList.map(async(f) => {
+        //     const friend = f;
+        //     const findFriend = await prisma.user.findUnique({
+        //         where: {
+        //             id: Number(friend),
+        //         },
+        //     })
+        //     if(findFriend){
+        //         return friend;
+        //     }
+        //     return null;
+        // })
+        // const list = await Promise.all(validFriends);
+        // const finalFriendsList = list.filter((f) => f!==null)
         
-        return NextResponse.json({friendList: friendList}, {status: 200})
+        // const friendList = user.friendList || [];
+        
+        return NextResponse.json({friendList: friendsList}, {status: 200})
 
     } catch(error){
         if (error instanceof Error) {
