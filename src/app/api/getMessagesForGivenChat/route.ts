@@ -5,9 +5,20 @@ import { ChatMessage } from "@/components/chat/public/PublicChat";
 export async function POST(req: Request){
     try{
         const { chatId } = await req.json();
+        const [id1, id2] = chatId.split('-')
+
+        const revChatId = (id1&&id2) ? `${id2}-${id1}` : chatId;
+        // const results = await prisma.chatMessage.findMany({
+        //     where: {
+        //         chatId: chatId
+        //     }
+        // })
         const results = await prisma.chatMessage.findMany({
             where: {
-                chatId: chatId
+                OR: [
+                    { chatId: chatId },
+                    { chatId: revChatId }
+                ]
             }
         })
         const dbMessages = results.map((message) => message as ChatMessage);
