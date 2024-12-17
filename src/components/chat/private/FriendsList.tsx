@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Search } from 'lucide-react'
 import { useState } from "react"
 
-export function FriendsList({friendList} : {friendList: FriendT[]}){
+export function FriendsList({friendList, userId} : {friendList: FriendT[], userId: string}){
     const [searchQuery, setSearchQuery] = useState("")
   
   const filteredFriends = friendList.filter(friend => 
@@ -32,7 +32,7 @@ export function FriendsList({friendList} : {friendList: FriendT[]}){
       <ScrollArea className="flex-1">
         <div className="p-2">
           {filteredFriends.map((friend) => (
-            <FriendCard key={friend.id} friend={friend} />
+            <FriendCard key={friend.id} friend={friend} userId={userId}/>
           ))}
         </div>
       </ScrollArea>
