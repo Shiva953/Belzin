@@ -6,6 +6,9 @@ import { useWallet } from "@solana/wallet-adapter-react"
 import { useState, useEffect } from "react";
 import { fetchProfile } from "../lib/utils";
 import { WalletLoginInterface } from "@/components/walletauth/WalletLogin";
+import { useProfile } from "@/hooks/useProfile";
+import { useFriends } from "@/hooks/useFriends";
+import { Loader2 } from "lucide-react";
 
 // 1. COMPLETE CONVERSATIONS INTEGRATION(BEFORE 12:15)
 // 2. FIX ALL STATEFUL LOGIN/SESSION/WALLETPROVIDER + PFP BESIDE MESSAGE(WITH START DM) + UI BUGS[+BETTER STATE MANAGEMENT](AFTER THAT STARTING WITH BET INTEGRATION)
@@ -19,51 +22,72 @@ export type FriendT = {
 
 export default function Page(){
     const wallet = useWallet();
-    const [userId, setUserId] = useState('')
-    const [friendList, setFriendList] = useState<FriendT[]>([])
+    const pubkey = wallet.publicKey?.toString() || '';
+    const { profile, loading, error: profileError } = useProfile(pubkey);
+    const { friendList, isLoading, error: friendListError } = useFriends(pubkey);
 
-    console.log("Starting FriendList", friendList)
-    //abstract this in a hook since its being used a lot
-    useEffect(() => {
-        const pubkey = wallet.publicKey?.toString() || '';
-        async function getFriendList(userId: string){
-            try {
-                const res = await fetch('/api/getFriendsForUser', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({userId: userId})
-                })
-                console.log("Getting Apt Response", res)
-        
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.error || 'Failed to fetch friends');
-                }
-                
-                const { friendList } = await res.json();
-                console.log("Is It Returning Apt Here: ",friendList)
-                return friendList;
-            } catch (error) {
-                console.error('Error fetching friends:', error);
-                return [];
-            }
-        }
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <Loader2 className="animate-spin w-10 h-10 text-blue-500" />
+            </div>
+        )
+    }
 
-        async function getUserIdAndFriends(pubkey: string){
-            const profile = await fetchProfile(pubkey, 0);
-            console.log("Getting Profile",profile)
-            const id = profile?.user?.id;
-            console.log("Getting ID: ",id)
-            if(id){
-                setUserId(id)
-                const friends = await getFriendList(id) || []
-                console.log("Getting Friends from the getFriendList func: ", friends)
-                setFriendList(friends);
-            }
-        }
-        getUserIdAndFriends(pubkey)
-    }, [wallet.publicKey])
+    if (profileError) {
+        return (
+            <div className="flex justify-center items-center h-full text-red-500">
+                <div className="text-center">
+                    <p>Error getting User Profile</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        )
+    }
 
+    if (!profile) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <div className="text-center">
+                    <p className="text-xl mb-4">Please create a profile</p>
+                </div>
+            </div>
+        )
+    }
+
+    const profileId = profile?.id;
+    const userId = typeof profileId === 'string' ? profileId : profileId?.toString();
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <Loader2 className="animate-spin w-10 h-10 text-blue-500" />
+            </div>
+        )
+    }
+
+    if (friendListError) {
+        return (
+            <div className="flex justify-center items-center h-full text-red-500">
+                <div className="text-center">
+                    <p>Error loading friends: {friendListError}</p>
+                    <button 
+                        onClick={() => window.location.reload()} 
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                    >
+                        Retry
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+ 
 
     console.log("Do we have FriendList till the end", friendList)
     return(
@@ -71,7 +95,7 @@ export default function Page(){
         {/* <WalletLoginInterface> */}
         <div className="flex flex-row m-4 p-8">
             {/* instead of this make the useFriendList hook and have a more stateful impl with loading/data/error */}
-            {friendList && userId && <FriendsList friendList={friendList} userId={userId}/>}
+            {<FriendsList friendList={friendList} userId={userId}/>}
             Select a Conversation to start Blinks & Betting in Chat
         </div>
         {/* </WalletLoginInterface> */}
