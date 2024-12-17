@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma";
-import { ChatMessage } from "@/components/chat/public/page";
+import { ChatMessage } from "@/components/chat/public/PublicChat";
 
 export async function POST(req: Request){
     try{

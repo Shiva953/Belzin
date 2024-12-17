@@ -36,24 +36,8 @@ export interface ChatMessage{
     timestamp: string | null
 }
 
-export function PublicChat({ userId } : { userId: string }){
+export function PublicChat({ userId, initialMessages } : { userId: string, initialMessages: Message[] }){
     //component tree: Interface(my Messages(right) + other user Messages(left)) + MessageInput + SendMessage + (+)icon in the left(for adding bets)
-    const [initialMessages, setInitialMessages] = useState<Message[]>([]);
-
-    useEffect(() => {
-        async function getChatMessages(){
-            try{
-                const res = await fetch('/api/getMessages');
-                const messages = await res.json();
-                setInitialMessages(messages)
-                console.log(messages)
-                return messages;
-            } catch(error){
-                console.log("Error fetching messages: ",error)
-            }
-        }
-        getChatMessages();
-    }, [])
 
     //1. check user session
     // make req to /api/userProfile to fetch the user details and pass it on to the other components
@@ -65,10 +49,12 @@ export function PublicChat({ userId } : { userId: string }){
     //4. POST to /api/message/send with body containing (chatroom, sender, message, ...)[this would trigger an event in pub/sub channel + send message to db]
 
     //for publishing/subscribing messages to channel(in this case global chatroom) + db insertion -> req to /message/send
+
+    //make this more stateful
     return (
         <div className='flex flex-col h-full w-full'>
             <div className='flex-1 overflow-hidden'>
-                {(initialMessages.length > 0) && (
+                {(initialMessages.length > 0) && userId && (
                 <Messages 
                     initialMessages={initialMessages} 
                     currentUserId={userId}

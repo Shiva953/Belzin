@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Message } from "@/components/chat/public/page";
+import { Message } from "@/components/chat/public/PublicChat";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request){

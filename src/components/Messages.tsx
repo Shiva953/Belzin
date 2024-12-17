@@ -3,7 +3,7 @@
 import {pusherClient} from '@/lib/pusher';
 import { useState, useEffect, useRef } from 'react';
 import { format } from "date-fns";
-import { Message } from './chat/public/page';
+import { Message } from './chat/public/PublicChat';
 import { cn } from '@/lib/utils';
 import { ChatMessage } from '@prisma/client';
 

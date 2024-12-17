@@ -2,9 +2,9 @@
 import {pusherServer} from "@/lib/pusher";
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid"
-import { Message } from "@/components/chat/public/page";
+import { Message } from "@/components/chat/public/PublicChat";
 import prisma from "@/lib/prisma";
-import { ChatMessage } from "@/components/chat/public/page";
+import { ChatMessage } from "@/components/chat/public/PublicChat";
 
 export async function POST(req: Request){
   try{
