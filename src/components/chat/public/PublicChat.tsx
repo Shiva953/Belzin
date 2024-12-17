@@ -1,23 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // Public GC Interface
-import {pusherClient} from '@/lib/pusher';
-import * as Ably from 'ably';
-import { useState, useEffect, useRef } from 'react';
-import { format } from "date-fns";
-import { AblyProvider, ChannelProvider,useChannel } from 'ably/react';
 import { Messages } from '@/components/Messages';
-import axios from "axios"
-import { useWallet } from '@solana/wallet-adapter-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import prisma from '@/lib/prisma';
 import { MessageInput } from '@/components/MessageInput';
-// validate the user session -> if user signed in && logged in -> Show Public Chat
-// Public Chat: Real time messaging(using pusher pub/sub) <-> storing new messages/fetching existing messages in DB
-
-//ASK IMAGE + USERNAME FOR SETTING FIRST TIME PROFILE, MAKE THE USER PROFILE COMPONENT MORE DYNAMIC(PFP + USERNAME + (WALLET ADDRESS) IN DROP DOWN)
-//ADD PROFILE BESIDE THE CHAT MESSAGE(USERNAME + PFP, ALONG WITH WALLET ADDRESS AND HYPERLINK IN DROPDOWN MENU)
-//MAKE THE APP MORE STATEFUL(IMPROVE UI = F(STATE, DESIGN))
 
 export interface Message{
     id: string | number,

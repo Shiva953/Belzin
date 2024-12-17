@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -23,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 
 export type UserT = {
+  id: string|number,
   username: string,
   walletPublicKey: string
   imageUrl: string
@@ -46,13 +46,6 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
 
 
   return (
-    //modify to be more dynamic, add wallet address button(right) + PFP(avatar + [username](dropdown)left) 
-    // <div className="flex items-center space-x-4">
-    //       <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
-    //           {user?.username?.[0]?.toUpperCase() || ''}
-    //       </div>
-    //     <span className="font-medium">{user?.username || 'Invalid User'}</span>
-    //   </div>
     <div className="flex items-center justify-between space-x-4 bg-background p-2 rounded-lg shadow-sm">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -72,10 +65,6 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
             <ExternalLink className="mr-2 h-4 w-4" />
             <span>View Account</span>
           </DropdownMenuItem>
-          {/* <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <SignOutButton onSignOut={onSignOut} />
-          </DropdownMenuItem> */}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -152,7 +141,6 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
         throw new Error(errorData.message || 'Failed to create profile')
       }
 
-      // Profile created successfully
       onProfileCreated?.()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')

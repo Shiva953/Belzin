@@ -25,9 +25,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
-
     let user;
-    // const pubkey = session?.user?.name ?? 'CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E';
     if (pubkey && !userId) {
       user = await prisma.user.findFirst({
         where: { walletPublicKey: pubkey },

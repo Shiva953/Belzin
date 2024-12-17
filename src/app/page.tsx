@@ -6,27 +6,13 @@ import { PublicChat } from '@/components/chat/public/PublicChat';
 import { useState, useEffect } from 'react';
 import { Message } from '@/components/chat/public/PublicChat';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { fetchProfile } from './lib/utils';
-// import UserProfile from '@/components/user/Profile';
-import { WalletLoginInterface } from '@/components/walletauth/WalletLogin';
-// import { useWallet } from '@solana/wallet-adapter-react';
+import { useProfile } from '@/hooks/useProfile';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
 
   const { connected, publicKey } = useWallet()
-  const [userId, setUserId] = useState('')
-
-  const userKey = publicKey?.toString() || '';
-
-  useEffect(() => {
-    async function getUserId(pubkey: string){
-      const profile = await fetchProfile(pubkey, 0)
-      const id = profile.id;
-      const idToString = id?.toString || '0'
-      setUserId(idToString);
-  }
-  getUserId(userKey);
-  }, [userKey])
+  const { profile, loading, error } = useProfile(publicKey?.toString());
 
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
 
@@ -45,6 +31,7 @@ export default function Home() {
         getChatMessages();
     }, [])
 
+
     if (!connected) {
       return (
         <div className="flex-1 w-full flex items-center justify-center">
@@ -52,6 +39,37 @@ export default function Home() {
         </div>
       )
     }
+
+    if (loading) {
+      return (
+        <div className="w-full h-screen flex flex-col">
+          <div className="flex flex-row flex-1 bg-background">
+            <div className='mr-16'>
+              <VerticalNavbar />
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+  if (error || !profile) {
+    return (
+      <div className="flex-1 w-full flex items-center justify-center">
+        <p className="text-lg text-destructive">
+          Error loading profile. Please try again or reconnect your wallet.
+        </p>
+      </div>
+    )
+  }
+
+    const userId = profile?.id?.toString() || '';
 
   return (
     <>

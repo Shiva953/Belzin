@@ -18,6 +18,8 @@ import { useRouter } from 'next/router'
 import { ChatMessage } from "@prisma/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useProfile } from "@/hooks/useProfile"
 
 export interface DMProps{
     params: {
@@ -35,57 +37,65 @@ interface ChatHeaderProps {
 
 export default function Page({ params }: { params: Promise<{ id: string }> }){
     const { id } = use(params);
-    // const { id } = params
-    // const id = use(Promise.resolve(params.id));
-    console.log("ChatId: ",id)
+    const event_name = `incoming-message-${id}`
+    const channel_name = `chat-room-${id}`
     const [userid1, userid2] = id.split('-')
     console.log(userid1)
     console.log(userid2)
 
-    const [userid, setUserid] = useState('')
-    const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
-    const [partner, setPartner] = useState<UserT|null>(null);
-    const chatPartnerid = userid == userid1 ? userid2 : userid1
-
-    const event_name = `incoming-message-${id}`
-    const channel_name = `chat-room-${id}`
-
     const wallet = useWallet();
     const userPubkey = wallet.publicKey?.toString() || '';
 
-    console.log("Wallet Public Key: ", userPubkey)
+    const { profile: currentUserProfile, loading: currentUserLoading, error: currentUserError } = 
+        useProfile(userPubkey);
 
-    console.log("User Id: ", userid)
-    useEffect(() => {
-        async function getUseridAndPartner(pubkey: string, partnerid: string) {
-            console.log("Pubkey: ", pubkey)
-            console.log("PartnerId", partnerid)
-            const partnerIdNumeric = Number(partnerid)
-            const [userData, partnerData] = await Promise.all([
-                fetchProfile(pubkey, 0),
-                fetchProfile('', partnerIdNumeric)
-            ]);
+    const chatPartnerId = currentUserProfile?.id === Number(userid1) ? userid2 : userid1;
+    const { profile: partnerProfile, loading: partnerLoading, error: partnerError } = 
+        useProfile(undefined, chatPartnerId);
 
-            if (!userData || !partnerData) {
-                console.error('Failed to fetch user or partner profile');
-            }
-            console.log("UserData", userData)
-            console.log("PartnerData",partnerData)
+    // const [userid, setUserid] = useState('')
+    // const [partner, setPartner] = useState<UserT|null>(null);
+    // const chatPartnerid = userid == userid1 ? userid2 : userid1
+
+
+    // const wallet = useWallet();
+    // const userPubkey = wallet.publicKey?.toString() || '';
+
+    // console.log("Wallet Public Key: ", userPubkey)
+
+    // console.log("User Id: ", userid)
+    // useEffect(() => {
+    //     async function getUseridAndPartner(pubkey: string, partnerid: string) {
+    //         console.log("Pubkey: ", pubkey)
+    //         console.log("PartnerId", partnerid)
+    //         const partnerIdNumeric = Number(partnerid)
+    //         const [userData, partnerData] = await Promise.all([
+    //             fetchProfile(pubkey, 0),
+    //             fetchProfile('', partnerIdNumeric)
+    //         ]);
+
+    //         if (!userData || !partnerData) {
+    //             console.error('Failed to fetch user or partner profile');
+    //         }
+    //         console.log("UserData", userData)
+    //         console.log("PartnerData",partnerData)
     
-            const user = userData?.user;
-            console.log("Current User: ",user)
-            const userId = user?.id || 0;
-            console.log("UserId(Number): ", userId)
-            const userIdString = userId.toString();
-            console.log("UserId(Number): ", userId)
-            const partner = partnerData?.user;
-            console.log("Partner: ",partner)
+    //         const user = userData?.user;
+    //         console.log("Current User: ",user)
+    //         const userId = user?.id || 0;
+    //         console.log("UserId(Number): ", userId)
+    //         const userIdString = userId.toString();
+    //         console.log("UserId(String): ", userIdString)
+    //         const partner = partnerData?.user;
+    //         console.log("Partner: ",partner)
     
-            setUserid(userIdString);
-            setPartner(partner);
-        }
-        getUseridAndPartner(userPubkey, chatPartnerid);
-    }, [userPubkey, chatPartnerid]);
+    //         setUserid(userIdString);
+    //         setPartner(partner);
+    //     }
+    //     getUseridAndPartner(userPubkey, chatPartnerid);
+    // }, [userPubkey, chatPartnerid]);
+
+    const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
 
     useEffect(() => {
         async function getChatMessages(chatid: string){
@@ -109,6 +119,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     }, [id])
 
     console.log("Initial Messages: ", initialMessages)
+
+     // Loading state
+     if (currentUserLoading || partnerLoading) {
+        return (
+            <div className="flex flex-col h-full w-full items-center justify-center">
+                <Skeleton className="h-12 w-12 rounded-full mb-4" />
+                <Skeleton className="h-4 w-[200px] mb-2" />
+                <Skeleton className="h-4 w-[150px]" />
+            </div>
+        )
+    }
+
+    // Error state
+    if (currentUserError || partnerError || !currentUserProfile || !partnerProfile) {
+        return (
+            <div className="flex-1 w-full flex items-center justify-center">
+                <p className="text-lg text-destructive">
+                    Error loading chat. Please try again or reconnect your wallet.
+                </p>
+            </div>
+        )
+    }
+
+    const currentuserid = currentUserProfile.id
+    const userid = typeof currentuserid === 'string' ? currentuserid : currentuserid.toString();
+    const partner = partnerProfile;
 
     // make user id check more robust
     return (
