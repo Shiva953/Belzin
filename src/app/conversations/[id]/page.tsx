@@ -113,7 +113,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     // make user id check more robust
     return (
         <>
-        <WalletLoginInterface>
+        {/* <WalletLoginInterface> */}
             {!(userid==userid1 || userid==userid2) && (
                 <div>
                     Invalid User!
@@ -152,7 +152,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         </div>
         )
             }
-        </WalletLoginInterface>
+        {/* </WalletLoginInterface> */}
         </>
     )
 

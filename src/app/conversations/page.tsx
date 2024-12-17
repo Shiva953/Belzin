@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { FriendsList } from "@/components/chat/private/FriendsList"
@@ -18,6 +19,7 @@ export type FriendT = {
 
 export default function Page(){
     const wallet = useWallet();
+    const [userId, setUserId] = useState('')
     const [friendList, setFriendList] = useState<FriendT[]>([])
 
     console.log("Starting FriendList", friendList)
@@ -53,6 +55,7 @@ export default function Page(){
             const id = profile?.user?.id;
             console.log("Getting ID: ",id)
             if(id){
+                setUserId(id)
                 const friends = await getFriendList(id) || []
                 console.log("Getting Friends from the getFriendList func: ", friends)
                 setFriendList(friends);
@@ -65,13 +68,13 @@ export default function Page(){
     console.log("Do we have FriendList till the end", friendList)
     return(
         <>
-        <WalletLoginInterface>
+        {/* <WalletLoginInterface> */}
         <div className="flex flex-row m-4 p-8">
             {/* instead of this make the useFriendList hook and have a more stateful impl with loading/data/error */}
-            {friendList && <FriendsList friendList={friendList}/>}
+            {friendList && userId && <FriendsList friendList={friendList} userId={userId}/>}
             Select a Conversation to start Blinks & Betting in Chat
         </div>
-        </WalletLoginInterface>
+        {/* </WalletLoginInterface> */}
         </>
     )
 }

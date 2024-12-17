@@ -45,13 +45,14 @@ export function MessageInput({chatId} : {chatId?: string}){
     const sendMessage = async () => {
         if(!input) return
         setIsLoading(true)
-    
+        const optimisticInput = input;
+        setInput('')
         try {
           if(!chatId){
-            await axios.post('/api/message/send', { messageContent: input, sender: sender, senderId: senderId})
+            await axios.post('/api/message/send', { messageContent: optimisticInput, sender: sender, senderId: senderId})
           }
           if(chatId){
-            await axios.post('/api/message/sendToPrivateChat', { messageContent: input, sender: sender, senderId: senderId, chatId: chatId})
+            await axios.post('/api/message/sendToPrivateChat', { messageContent: optimisticInput, sender: sender, senderId: senderId, chatId: chatId})
           }
           setInput('')
           textareaRef.current?.focus()

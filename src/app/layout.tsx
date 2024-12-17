@@ -10,6 +10,7 @@ import { authOptions } from "./lib/auth";
 import { cn } from "@/lib/utils";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import { WalletLoginInterface } from "@/components/walletauth/WalletLogin";
 // import { AuthSessionProvider } from "@/components/AuthSessionProvider";
 
 const inter = Inter({subsets: ["latin"]});
@@ -33,7 +34,9 @@ export default async function RootLayout({
           GeistSans.className
         )}>
         <SolanaProvider session={session}>
+          <WalletLoginInterface>
         {children}
+        </WalletLoginInterface>
         </SolanaProvider>
       </body>
     </html>
