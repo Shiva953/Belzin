@@ -6,59 +6,53 @@ export async function POST(req: Request){
     try{
         const { userId } = await req.json();
 
-        //each userId -> different FriendList[](create a postgres relation)
-        //one way is to filter conversations by userId, check the chatId, extract partner id, and add to friends list
-        //but on creating a new friend(= starting new chat) for first time, there is no pre-existing chat
-
-        //MAP EACH USER IN USERS -> UNIQUE FRIEND LIST
-        
-        //brute force -> optimal relational approach
-        // brute force = one FriendLists table(containg list of friendlists), which contains an array of userids and one main userId
-
-        const user = await prisma.user.findUnique({
+        const friendships = await prisma.friendship.findMany({
             where: {
-                id: userId
+                user_id: userId,
+                status: 1 // Only get accepted friendships
             },
-            select: { friendList: true }
-        })
-        
-        if(!user){
-            return NextResponse.json({error: "User Not Found"}, {status: 400})
-        }
-
-        const friends = await prisma.user.findMany({
-            where: {
-                id: {
-                    in: user.friendList.map(Number).filter(id => !isNaN(id))
+            include: {
+                User_Friendship_friend_idToUser: {
+                    select: {
+                        id: true,
+                        username: true,
+                        walletPublicKey: true,
+                        imageUrl: true
+                    }
                 }
-            },
-            select: {
-                id: true,
-                username: true,
-                walletPublicKey: true,
-                imageUrl: true
             }
-        })
+        });
 
-        const friendsList = friends.map((f) => f as FriendT)
-        // const validFriends = user.friendList.map(async(f) => {
-        //     const friend = f;
-        //     const findFriend = await prisma.user.findUnique({
-        //         where: {
-        //             id: Number(friend),
-        //         },
-        //     })
-        //     if(findFriend){
-        //         return friend;
-        //     }
-        //     return null;
+        const acceptedFriendList = friendships.map(f => f.User_Friendship_friend_idToUser as FriendT);
+
+        // const user = await prisma.user.findUnique({
+        //     where: {
+        //         id: userId
+        //     },
+        //     select: { friendList: true }
         // })
-        // const list = await Promise.all(validFriends);
-        // const finalFriendsList = list.filter((f) => f!==null)
         
-        // const friendList = user.friendList || [];
+        // if(!user){
+        //     return NextResponse.json({error: "User Not Found"}, {status: 400})
+        // }
+
+        // const friends = await prisma.user.findMany({
+        //     where: {
+        //         id: {
+        //             in: user.friendList.map(Number).filter(id => !isNaN(id))
+        //         }
+        //     },
+        //     select: {
+        //         id: true,
+        //         username: true,
+        //         walletPublicKey: true,
+        //         imageUrl: true
+        //     }
+        // })
+
+        // const friendsList = friends.map((f) => f as FriendT)
         
-        return NextResponse.json({friendList: friendsList}, {status: 200})
+        return NextResponse.json({friendList: acceptedFriendList}, {status: 200})
 
     } catch(error){
         if (error instanceof Error) {

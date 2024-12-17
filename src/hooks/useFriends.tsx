@@ -14,7 +14,9 @@ export function useFriends(pubkey: string) {
             setIsLoading(true);
             try {
                 const profile = await fetchProfile(pubkey, 0);
-                const id = profile?.id;
+                console.log("Checking Profile", profile)
+                const id = profile?.user?.id;
+                console.log("checking id: ",id)
 
                 if (!id) {
                     throw new Error('User profile not found');

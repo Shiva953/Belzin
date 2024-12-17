@@ -41,7 +41,6 @@ export function useProfile(pubkey?: string, userId?: number | string) {
       }
     }
 
-    // fetching only if either pubkey or userId is provided
     if (pubkey || (userId !== undefined && userId !== null)) {
       fetchUserProfile();
     }

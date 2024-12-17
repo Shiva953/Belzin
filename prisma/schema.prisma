@@ -8,11 +8,13 @@ datasource db {
 }
 
 model User {
-  id              Int      @id(map: "users_pkey") @default(autoincrement())
-  walletPublicKey String?
-  username        String?
-  imageUrl        String?
-  friendList      String[]
+  id                                    Int          @id(map: "users_pkey") @default(autoincrement())
+  walletPublicKey                       String?
+  username                              String?
+  imageUrl                              String?
+  friendList                            String[]
+  Friendship_Friendship_friend_idToUser Friendship[] @relation("Friendship_friend_idToUser")
+  Friendship_Friendship_user_idToUser   Friendship[] @relation("Friendship_user_idToUser")
 }
 
 model Message {
@@ -30,4 +32,16 @@ model ChatMessage {
   senderId  String?
   chatId    String?
   timestamp String?
+}
+
+model Friendship {
+  id                              Int       @id(map: "friendship_pkey") @default(autoincrement())
+  user_id                         Int
+  friend_id                       Int
+  status                          Int       @default(1)
+  created_at                      DateTime? @default(now()) @db.Timestamp(6)
+  User_Friendship_friend_idToUser User      @relation("Friendship_friend_idToUser", fields: [friend_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "friendship_friend_id_fkey")
+  User_Friendship_user_idToUser   User      @relation("Friendship_user_idToUser", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "friendship_user_id_fkey")
+
+  @@unique([user_id, friend_id], map: "friendship_user_id_friend_id_key")
 }

@@ -5,21 +5,17 @@
 
 import { useWallet } from "@solana/wallet-adapter-react"
 import React from "react"
-import { notFound } from "next/navigation"
 import { use, useEffect, useState } from "react"
-import { Message } from "@/components/chat/public/PublicChat"
-import Image from "next/image"
-import { UserT } from "@/components/user-profile"
 import { Messages } from "@/components/Messages"
 import { MessageInput } from "@/components/MessageInput"
-import { fetchProfile } from "@/app/lib/utils"
-import { WalletLoginInterface } from "@/components/walletauth/WalletLogin"
-import { useRouter } from 'next/router'
 import { ChatMessage } from "@prisma/client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/useProfile"
+
+// USER PROFILE BESIDE MESSAGE
+// START DM OPTION(ON CLICKING USER PROFILE BESIDE MESSAGE) + MAINTING THE FRIENDLIST ON BOTH ENDS, EVEN IF CONVO STARTS FROM ONE SIDE
 
 export interface DMProps{
     params: {
@@ -52,48 +48,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     const chatPartnerId = currentUserProfile?.id === Number(userid1) ? userid2 : userid1;
     const { profile: partnerProfile, loading: partnerLoading, error: partnerError } = 
         useProfile(undefined, chatPartnerId);
-
-    // const [userid, setUserid] = useState('')
-    // const [partner, setPartner] = useState<UserT|null>(null);
-    // const chatPartnerid = userid == userid1 ? userid2 : userid1
-
-
-    // const wallet = useWallet();
-    // const userPubkey = wallet.publicKey?.toString() || '';
-
-    // console.log("Wallet Public Key: ", userPubkey)
-
-    // console.log("User Id: ", userid)
-    // useEffect(() => {
-    //     async function getUseridAndPartner(pubkey: string, partnerid: string) {
-    //         console.log("Pubkey: ", pubkey)
-    //         console.log("PartnerId", partnerid)
-    //         const partnerIdNumeric = Number(partnerid)
-    //         const [userData, partnerData] = await Promise.all([
-    //             fetchProfile(pubkey, 0),
-    //             fetchProfile('', partnerIdNumeric)
-    //         ]);
-
-    //         if (!userData || !partnerData) {
-    //             console.error('Failed to fetch user or partner profile');
-    //         }
-    //         console.log("UserData", userData)
-    //         console.log("PartnerData",partnerData)
-    
-    //         const user = userData?.user;
-    //         console.log("Current User: ",user)
-    //         const userId = user?.id || 0;
-    //         console.log("UserId(Number): ", userId)
-    //         const userIdString = userId.toString();
-    //         console.log("UserId(String): ", userIdString)
-    //         const partner = partnerData?.user;
-    //         console.log("Partner: ",partner)
-    
-    //         setUserid(userIdString);
-    //         setPartner(partner);
-    //     }
-    //     getUseridAndPartner(userPubkey, chatPartnerid);
-    // }, [userPubkey, chatPartnerid]);
 
     const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
 
@@ -131,7 +85,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         )
     }
 
-    // Error state
     if (currentUserError || partnerError || !currentUserProfile || !partnerProfile) {
         return (
             <div className="flex-1 w-full flex items-center justify-center">

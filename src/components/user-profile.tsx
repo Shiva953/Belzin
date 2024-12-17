@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, ExternalLink, Copy } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-// import { SignOutButton } from "./sign-out-button"
 
 
 export type UserT = {
