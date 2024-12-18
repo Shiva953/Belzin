@@ -10,8 +10,8 @@ import { useProfile } from "@/hooks/useProfile";
 import { useFriends } from "@/hooks/useFriends";
 import { Loader2 } from "lucide-react";
 
-// 1. COMPLETE CONVERSATIONS INTEGRATION(BEFORE 12:15)
-// 2. FIX ALL STATEFUL LOGIN/SESSION/WALLETPROVIDER + PFP BESIDE MESSAGE(WITH START DM) + UI BUGS[+BETTER STATE MANAGEMENT](AFTER THAT STARTING WITH BET INTEGRATION)
+// (DM INITIATOR USERID-PARTNER USERID)[ROUTE + DB FIX]
+// BETTING CONTRACTS
 
 export type FriendT = {
     id: string | number,

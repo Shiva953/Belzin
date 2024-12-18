@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { WalletLoginInterface } from "@/components/walletauth/WalletLogin";
-// import { AuthSessionProvider } from "@/components/AuthSessionProvider";
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({subsets: ["latin"]});
 
@@ -36,6 +36,7 @@ export default async function RootLayout({
         <SolanaProvider session={session}>
           <WalletLoginInterface>
         {children}
+        <Toaster />
         </WalletLoginInterface>
         </SolanaProvider>
       </body>
