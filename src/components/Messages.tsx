@@ -111,7 +111,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                               <Copy className="h-3.5 w-3.5 opacity-70" />
                             </button>
                           </div>
-                          {channel=='global-chat' && (
+                          {channel=='global-chat' && !isCurrentUser && (
                             <Button 
                             variant="secondary" 
                             className="w-full"

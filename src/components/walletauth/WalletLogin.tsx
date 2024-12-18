@@ -27,6 +27,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const [userProfile, setUserProfile] = useState<UserT|null>(null);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
 
+
   const handleSignIn = async () => {
 
     if (!wallet.connected) {
