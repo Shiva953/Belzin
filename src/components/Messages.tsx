@@ -63,9 +63,27 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
             return format(timestamp, 'HH:mm')
         }
 
-        const handleStartDM = (userId: string | number) => {
+        const handleStartDM = async (friendId: string | number) => {
           // Handle DM logic here
-          console.log('Starting DM with user:', userId);
+          console.log('Starting DM with user:', friendId);
+
+          const fid = typeof friendId === 'string' ? Number(friendId) : friendId;
+
+          const res = await fetch(`/api/initiateDM`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              initiatorUserId: Number(currentUserId),
+              friendId: fid,
+            })
+          })
+          const data = await res.json();
+          if(data){
+            console.log(data)
+            // toast({
+            //   content: ""
+            // })
+          }
         };
 
         const fetchUserData = async (userId: string | number) => {
@@ -115,7 +133,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                             <Button 
                             variant="secondary" 
                             className="w-full"
-                            onClick={() => handleStartDM(user?.id || '')}
+                            onClick={() => handleStartDM(user?.id)}
                           >
                           <MessageSquare className="w-4 h-4 mr-2" />
                             Start DM

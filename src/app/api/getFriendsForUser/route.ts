@@ -23,7 +23,7 @@ export async function POST(req: Request){
                         walletPublicKey: true,
                         imageUrl: true
                     }
-                }
+                },
             }
         });
 
