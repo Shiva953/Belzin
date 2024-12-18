@@ -14,8 +14,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/useProfile"
 
-// USER PROFILE BESIDE MESSAGE
-// START DM OPTION(ON CLICKING USER PROFILE BESIDE MESSAGE) + MAINTING THE FRIENDLIST ON BOTH ENDS, EVEN IF CONVO STARTS FROM ONE SIDE
+// WHEN THE CONVO HAS STARTED(NO INITIAL MESSAGES), IT DOESNT SHOW THE CURRENTLY SENT MESSAGES,FIX THAT + SHOW FRIENDLIST IN /CONVERSATIONS/ID TOO
+// FIX WALLET SIGN-IN + WALLET CONNECT/DISCONNECT GLITCHES AND MAINTAIN SYNC
+
+// INIT BETTING CONTRACT
 
 export interface DMProps{
     params: {
@@ -132,7 +134,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
             )}
             <div className='flex-1 overflow-hidden'>
             {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
-            {initialMessages.length>0 && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
+            {initialMessages!==undefined && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
             </div>
             {/* 3. CHAT INPUT */}
             <div className='sticky bottom-0 w-full'>

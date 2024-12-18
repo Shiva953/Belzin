@@ -47,7 +47,12 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
             fetchUserData(message.senderId!);
         }
         pusherClient.bind(event, messageHandler)
-        initialMessages.forEach((message) => fetchUserData(message.senderId!));
+        // initialMessages.forEach((message) => fetchUserData(message.senderId!));
+        initialMessages.forEach((message) => {
+          if (message.senderId) {
+              fetchUserData(message.senderId);
+          }
+      });
 
         return () => {
           pusherClient.unsubscribe(
@@ -55,7 +60,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
           )
           pusherClient.unbind(event, messageHandler)
         }
-    }, [])
+    }, [initialMessages])
 
         const scrollDownRef = useRef<HTMLDivElement | null>(null)
 
@@ -87,21 +92,26 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         };
 
         const fetchUserData = async (userId: string | number) => {
-          if (!users[userId]) {
+          if (userId && !users[userId]) {
             try {
-              const profile = await fetchProfile('', Number(userId));
-              setUsers((prev) => ({ ...prev, [userId]: profile.user }));
+                const profile = await fetchProfile('', Number(userId));
+                setUsers((prev) => ({ ...prev, [userId]: profile.user }));
             } catch (error) {
-              console.error('Error fetching user profile:', error);
+                console.error('Error fetching user profile:', error);
             }
-          }
+        }
         };
 
         return (
           <div className='h-full overflow-y-auto'>
             <div className='flex flex-col-reverse gap-4 p-3'>
               <div ref={scrollDownRef} />
-              {messages.map((message, index) => {
+              { messages.length === 0 ? (
+                    <div className="text-center text-muted-foreground py-4">
+                        No messages yet. Start the conversation!
+                    </div>
+                ) : 
+              (messages.map((message, index) => {
                 const isCurrentUser = message.senderId == currentUserId;
                 const user = users[message.senderId!];
                 const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
@@ -157,7 +167,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                     </div>
                   </div>
                 );
-              })}
+              }))}
             </div>
           </div>
         );

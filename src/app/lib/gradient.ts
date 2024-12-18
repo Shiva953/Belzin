@@ -11,13 +11,10 @@ const gradientPairs = [
   export function getRandomGradient(userId: string | number) {
     // Use userId to consistently get the same gradient for the same user
     let id = 1;
-    console.log(userId)
     if(userId){
         id = typeof userId === 'string' ? Number(userId) : userId;
     }
-    console.log(id)
     const index = (id-1)%5 + 1;
-    console.log("Index:", index)
     return {
       normal: gradientPairs[index][0],
       hover: gradientPairs[index][1],

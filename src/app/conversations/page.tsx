@@ -3,9 +3,6 @@
 
 import { FriendsList } from "@/components/chat/private/FriendsList"
 import { useWallet } from "@solana/wallet-adapter-react"
-import { useState, useEffect } from "react";
-import { fetchProfile } from "../lib/utils";
-import { WalletLoginInterface } from "@/components/walletauth/WalletLogin";
 import { useProfile } from "@/hooks/useProfile";
 import { useFriends } from "@/hooks/useFriends";
 import { Loader2 } from "lucide-react";
@@ -25,6 +22,8 @@ export default function Page(){
     const pubkey = wallet.publicKey?.toString() || '';
     const { profile, loading, error: profileError } = useProfile(pubkey);
     const { friendList, isLoading, error: friendListError } = useFriends(pubkey);
+
+    //the route should be same from both sides({initiatorUserId}-{chatPartnerUserId})
 
     if (loading) {
         return (

@@ -45,7 +45,6 @@ export async function POST(req: Request){
     if(friendship){
         return NextResponse.json({message: "Successfully created friendship & added to DM"}, {status: 200})
     }
-    //initiate route on both-sides
 
     } catch(error){
         if (error instanceof Error) {
