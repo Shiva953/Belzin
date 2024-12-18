@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/useProfile"
+import { useChatMessages } from "@/hooks/useMessages"
 
 // WHEN THE CONVO HAS STARTED(NO INITIAL MESSAGES), IT DOESNT SHOW THE CURRENTLY SENT MESSAGES,FIX THAT + SHOW FRIENDLIST IN /CONVERSATIONS/ID TOO
 // FIX WALLET SIGN-IN + WALLET CONNECT/DISCONNECT GLITCHES AND MAINTAIN SYNC
@@ -44,40 +45,40 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     const wallet = useWallet();
     const userPubkey = wallet.publicKey?.toString() || '';
 
-    const { profile: currentUserProfile, loading: currentUserLoading, error: currentUserError } = 
-        useProfile(userPubkey);
+    const { profile: currentUserProfile, loading: currentUserLoading, error: currentUserError } = useProfile(userPubkey);
 
     const chatPartnerId = currentUserProfile?.id === Number(userid1) ? userid2 : userid1;
-    const { profile: partnerProfile, loading: partnerLoading, error: partnerError } = 
-        useProfile(undefined, chatPartnerId);
+    const { profile: partnerProfile, loading: partnerLoading, error: partnerError } = useProfile(undefined, chatPartnerId);
 
-    const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
+    const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages(id);
 
-    useEffect(() => {
-        async function getChatMessages(chatid: string){
-            try{
-                const res = await fetch('/api/getMessagesForGivenChat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        chatId: chatid
-                    })
-                });
-                const messages = await res.json();
-                console.log("Messages returned: ",messages)
-                setInitialMessages(messages)
-                return messages;
-            } catch(error){
-                console.log("Error fetching messages for given chatid: ",error)
-            }
-        }
-        getChatMessages(id);
-    }, [id])
+    // const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
 
-    console.log("Initial Messages: ", initialMessages)
+    // useEffect(() => {
+    //     async function getChatMessages(chatid: string){
+    //         try{
+    //             const res = await fetch('/api/getMessagesForGivenChat', {
+    //                 method: 'POST',
+    //                 headers: {'Content-Type': 'application/json'},
+    //                 body: JSON.stringify({
+    //                     chatId: chatid
+    //                 })
+    //             });
+    //             const messages = await res.json();
+    //             console.log("Messages returned: ",messages)
+    //             setInitialMessages(messages)
+    //             return messages;
+    //         } catch(error){
+    //             console.log("Error fetching messages for given chatid: ",error)
+    //         }
+    //     }
+    //     getChatMessages(id);
+    // }, [id])
+
+    // console.log("Initial Messages: ", initialMessages)
 
      // Loading state
-     if (currentUserLoading || partnerLoading) {
+     if (currentUserLoading || partnerLoading || messagesLoading) {
         return (
             <div className="flex flex-col h-full w-full items-center justify-center">
                 <Skeleton className="h-12 w-12 rounded-full mb-4" />
@@ -87,7 +88,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         )
     }
 
-    if (currentUserError || partnerError || !currentUserProfile || !partnerProfile) {
+    if (currentUserError || partnerError || messagesError || !currentUserProfile || !partnerProfile) {
         return (
             <div className="flex-1 w-full flex items-center justify-center">
                 <p className="text-lg text-destructive">
@@ -134,7 +135,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
             )}
             <div className='flex-1 overflow-hidden'>
             {/* 2. CHAT INTERFACE(WITH MESSAGES) */}
-            {initialMessages!==undefined && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
+            {initialMessages!==null && <Messages initialMessages={initialMessages} currentUserId={userid} event={event_name} channel={channel_name}/>}
             </div>
             {/* 3. CHAT INPUT */}
             <div className='sticky bottom-0 w-full'>

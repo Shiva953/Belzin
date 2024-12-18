@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react';
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  senderId: string;
-  timestamp: number;
-  // Add other relevant fields
-}
+import { ChatMessage } from '@/components/chat/public/PublicChat';
 
 interface UseChatMessagesResult {
-  initialMessages: ChatMessage[];
+  initialMessages: ChatMessage[]|null;
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
 }
 
 export function useChatMessages(chatId: string): UseChatMessagesResult {
-  const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([]);
+  const [initialMessages, setInitialMessages] = useState<ChatMessage[]|null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
   async function fetchChatMessages() {
-    // Reset states before fetching
     setLoading(true);
     setError(null);
 
@@ -38,7 +30,6 @@ export function useChatMessages(chatId: string): UseChatMessagesResult {
 
       const messages = await res.json();
       
-      // Sort messages by timestamp in descending order (most recent first)
       const sortedMessages = messages.sort((a: ChatMessage, b: ChatMessage) => 
         Number(b.timestamp) - Number(a.timestamp)
       );
@@ -53,7 +44,6 @@ export function useChatMessages(chatId: string): UseChatMessagesResult {
   }
 
   useEffect(() => {
-    // Only fetch if chatId is provided
     if (chatId) {
       fetchChatMessages();
     }
