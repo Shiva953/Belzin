@@ -33,7 +33,7 @@ async function initializeAgent() {
       const llm = new ChatXAI({
         model: "grok-2-latest",
         temperature: 0.7,
-        maxRetries: 30,
+        maxRetries: 2,
         apiKey: process.env.GROK_API_KEY
       })
       // const llm = new ChatGroq({
@@ -139,6 +139,7 @@ export async function POST(req: Request) {
 
       // Parse the request body
       const { message } = await req.json();
+      console.log("Message got from frontend: ",message)
 
       if (!message) {
           return NextResponse.json(
@@ -148,27 +149,40 @@ export async function POST(req: Request) {
       }
 
       // Create a stream for the agent's response
+
       const stream = await agent.stream(
           { messages: [new HumanMessage(message)] },
           config
       );
+      console.log("Initial Stream: ", stream)
 
       let agentResponse = '';
-      
+      let agentToolResponse = '';
       // Process the stream chunks
       for await (const chunk of stream) {
-          if ("agent" in chunk) {
+        console.log("Chunk: ", chunk)
+          if ("agent" in chunk && chunk.agent.messages.length > 0 && chunk.agent.messages?.[0]?.content) {
               agentResponse = chunk.agent.messages[0].content;
-          } else if ("tools" in chunk) {
+              console.log("Agent Response for agent in chunk:", agentResponse)
+          } else if ("tools" in chunk && chunk.tools.messages.length > 0 && chunk.tools.messages?.[0]?.content) {
               // Append tool execution results to the response
-              agentResponse += '\n' + chunk.tools.messages[0].content;
+              agentToolResponse += chunk.tools.messages[0].content;
+              console.log("Agent Response for tool in chunk:", agentToolResponse)
+              return NextResponse.json(
+                { reply: new HumanMessage(agentToolResponse).content },
+                { status: 200 }
+            );
           }
       }
 
-      return NextResponse.json(
-          { reply: agentResponse.trim() },
-          { status: 200 }
-      );
+      console.log("If agent response gets here: ",agentResponse);
+          if(agentResponse){
+            console.log("Final Agent Response: ",agentResponse)
+            return NextResponse.json(
+              { reply: agentResponse },
+              { status: 200 }
+          );
+        }
 
   } catch (error) {
       console.error("Error processing request:", error);
