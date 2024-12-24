@@ -10,6 +10,9 @@ import { Loader2 } from "lucide-react";
 // (DM INITIATOR USERID-PARTNER USERID)[ROUTE + DB FIX]
 // BETTING CONTRACTS
 
+// integrating agent solana agent kit in chat and adding custom tools for betting, trading/other blinks
+// upon pinging agent (@agent then entering the prompt it would the betting/trading/other blink for you)
+
 export type FriendT = {
     id: string | number,
     username: string,
@@ -86,18 +89,12 @@ export default function Page(){
         )
     }
 
- 
-
-    console.log("Do we have FriendList till the end", friendList)
     return(
         <>
-        {/* <WalletLoginInterface> */}
         <div className="flex flex-row m-4 p-8">
-            {/* instead of this make the useFriendList hook and have a more stateful impl with loading/data/error */}
-            {<FriendsList friendList={friendList} userId={userId}/>}
+            <FriendsList friendList={friendList} userId={userId}/>
             Select a Conversation to start Blinks & Betting in Chat
         </div>
-        {/* </WalletLoginInterface> */}
         </>
     )
 }

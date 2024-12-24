@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/hooks/useProfile"
 import { useChatMessages } from "@/hooks/useMessages"
 
-// WHEN THE CONVO HAS STARTED(NO INITIAL MESSAGES), IT DOESNT SHOW THE CURRENTLY SENT MESSAGES,FIX THAT + SHOW FRIENDLIST IN /CONVERSATIONS/ID TOO
+// SHOW FRIENDLIST IN /CONVERSATIONS/ID TOO
 // FIX WALLET SIGN-IN + WALLET CONNECT/DISCONNECT GLITCHES AND MAINTAIN SYNC
 
 // INIT BETTING CONTRACT
@@ -39,8 +39,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     const event_name = `incoming-message-${id}`
     const channel_name = `chat-room-${id}`
     const [userid1, userid2] = id.split('-')
-    console.log(userid1)
-    console.log(userid2)
 
     const wallet = useWallet();
     const userPubkey = wallet.publicKey?.toString() || '';
@@ -52,32 +50,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
 
     const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages(id);
 
-    // const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
-
-    // useEffect(() => {
-    //     async function getChatMessages(chatid: string){
-    //         try{
-    //             const res = await fetch('/api/getMessagesForGivenChat', {
-    //                 method: 'POST',
-    //                 headers: {'Content-Type': 'application/json'},
-    //                 body: JSON.stringify({
-    //                     chatId: chatid
-    //                 })
-    //             });
-    //             const messages = await res.json();
-    //             console.log("Messages returned: ",messages)
-    //             setInitialMessages(messages)
-    //             return messages;
-    //         } catch(error){
-    //             console.log("Error fetching messages for given chatid: ",error)
-    //         }
-    //     }
-    //     getChatMessages(id);
-    // }, [id])
-
-    // console.log("Initial Messages: ", initialMessages)
-
-     // Loading state
      if (currentUserLoading || partnerLoading || messagesLoading) {
         return (
             <div className="flex flex-col h-full w-full items-center justify-center">
@@ -102,7 +74,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
     const userid = typeof currentuserid === 'string' ? currentuserid : currentuserid.toString();
     const partner = partnerProfile;
 
-    // make user id check more robust
     return (
         <>
         {/* <WalletLoginInterface> */}
@@ -114,7 +85,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         {
         (userid==userid1 || userid==userid2) && (
         <div className='flex flex-col h-full w-full'>
-        {/* 1. TOP BAR SHOWING THE PARTNER PFP AND USERNAME */}
         {partner && (
             <Card className="w-full transition-colors fixed top-0 z-40 mb-4 pb-2">
             <CardContent className="p-4 flex items-center space-x-4">

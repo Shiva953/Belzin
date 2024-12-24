@@ -2,7 +2,6 @@
 import {pusherServer} from "@/lib/pusher";
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid"
-import { Message } from "@/components/chat/public/PublicChat";
 import prisma from "@/lib/prisma";
 import { ChatMessage } from "@/components/chat/public/PublicChat";
 
@@ -30,7 +29,6 @@ export async function POST(req: Request){
 
     await pusherServer.trigger(`chat-room-${chatId}`, 'new-send-message', message);
 
-    //pushing to db
     await prisma.chatMessage.create({
         data: {
             sender: message.sender,

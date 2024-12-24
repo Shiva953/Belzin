@@ -39,6 +39,19 @@ export function VerticalNavbar() {
             <span className="sr-only">Private Chats</span>
           </Button>
         </Link>
+        <Link href="/agent">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              'hover:bg-primary/10',
+              pathname === '/agent' && 'bg-primary/10'
+            )}
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span className="sr-only">Chat With Agent</span>
+          </Button>
+        </Link>
       </div>
     </nav>
   )

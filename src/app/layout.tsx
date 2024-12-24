@@ -34,10 +34,10 @@ export default async function RootLayout({
           GeistSans.className
         )}>
         <SolanaProvider session={session}>
-          <WalletLoginInterface>
+          {/* <WalletLoginInterface> */}
         {children}
         <Toaster />
-        </WalletLoginInterface>
+        {/* </WalletLoginInterface> */}
         </SolanaProvider>
       </body>
     </html>
