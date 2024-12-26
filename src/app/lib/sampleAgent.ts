@@ -7,9 +7,6 @@ import { ChatOpenAI } from "@langchain/openai";
 import * as fs from "fs";
 import * as readline from "readline";
 
-// FIX EMPTY MESSAGE ON STARTING ACTION(LIKE TRADING/CREATING A POOL)
-// FIGURE OUT A WAY TO STORE THE MESSAGES(IF THEY AREN'T ALREADY STORED) + IMPROVE UI
-
 function validateEnvironment(): void {
   const missingVars: string[] = [];
   const requiredVars = ["OPENAI_API_KEY", "RPC_URL", "SOLANA_PRIVATE_KEY"];

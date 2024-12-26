@@ -1,142 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-// 'use client'
-// import React, { useState, useEffect, useRef } from 'react';
-
-// export default function AgentChat() {
-//   const [messages, setMessages] = useState<{ type: string; content: string }[]>([]);
-//   const [input, setInput] = useState('');
-//   const [loading, setLoading] = useState(false);
-//   const chatEndRef = useRef(null);
-
-//   // In your AgentChat component:
-//     // const [messages, setMessages] = useState<{ type: string; content: string }[]>(() => {
-//     //   // Load initial messages from localStorage
-//     //   const saved = localStorage.getItem('chatMessages');
-//     //   return saved ? JSON.parse(saved) : [];
-//     // });
-
-//     // // Save to localStorage whenever messages change
-//     // useEffect(() => {
-//     //   localStorage.setItem('chatMessages', JSON.stringify(messages));
-//     // }, [messages]);
-
-//   const scrollToBottom = () => {
-//     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-//   };
-
-//   useEffect(() => {
-//     scrollToBottom();
-//   }, [messages]);
-
-
-//   const handleSubmit = async (event: any) => {
-//     event.preventDefault();
-//     if (!input.trim()) return;
-
-//     // Add user's message to the chat
-//     setMessages(prev => [...prev, { type: 'User', content: input }]);
-//     setLoading(true);
-    
-//     try {
-//       const response = await fetch('/api/agent', {
-//         method: 'POST',
-//         headers: { 'Content-Type': 'application/json' },
-//         body: JSON.stringify({ message: input }),
-//       });
-//       const data = await response.json();
-      
-//       // Add agent's response to the chat
-//       setMessages(prev => [...prev, { type: 'Agent', content: data.reply }]);
-//     } catch (error) {
-//       console.error('Error:', error);
-//       setMessages(prev => [...prev, { type: 'Agent', content: 'Error communicating with agent.' }]);
-//     } finally {
-//       setLoading(false);
-//       setInput('');
-//     }
-//   };
-
-//   return (
-//     // <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-//     //   <h2>Chat with AI Agent</h2>
-//     //   <div style={{ border: '1px solid #ccc', height: '400px', overflowY: 'scroll', padding: '10px' }}>
-//     //     {messages.map((msg, index) => (
-//     //       <div key={index} style={{ marginBottom: '10px', textAlign: msg.sender === 'User' ? 'right' : 'left' }}>
-//     //         <strong>{msg.sender}:</strong> {msg.text}
-//     //       </div>
-//     //     ))}
-//     //     {loading && <div>Agent is typing...</div>}
-//     //   </div>
-//     //   <input
-//     //     type="text"
-//     //     value={input}
-//     //     onChange={e => setInput(e.target.value)}
-//     //     onKeyPress={e => e.key === 'Enter' && handleSend()}
-//     //     placeholder="Type your message..."
-//     //     style={{ width: '100%', padding: '10px', marginTop: '10px' }}
-//     //   />
-//     //   <button onClick={handleSend} style={{ padding: '10px', marginTop: '10px' }}>Send</button>
-//     // </div>
-//     <div className="flex flex-col h-screen w-full mx-auto p-4">
-//         <>
-//           <div className="flex-1 overflow-auto bg-gray-50 rounded-lg p-4 mb-4">
-//             <div className="space-y-4">
-//               {messages.map((message, index) => (
-//                 <div
-//                   key={index}
-//                   className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-//                 >
-//                   <div
-//                     className={`max-w-[80%] rounded-lg p-3 ${
-//                       message.type === 'user'
-//                         ? 'bg-blue-500 text-black'
-//                         : message.type === 'error'
-//                         ? 'bg-red-100 text-red-700'
-//                         : message.type === 'tool'
-//                         ? 'bg-green-100 text-green-700'
-//                         : 'bg-white border border-gray-200 text-black'
-//                     }`}
-//                   >
-//                     {message.content}
-//                   </div>
-//                 </div>
-//               ))}
-//               {loading && <div>Agent is typing...</div>}
-//               <div ref={chatEndRef} />
-//             </div>
-//           </div>
-//           <form onSubmit={handleSubmit} className="flex gap-2">
-//             <input
-//               type="text"
-//               value={input}
-//               onChange={(e) => setInput(e.target.value)}
-//               placeholder="Type your message here..."
-//               className="flex-1 p-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//             <button
-//               type="submit"
-//               disabled={!input.trim()}
-//               className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-//             >
-//               {'Send'}
-//             </button>
-//           </form>
-//         </>
-//     </div>
-//   );
-// }
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useChat } from "ai/react"
+import { Paperclip, ArrowUp } from 'lucide-react';
 
 interface Message {
   type: 'User' | 'Agent' | 'System' | 'Error';
   content: string;
   timestamp: Date;
 }
+
+
+// go through agent-kit examples
+// FIX SUBSEQUENT 500 ERRORS AFTER FIRST SUCCESSFUL ACTION EXEC/handle erronous executions
+// ADD CUSTOM BLINK CREATION TOOL
+
+const DEFAULT_OPTIONS = [
+  {
+    title: "Swap tokens",
+    subtitle: "Ex: Swap 0.1 SOL for USDC"
+  },
+  {
+    title: "Buy SOL",
+    subtitle: "Ex: Buy 100 USDC worth of SOL"
+  },
+  {
+    title: "Create a PumpFun Token",
+    subtitle: "Launch a pumpfun token"
+  },
+  {
+    title: "Launch a Bet",
+    subtitle: "Ex: Create a new betting blink with bet amount as 100$"
+  }
+];
 
 export default function AgentChat() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -254,82 +153,112 @@ export default function AgentChat() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full mx-auto p-4">
+    <div className="flex flex-col h-screen bg-black text-white">
       {/* Mode Toggle */}
-      <div className="flex items-center space-x-2 mb-4">
+      <div className="flex items-center space-x-2 p-4 border-b border-gray-800">
         <Switch
           id="auto-mode"
           checked={autoMode}
           onCheckedChange={setAutoMode}
         />
-        <Label htmlFor="auto-mode">Autonomous Mode</Label>
+        <Label htmlFor="auto-mode" className="text-gray-300">Autonomous Mode</Label>
         {autoMode && (
           <input
             type="number"
             value={autoInterval}
             onChange={(e) => setAutoInterval(Number(e.target.value))}
-            className="w-16 px-2 py-1 ml-4 border rounded"
+            className="w-16 px-2 py-1 ml-4 bg-gray-800 border border-gray-700 rounded text-white"
             min="5"
             max="60"
           />
         )}
       </div>
 
-      {/* Chat Window */}
-      <div className="flex-1 overflow-auto bg-gray-50 rounded-lg p-4 mb-4">
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div
+      {/* Default Options */}
+      {messages.length === 0 && (
+        <div className="grid grid-cols-2 gap-4 p-4">
+          {DEFAULT_OPTIONS.map((option, index) => (
+            <button
               key={index}
-              className={`flex ${message.type === 'User' ? 'justify-end' : 'justify-start'}`}
+              onClick={() => {
+                setInput(option.subtitle);
+                handleSubmit(new Event('submit') as any);
+              }}
+              className="p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition-colors text-left"
             >
-              <div
-                className={`max-w-[80%] rounded-lg p-3 ${
-                  message.type === 'User'
-                    ? 'bg-blue-500 text-black'
-                    : message.type === 'Error'
-                    ? 'bg-red-100 text-red-700'
-                    : message.type === 'System'
-                    ? 'bg-gray-100 text-gray-900 italic'
-                    : 'bg-white border border-gray-200 text-black'
-                }`}
-              >
-                <div className="text-sm opacity-75 mb-1">
-                  {message.timestamp.toLocaleTimeString()}
-                </div>
-                {message.content}
-              </div>
-            </div>
+              <h3 className="font-medium text-white">{option.title}</h3>
+              <p className="text-sm text-gray-400">{option.subtitle}</p>
+            </button>
           ))}
-          {loading && (
-            <div className="flex justify-start">
-              <div className="bg-gray-100 rounded-lg p-3">
-                Agent is thinking...
-              </div>
-            </div>
-          )}
-          <div ref={chatEndRef} />
         </div>
+      )}
+
+      {/* Chat Window */}
+      <div className="flex-1 overflow-auto p-4 space-y-4">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${message.type === 'User' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[600px] rounded-2xl p-4 break-words ${
+                message.type === 'User'
+                  ? 'bg-white text-black'
+                  : message.type === 'Error'
+                  ? 'bg-red-500/10 text-red-500'
+                  : message.type === 'System'
+                  ? 'bg-[rgb(26,26,26)] text-gray-300 italic'
+                  : 'bg-[rgb(26,26,26)] text-white'
+              }`}
+              style={{ overflowWrap: 'break-word' }}
+            >
+              <div className="text-sm opacity-75 mb-1 text-gray-400">
+                {message.timestamp.toLocaleTimeString()}
+              </div>
+              {message.content}
+            </div>
+          </div>
+        ))}
+        {loading && (
+          <div className="flex justify-start">
+            <div className="bg-gray-800 rounded-2xl p-4 text-gray-300">
+              Agent is thinking...
+            </div>
+          </div>
+        )}
+        <div ref={chatEndRef} />
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message here..."
-          className="flex-1 p-2 border border-gray-300 text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={loading || autoMode}
-        />
-        <Button
-          type="submit"
-          disabled={loading || !input.trim() || autoMode}
-          className="px-4 py-2"
-        >
-          {loading ? 'Sending...' : 'Send'}
-        </Button>
-      </form>
+      <div className="border-t border-gray-800 p-4">
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-2 bg-[rgb(26,26,26)] rounded-full px-4 py-2">
+            <button
+              type="button"
+              className="text-gray-400 hover:text-gray-300"
+              onClick={() => {/* Handle attachment */}}
+            >
+              <Paperclip className="h-5 w-5" />
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Send a message..."
+              className="flex-1 bg-[rgb(26,26,26)] text-white placeholder-gray-500 focus:outline-none"
+              disabled={loading || autoMode}
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={loading || !input.trim() || autoMode}
+            className="rounded-full p-3 aspect-square"
+            variant="default"
+          >
+            <ArrowUp className="h-5 w-5" />
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }

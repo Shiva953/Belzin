@@ -23,25 +23,12 @@ const validateEnvVars = () => {
 async function initializeAgent() {
     try {
       validateEnvVars();
-      // const llm = new ChatOpenAI({
-      //   modelName: "gpt-4o-mini",
-      //   temperature: 0.7,
-      //   cache: true,
-      //   maxRetries: 2,
-      //   openAIApiKey: process.env.OPENAI_API_KEY,
-      // });
       const llm = new ChatXAI({
         model: "grok-2-latest",
         temperature: 0.7,
         maxRetries: 2,
         apiKey: process.env.GROK_API_KEY
       })
-      // const llm = new ChatGroq({
-      //   modelName: "llama-3.3-70b-versatile",
-      //   temperature: 0.7,
-      //   cache: true,
-      //   maxRetries: 10,
-      // })
       const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,
         process.env.RPC_URL!,
@@ -67,8 +54,7 @@ async function initializeAgent() {
           explicitly requested.
         `,
       });
-  
-  
+
       return { agent, config };
     } catch (error) {
       console.error("Failed to initialize agent:", error);
@@ -79,65 +65,14 @@ async function initializeAgent() {
 let agent: any;
 let config: any;
 
-// export async function POST(req: Request) {
-//   const { message } = await req.json();
-
-//   if (!agent) {
-//     try {
-//       ({ agent, config } = await initializeAgent());
-//     } catch (error) {
-//       console.error("Failed to initialize agent:", error);
-//       return NextResponse.json({ reply: "Failed to initialize agent." }, { status: 500 });
-//     }
-//   }
-
-//   try {
-//     const stream = await agent.stream({ 
-//       messages: [
-//         // Ensure message format matches what the agent expects
-//         new HumanMessage({
-//           content: message
-//         })
-//       ]
-//     }, config);
-
-//     let finalResponse = '';
-    
-//     // Process all chunks and accumulate the response
-//     for await (const chunk of stream) {
-//       if ("agent" in chunk && chunk.agent.messages?.[0]?.content) {
-//         finalResponse = chunk.agent.messages[0].content;
-//       }
-//       else if ("tools" in chunk && chunk.tools.messages?.[0]?.content) {
-//         finalResponse = chunk.tools.messages[0].content;
-//       }
-//     }
-
-//     // Only return if we have a non-empty response
-//     if (finalResponse) {
-//       return NextResponse.json({ reply: finalResponse });
-//     }
-
-//     throw new Error("No valid response received from agent");
-
-//   } catch (error: any) {
-//     console.error("Error during agent processing:", error);
-//     return NextResponse.json({ 
-//       reply: error.message || "An error occurred while processing your request",
-//       error: true 
-//     }, { status: 500 });
-//   }
-// }
 export async function POST(req: Request) {
   try {
-      // Initialize agent if not already initialized
       if (!agent || !config) {
           const initialized = await initializeAgent();
           agent = initialized.agent;
           config = initialized.config;
       }
 
-      // Parse the request body
       const { message } = await req.json();
       console.log("Message got from frontend: ",message)
 
@@ -148,7 +83,6 @@ export async function POST(req: Request) {
           );
       }
 
-      // Create a stream for the agent's response
 
       const stream = await agent.stream(
           { messages: [new HumanMessage(message)] },
@@ -162,32 +96,54 @@ export async function POST(req: Request) {
       for await (const chunk of stream) {
         console.log("Chunk: ", chunk)
           if ("agent" in chunk && chunk.agent.messages.length > 0 && chunk.agent.messages?.[0]?.content) {
-              agentResponse = chunk.agent.messages[0].content;
+              agentResponse += chunk.agent.messages[0].content;
               console.log("Agent Response for agent in chunk:", agentResponse)
           } else if ("tools" in chunk && chunk.tools.messages.length > 0 && chunk.tools.messages?.[0]?.content) {
               // Append tool execution results to the response
-              agentToolResponse += chunk.tools.messages[0].content;
-              console.log("Agent Response for tool in chunk:", agentToolResponse)
-              return NextResponse.json(
-                { reply: new HumanMessage(agentToolResponse).content },
-                { status: 200 }
-            );
+              const toolResponse = chunk.tools.messages[0].content;
+              try {
+                const parsed = JSON.parse(toolResponse);
+                agentToolResponse = parsed.message || toolResponse;
+              } catch {
+                agentToolResponse = toolResponse;
+              }
           }
       }
-
-      console.log("If agent response gets here: ",agentResponse);
           if(agentResponse){
-            console.log("Final Agent Response: ",agentResponse)
+            console.log("Final agent response: ",agentResponse);
             return NextResponse.json(
               { reply: agentResponse },
               { status: 200 }
           );
         }
+        else if(agentToolResponse){
+          try {
+            // Parse the JSON error response
+            const parsedError = JSON.parse(agentToolResponse);
+            
+            // Create a user-friendly error message
+            let errorMessage = "The swap operation failed. ";
+            if (parsedError.message) {
+              // Extract the main error message without the technical details
+              const mainError = parsedError.message.split('\n')[0];
+              errorMessage += mainError;
+            }
+            
+            return NextResponse.json(
+              { reply: errorMessage },
+              { status: 200 }
+            );
+          } catch (e) {
+            // Fallback if JSON parsing fails
+            return NextResponse.json(
+              { reply: "An error occurred while processing the swap" },
+              { status: 200 }
+            );
+          }
+        }
 
   } catch (error) {
       console.error("Error processing request:", error);
-      
-      // Return appropriate error response
       return NextResponse.json(
           { 
               error: true,
