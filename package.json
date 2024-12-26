@@ -57,6 +57,7 @@
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-dropzone": "^14.3.5",
+    "react-toastify": "^11.0.2",
     "socket-io": "^1.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
