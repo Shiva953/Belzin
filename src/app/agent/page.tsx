@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
@@ -67,7 +68,7 @@ export default function AgentChat() {
       // Start auto mode cycle
       const runAutoMode = async () => {
         const thought = "Be creative and do something interesting on the blockchain. Choose an action or set of actions and execute it that highlights your abilities.";
-        await handleAgentInteraction(thought);
+        await fetchAgentReply(thought);
       };
 
       runAutoMode();
@@ -93,6 +94,29 @@ export default function AgentChat() {
       }
     };
   }, [autoMode, autoInterval]);
+
+  const fetchAgentReply = async (message: string) => {
+    try {
+      const response = await fetch("/api/agent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: message }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.reply;
+      } else {
+        console.error("Failed to fetch agent reply");
+        return "Sorry, something went wrong.";
+      }
+    } catch (error) {
+      console.error("Error fetching agent reply:", error);
+      return "Sorry, something went wrong.";
+    }
+  };
 
   const handleAgentInteraction = async (content: string) => {
     try {
@@ -134,7 +158,7 @@ export default function AgentChat() {
     setInput('');
 
     try {
-      const reply = await handleAgentInteraction(userMessage.content);
+      const reply = await fetchAgentReply(userMessage.content);
       
       setMessages(prev => [...prev, {
         type: 'Agent',
@@ -236,7 +260,7 @@ export default function AgentChat() {
             <button
               type="button"
               className="text-gray-400 hover:text-gray-300"
-              onClick={() => {/* Handle attachment */}}
+              onClick={() => handleSubmit}
             >
               <Paperclip className="h-5 w-5" />
             </button>
