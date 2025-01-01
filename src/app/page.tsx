@@ -9,6 +9,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 
+
+//INTEGRATE SOLANA AGENT AS A USER IN HERE, PINGABLE + EXECUTES THE RELEVANT OPTION
 export default function Home() {
 
   const { connected, publicKey } = useWallet()
@@ -74,7 +76,6 @@ export default function Home() {
   return (
     <>
     <div className="w-full h-screen flex flex-col">
-      {/* <WalletLoginInterface> */}
         <div className="flex flex-row flex-1 bg-background">
           <div className='mr-16'>
           <VerticalNavbar />
@@ -84,7 +85,6 @@ export default function Home() {
           {userId && initialMessages && initialMessages.length>0 && <PublicChat userId={userId} initialMessages={initialMessages}/>}
           </div>
         </div>
-      {/* </WalletLoginInterface> */}
     </div>
   </>
   );

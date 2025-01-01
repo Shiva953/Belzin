@@ -20,6 +20,8 @@ export interface ChatMessage{
     timestamp: string | null
 }
 
+
+// USER PINGS AGENT WITH MESSAGE(PING IS REQUIRED) -> /api/agent route is called and stream is established -> AGENT RESPONDS + FRONTEND STATE CHANGE -> MESSAGE GETS STORED
 export function PublicChat({ userId, initialMessages } : { userId: string, initialMessages: Message[] }){
     //component tree: Interface(my Messages(right) + other user Messages(left)) + MessageInput + SendMessage + (+)icon in the left(for adding bets)
 

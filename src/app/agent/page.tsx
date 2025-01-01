@@ -55,17 +55,14 @@ export default function AgentChat() {
     scrollToBottom();
   }, [messages]);
 
-  // Auto mode handler
   useEffect(() => {
     if (autoMode) {
-      // Add system message when auto mode starts
       setMessages(prev => [...prev, {
         type: 'System',
         content: 'Autonomous mode activated. Agent will perform actions automatically.',
         timestamp: new Date()
       }]);
       
-      // Start auto mode cycle
       const runAutoMode = async () => {
         const thought = "Be creative and do something interesting on the blockchain. Choose an action or set of actions and execute it that highlights your abilities.";
         await fetchAgentReply(thought);
@@ -74,7 +71,6 @@ export default function AgentChat() {
       runAutoMode();
       autoModeRef.current = setInterval(runAutoMode, autoInterval * 1000);
     } else {
-      // Clear interval when auto mode is turned off
       if (autoModeRef.current) {
         clearInterval(autoModeRef.current);
         autoModeRef.current = null;
@@ -87,7 +83,6 @@ export default function AgentChat() {
       }
     }
 
-    // Cleanup on component unmount
     return () => {
       if (autoModeRef.current) {
         clearInterval(autoModeRef.current);
