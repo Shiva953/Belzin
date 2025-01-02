@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 // import { Message as VercelChatMessage, streamText } from "ai"; 
-import { SolanaAgentKit, createSolanaTools } from '../../../../../solana-agent-kit';
+import { SolanaAgentKit, createSolanaTools } from 'solana-agent-kit';
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 import { MemorySaver } from "@langchain/langgraph";
@@ -45,17 +45,19 @@ function validateEnvironment(): void {
 
 async function initializeAgent() {
     try {
-      const llm = new ChatXAI({
-        model: "grok-2-latest",
-        temperature: 0.7,
-        apiKey: process.env.GROK_API_KEY,
+      // const llm = new ChatXAI({
+      //   model: "grok-2-latest",
+      //   temperature: 0.7,
+      //   apiKey: process.env.GROK_API_KEY,
+      // })
+      const llm = new ChatOpenAI({
+        model: "gpt-4o-mini",
+        temperature: 0.7
       })
       const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,
         process.env.RPC_URL!,
-        {
-        OPENAI_API_KEY: process.env.OPENAI_API_KEY!
-        }
+        process.env.OPENAI_API_KEY!
       );
   
       const tools = createSolanaTools(solanaKit);
@@ -85,59 +87,104 @@ async function initializeAgent() {
     }
   }
 
-export async function POST(req: Request) {
-  try {
-    validateEnvironment();
-      const { message } = await req.json();
-      if (!message) {
-        return NextResponse.json(
-            { error: "Message is required" },
-            { status: 400 }
-        );
-    }
-      console.log("Message got from frontend: ",message)
+// export async function POST(req: Request) {
+//   try {
+//     validateEnvironment();
+//       const { message } = await req.json();
+//       if (!message) {
+//         return NextResponse.json(
+//             { error: "Message is required" },
+//             { status: 400 }
+//         );
+//     }
+//       console.log("Message got from frontend: ",message)
 
-      const { agent, config } = await initializeAgent();
+//       const { agent, config } = await initializeAgent();
 
-      const stream = await agent.stream(
-          { messages: [new HumanMessage(message)] },
-          config
-      );
-      console.log("Initial Stream: ", stream)
+//       const stream = await agent.stream(
+//           { messages: [new HumanMessage(message)] },
+//           config
+//       );
+//       console.log("Initial Stream: ", stream)
 
-      let responseContent = "default";
-      // Process the stream chunks
-      for await (const chunk of stream) {
-        console.log("Chunk: ", chunk)
-          if ("agent" in chunk) { //&& chunk.agent.messages.length > 0 && chunk.agent.messages?.[0]?.content
-              const agentCheck = chunk.agent?.messages && Array.isArray(chunk.agent.messages) && chunk.agent.messages.length > 0 && chunk.agent.messages[0]?.content && typeof chunk.agent.messages[0].content === 'string' && chunk.agent.messages[0].content.trim() !== '';
-              if(agentCheck){
-                responseContent += chunk.agent.messages[0].content
-                console.log("Agent Response for agent in chunk:", responseContent)
-              }
-          } else if ("tools" in chunk) { //&& chunk.tools.messages.length > 0 && chunk.tools.messages?.[0]?.content
-              const toolCheck = chunk.tools?.messages && Array.isArray(chunk.tools.messages) && chunk.tools.messages.length > 0 && chunk.tools.messages[0]?.content && typeof chunk.tools.messages[0].content === 'string' && chunk.tools.messages[0].content.trim() !== '';
-              if(toolCheck){
-                responseContent += chunk.tools.messages[0].content
-                console.log("Agent Response for tool in chunk:", responseContent)
-              }
-          }
-      }
-        if(responseContent){
-          return NextResponse.json({ reply: responseContent }, { status: 200 });
-        }
-        else{
-          return NextResponse.json({ reply: "Unable to Get Response" }, { status: 200 })
-        }
+//       let responseContent = "default";
+//       // Process the stream chunks
+//       for await (const chunk of stream) {
+//         console.log("Chunk: ", chunk)
+//           if ("agent" in chunk) { //&& chunk.agent.messages.length > 0 && chunk.agent.messages?.[0]?.content
+//               const agentCheck = chunk.agent?.messages && Array.isArray(chunk.agent.messages) && chunk.agent.messages.length > 0 && chunk.agent.messages[0]?.content && typeof chunk.agent.messages[0].content === 'string' && chunk.agent.messages[0].content.trim() !== '';
+//               if(agentCheck){
+//                 responseContent += chunk.agent.messages[0].content
+//                 console.log("Agent Response for agent in chunk:", responseContent)
+//               }
+//           } else if ("tools" in chunk) { //&& chunk.tools.messages.length > 0 && chunk.tools.messages?.[0]?.content
+//               const toolCheck = chunk.tools?.messages && Array.isArray(chunk.tools.messages) && chunk.tools.messages.length > 0 && chunk.tools.messages[0]?.content && typeof chunk.tools.messages[0].content === 'string' && chunk.tools.messages[0].content.trim() !== '';
+//               if(toolCheck){
+//                 responseContent += chunk.tools.messages[0].content
+//                 console.log("Agent Response for tool in chunk:", responseContent)
+//               }
+//           }
+//       }
+//         if(responseContent){
+//           return NextResponse.json({ reply: responseContent }, { status: 200 });
+//         }
+//         else{
+//           return NextResponse.json({ reply: "Unable to Get Response" }, { status: 200 })
+//         }
 
-  } catch (error) {
-      console.error("Error processing request:", error);
-      return NextResponse.json(
-          { 
-              error: true,
-              reply: error instanceof Error ? error.message : "An unknown error occurred" 
-          },
-          { status: 500 }
-      );
-  }
+//   } catch (error) {
+//       console.error("Error processing request:", error);
+//       return NextResponse.json(
+//           { 
+//               error: true,
+//               reply: error instanceof Error ? error.message : "An unknown error occurred" 
+//           },
+//           { status: 500 }
+//       );
+//   }
+// }
+export async function POST(req: NextRequest) {
+	try {
+		const body = await req.json();
+		const messages = body.messages ?? [];
+
+    const { agent, config } = await initializeAgent();
+
+		const eventStream = agent.streamEvents(
+			{
+				messages,
+			},
+			{
+				version: "v2",
+				configurable: {
+					thread_id: "Solana Agent Kit!",
+				},
+			},
+		);
+
+    console.log("Agent Stream: ", eventStream)
+		const textEncoder = new TextEncoder();
+		const transformStream = new ReadableStream({
+			async start(controller) {
+        console.log("stream start")
+				for await (const { event, data } of eventStream) {
+          console.log("Iteration Start")
+          console.log("Event: ",event)
+          console.log("Data: ",data)
+					if (event === "on_chat_model_stream") {
+						if (!!data.chunk.content) {
+              console.log("Message Content: ", data.chunk.content)
+							controller.enqueue(textEncoder.encode(data.chunk.content));
+						}
+					}
+          console.log("Iteration End")
+				}
+				controller.close();
+			},
+		});
+
+		return new Response(transformStream);
+	} catch (e: any) {
+		return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+	}
 }
