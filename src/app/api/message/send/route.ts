@@ -11,11 +11,6 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 
 async function initializeAgent() {
     try {
-      // const llm = new ChatXAI({
-      //   model: "grok-2-latest",
-      //   temperature: 0.7,
-      //   apiKey: process.env.GROK_API_KEY,
-      // })
       const llm = new ChatOpenAI({
         model: "gpt-4o-mini",
         temperature: 0.7
@@ -29,6 +24,9 @@ async function initializeAgent() {
       const tools = createSolanaTools(solanaKit);
       const memory = new MemorySaver();
       const config = { configurable: { thread_id: "Solana Agent Kit!" } };
+
+      const blinktool = tools.find(t => t.name==="solana_blink_url")?.name;
+      console.log("solana blink tool: ", blinktool)
   
       const agent = createReactAgent({
         llm,
@@ -114,14 +112,14 @@ export async function POST(req: Request){
 
             // Process the stream
             for await (const { event, data } of eventStream) {
-                console.log("Iteration Start")
-                console.log("Event: ",event)
-                console.log("Data: ",data)
+                // console.log("Iteration Start")
+                // console.log("Event: ",event)
+                // console.log("Data: ",data)
                 if (event === 'on_chat_model_stream') {
                     if (!!data.chunk.content) {
-                        console.log("Message Content: ", data.chunk.content)
+                        // console.log("Message Content: ", data.chunk.content)
                         agentResponse += data.chunk.content;
-                        console.log("Agent Response", agentResponse)
+                        // console.log("Agent Response", agentResponse)
                     }
                 }
             }
