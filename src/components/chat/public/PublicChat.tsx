@@ -9,6 +9,7 @@ export interface Message{
     sender: string | null,
     senderId: string | null,
     timestamp: string | null
+    isAgent: boolean | null
 }
 
 export interface ChatMessage{
@@ -17,7 +18,8 @@ export interface ChatMessage{
     sender: string | null,
     senderId: string | null,
     chatId: string | null,
-    timestamp: string | null
+    timestamp: string | null,
+    isAgent: boolean | null
 }
 
 

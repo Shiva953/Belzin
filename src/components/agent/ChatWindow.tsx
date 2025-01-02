@@ -12,6 +12,8 @@ import type { FormEvent } from "react";
 import { ChatMessageBubble } from "@/components/agent/ChatMessageBubble";
 import { IntermediateStep } from "./IntermediateStep";
 
+type ATool = 'system' | 'user' | 'assistant' | 'data' | 'tool';
+
 export function ChatWindow(props: {
 	endpoint: string;
 	emptyStateComponent: ReactElement;
@@ -128,7 +130,7 @@ export function ChatWindow(props: {
 						return (
 							(responseMessage.role === "assistant" &&
 								!!responseMessage.toolInvocations?.length) ||
-							responseMessage.role === "tool"
+							(responseMessage).role as ATool === "tool"
 						);
 					},
 				);

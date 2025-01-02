@@ -18,11 +18,12 @@ model User {
 }
 
 model Message {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   content   String?
   sender    String?
   senderId  String?
   timestamp String?
+  isAgent   Boolean?
 }
 
 model ChatMessage {

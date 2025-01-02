@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 'use client';
@@ -49,7 +50,7 @@ export function MessageInput({chatId} : {chatId?: string}){
         setInput('')
         try {
           if(!chatId){
-            await axios.post('/api/message/send', { messageContent: optimisticInput, sender: sender, senderId: senderId})
+            await axios.post('/api/message/send', { messageContent: optimisticInput, sender: sender, senderId: senderId, isAgent: false})
           }
           if(chatId){
             await axios.post('/api/message/sendToPrivateChat', { messageContent: optimisticInput, sender: sender, senderId: senderId, chatId: chatId})

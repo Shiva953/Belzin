@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import { format } from "date-fns";
 import { Message } from './chat/public/PublicChat';
 import { cn } from '@/lib/utils';
-import { ChatMessage } from '@prisma/client';
+import { ChatMessage } from './chat/public/PublicChat';
 import { getRandomGradient } from '@/app/lib/gradient';
 import { fetchProfile } from '@/app/lib/utils';
 import { UserT } from './user-profile';

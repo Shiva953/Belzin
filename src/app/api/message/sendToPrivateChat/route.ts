@@ -22,6 +22,7 @@ export async function POST(req: Request){
         senderId: senderId || '',
         timestamp: timestamp.toString(),
         chatId: chatId || '',
+        isAgent: false
     }
 
     //server side trigger(publishing event to all subscribed clients with given (channel, event))
