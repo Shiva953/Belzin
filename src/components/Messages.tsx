@@ -20,6 +20,7 @@ import { MessageSquare } from 'lucide-react';
 export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [users, setUsers] = useState<Record<string, UserT>>({});
+    const [userCache, setUserCache] = useState<Record<string, UserT>>({});
 
     const { toast } = useToast();
 
@@ -91,16 +92,34 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
           }
         };
 
+        // const fetchUserData = async (userId: string | number) => {
+        //   if (userId && !users[userId]) {
+        //     try {
+        //         const profile = await fetchProfile('', Number(userId));
+        //         setUsers((prev) => ({ ...prev, [userId]: profile.user }));
+        //     } catch (error) {
+        //         console.error('Error fetching user profile:', error);
+        //     }
+        // }
+        // };
         const fetchUserData = async (userId: string | number) => {
           if (userId && !users[userId]) {
-            try {
-                const profile = await fetchProfile('', Number(userId));
-                setUsers((prev) => ({ ...prev, [userId]: profile.user }));
-            } catch (error) {
-                console.error('Error fetching user profile:', error);
+            if (userCache[userId]) {
+              setUsers((prev) => ({ ...prev, [userId]: userCache[userId] }));
+              return;
             }
-        }
+            
+            try {
+              const profile = await fetchProfile('', Number(userId));
+              setUsers((prev) => ({ ...prev, [userId]: profile.user }));
+              setUserCache((prev) => ({ ...prev, [userId]: profile.user })); // Cache the profile
+            } catch (error) {
+              console.error('Error fetching user profile:', error);
+            }
+          }
         };
+
+        
 
         return (
           <div className='h-full overflow-y-auto'>

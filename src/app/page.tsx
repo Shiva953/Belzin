@@ -9,8 +9,8 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// CREATE BETTING SMART CONTRACT + BETTING BLINK, ADD IT IN THE TOOL(along with agent blink execution capability)
-// ADD BLINK CLIENT SUPPORT, FIX WALLET AUTH ONCE AND FOR ALL
+// CREATE BETTING BLINK, ADD IT IN THE TOOL(along with agent blink execution capability)
+// ADD BLINK CLIENT SUPPORT
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading, error } = useProfile(publicKey?.toString());
