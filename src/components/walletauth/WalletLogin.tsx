@@ -37,23 +37,31 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
     if (!wallet.publicKey || !wallet.signMessage || !wallet.signIn) return;
 
+    const nonce = await getCsrfToken();
+    console.log("CSRF Token from frontend: ",nonce)
+
     // Creation of SignInInput to be passed to wallet.signIn
     const input: SolanaSignInInput = {
       domain: window.location.host,
       address: wallet.publicKey?.toBase58() || '',
       statement: 'Sign in to the App',
-      nonce: await getCsrfToken(),
+      nonce: nonce,
     }
+    
 
     // const data = new TextEncoder().encode(`${input.statement}${input.nonce}`);
     // const signature = await wallet.signMessage(data);
     // const serializedSignature = bs58.encode(signature);
   
     // Actual signature by the user through the wallet
+    console.log("Client - Original Input:", input);
     const output: SolanaSignInOutput = await wallet.signIn(input)
+    console.log("Client - Original Output:", output);
 
     // Serialisation of the input and output data
     const { jsonInput, jsonOutput }: { jsonInput: string, jsonOutput: string } = serializeData(input, output);
+    console.log("Client - Serialized Input:", jsonInput);
+    console.log("Client - Serialized Output:", jsonOutput);
 
     // Signing in the user with NextAuth.js signIn()
     await signInWallet(jsonInput, jsonOutput);
@@ -150,7 +158,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
     };
   
     handleAuth();
-  }, [wallet.connected, status]);
+  }, [wallet.connected]);
 
   return (
     <>

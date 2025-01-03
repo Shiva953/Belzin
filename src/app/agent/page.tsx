@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button';
 import { useChat } from "ai/react"
 import { Paperclip, ArrowUp } from 'lucide-react';
 
-// 1. CREATE CUSTOM BLINK TOOL -> FINALLY FIX AGENT->USER MESSAGE CHAT FRONTEND+BACKEND ONCE AND FOR ALL -> ADD BLINK CLIENT SUPPORT AND MAKE THE AGENT RETURN A BLINK
-// 2. CREATE BETTING BLINK + BETTING SMART CONTRACT, ADD IT IN THE TOOL
+// CREATE BETTING SMART CONTRACT + BETTING BLINK, ADD IT IN THE TOOL(along with agent blink execution capability)
+// ADD BLINK CLIENT SUPPORT, FIX WALLET AUTH ONCE AND FOR ALL
 
 interface Message {
   type: 'User' | 'Agent' | 'System' | 'Error';

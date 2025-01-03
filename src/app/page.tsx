@@ -9,11 +9,9 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// ADD BLINK SUPPORT, EXTEND AGENT KIT TO RETURN BETTING+TRADING+VARIOUS OTHER KINDS OF BLINKS
-// FIRST LETS TRY WITH DIAL BLINKS
-// FIX WALLET AUTH ISSUES
+// CREATE BETTING SMART CONTRACT + BETTING BLINK, ADD IT IN THE TOOL(along with agent blink execution capability)
+// ADD BLINK CLIENT SUPPORT, FIX WALLET AUTH ONCE AND FOR ALL
 export default function Home() {
-
   const { connected, publicKey } = useWallet()
   const { profile, loading, error } = useProfile(publicKey?.toString());
 

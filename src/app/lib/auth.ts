@@ -4,6 +4,7 @@ import { getCsrfToken } from "next-auth/react";
 import { deserializeData } from "./utils";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { cookies } from "next/headers";
 // import bs58 from 'bs58';
 
 export const providers = [
@@ -22,14 +23,23 @@ export const providers = [
       },
         async authorize(credentials, req) {
           try {
+            console.log("CSRF TOKEN FROM COOKIES: ",(await cookies()).get('next-auth.csrf-token'));
+            console.log("CSRF TOKEN FROM SERVER: ",(await getCsrfToken({ req: { ...req, body: null } })))
+            const csrf = (await cookies()).get('next-auth.csrf-token')?.value.split('|')[0] || (await getCsrfToken({ req: { ...req, body: null } }));
             const { input, output }: {
               input: SolanaSignInInput,
               output: SolanaSignInOutput
             } = await deserializeData(
               credentials?.input || "",
               credentials?.output || "",
-              await getCsrfToken({ req: { ...req, body: null } })
+              csrf
             );
+
+            console.log("Server - Deserialized Input:", input);
+            console.log("Server - Deserialized Output:", output);
+
+            const verificationResult = verifySignIn(input, output);
+            console.log("Server - Verification Result:", verificationResult);
 
             if (!verifySignIn(input, output)) {
               throw new Error("Invalid signature");

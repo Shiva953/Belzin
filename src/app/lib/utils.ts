@@ -30,38 +30,82 @@ function walletAccountToSerializableObject(walletAccount: WalletAccount): Serial
   }
 }
 
-export function serializeData(input: SolanaSignInInput, output: SolanaSignInOutput): {
-    jsonInput: any,
-    jsonOutput: any
-} {
-    const account: SerialisableWalletAccount = walletAccountToSerializableObject(output.account);
-    const jsonOutput: string = JSON.stringify({...output, account});
-    const jsonInput: string = JSON.stringify(input);
+// export function serializeData(input: SolanaSignInInput, output: SolanaSignInOutput): {
+//     jsonInput: any,
+//     jsonOutput: any
+// } {
+//     const account: SerialisableWalletAccount = walletAccountToSerializableObject(output.account);
+//     const jsonOutput: string = JSON.stringify({...output, account});
+//     const jsonInput: string = JSON.stringify(input);
 
-    return { jsonInput, jsonOutput }
+//     return { jsonInput, jsonOutput }
+// }
+
+// export async function deserializeData(jsonInput: string, jsonOutput: string, csrfToken: string | undefined) {
+//     const parsedInput: SolanaSignInInput = await JSON.parse(jsonInput);
+//     const input: SolanaSignInInput = {...parsedInput, nonce: csrfToken};
+
+//     const parsedOutput: any = await JSON.parse(jsonOutput);
+
+//     // Deserialization of the WalletAccount Object
+//     const account = {...parsedOutput.account, publicKey: new Uint8Array(parsedOutput.account.publicKeyLength)};
+//     for (let i = 0; i < parsedOutput.account.publicKeyLength; i++) {
+//       account.publicKey[i] = parsedOutput.account.publicKey[i];
+//     }
+//     delete parsedOutput.account.publicKeyLength;
+
+//     // Final Output Object
+//     const output: SolanaSignInOutput = {
+//       account: account,
+//       signedMessage: new Uint8Array(parsedOutput.signedMessage.data),
+//       signature: new Uint8Array(parsedOutput.signature.data),
+//     };
+
+//     return { input, output };
+// }
+
+export function serializeData(input: SolanaSignInInput, output: SolanaSignInOutput): {
+  jsonInput: string,
+  jsonOutput: string
+} {
+  // Convert account's publicKey to array
+  const account = {
+      ...output.account,
+      publicKey: Array.from(output.account.publicKey),
+      publicKeyLength: output.account.publicKey.length
+  };
+
+  // Convert other Uint8Arrays to arrays
+  const jsonOutput = JSON.stringify({
+      account,
+      signedMessage: Array.from(output.signedMessage),
+      signature: Array.from(output.signature)
+  });
+
+  const jsonInput = JSON.stringify(input);
+  return { jsonInput, jsonOutput };
 }
 
 export async function deserializeData(jsonInput: string, jsonOutput: string, csrfToken: string | undefined) {
-    const parsedInput: SolanaSignInInput = await JSON.parse(jsonInput);
-    const input: SolanaSignInInput = {...parsedInput, nonce: csrfToken};
+  const parsedInput: SolanaSignInInput = JSON.parse(jsonInput);
+  const input: SolanaSignInInput = {...parsedInput, nonce: csrfToken};
 
-    const parsedOutput: any = await JSON.parse(jsonOutput);
+  const parsedOutput = JSON.parse(jsonOutput);
 
-    // Deserialization of the WalletAccount Object
-    const account = {...parsedOutput.account, publicKey: new Uint8Array(parsedOutput.account.publicKeyLength)};
-    for (let i = 0; i < parsedOutput.account.publicKeyLength; i++) {
-      account.publicKey[i] = parsedOutput.account.publicKey[i];
-    }
-    delete parsedOutput.account.publicKeyLength;
+  // Reconstruct the account with proper Uint8Array
+  const account = {
+      ...parsedOutput.account,
+      publicKey: new Uint8Array(parsedOutput.account.publicKey)
+  };
 
-    // Final Output Object
-    const output: SolanaSignInOutput = {
-      account: account,
-      signedMessage: new Uint8Array(parsedOutput.signedMessage.data),
-      signature: new Uint8Array(parsedOutput.signature.data),
-    };
+  // Final Output Object with proper Uint8Arrays
+  const output: SolanaSignInOutput = {
+      account,
+      signedMessage: new Uint8Array(parsedOutput.signedMessage),
+      signature: new Uint8Array(parsedOutput.signature)
+  };
 
-    return { input, output };
+  return { input, output };
 }
 
 export async function fetchProfile(pubkey: string, userId: number) {

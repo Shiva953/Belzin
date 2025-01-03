@@ -27,6 +27,7 @@ export function useProfile(pubkey?: string, userId?: number | string) {
         });
 
         const data = await res.json();
+        console.log("Use Profile Check")
         
         if (data.user) {
           setProfile(data.user);

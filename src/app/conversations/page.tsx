@@ -7,12 +7,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { useFriends } from "@/hooks/useFriends";
 import { Loader2 } from "lucide-react";
 
-// (DM INITIATOR USERID-PARTNER USERID)[ROUTE + DB FIX]
-// BETTING CONTRACTS
-
-// integrating agent solana agent kit in chat and adding custom tools for betting, trading/other blinks
-// upon pinging agent (@agent then entering the prompt it would the betting/trading/other blink for you)
-
 export type FriendT = {
     id: string | number,
     username: string,
