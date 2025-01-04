@@ -25,17 +25,25 @@ import { Betting,IDL } from "@/types/betting";
 // get the params(bet title, bet amount) -> create bet -> WHEN BET CREATED, SHOW THE INTERFACE WITH SIDES ("YES"|"NO")
 
 // bet is ALREADY CREATED BY THE AGENT, YOU SEE THE PLACEBET INTERFACE HERE
-// ex - /api/actions/bet?betId=2QeK279LrHguLGAAr9S3RGEYnWuYZEzHv5iMixuG1NU9
+// ex - /api/actions/bet?betId=8qh4Gnua1xzAyw2EyHiVHR5A9F2fbqRDLfZ21MNdMvyu
 export const GET = async (req: Request) => {
     const requestUrl = new URL(req.url as string);
-    const betAccountId = requestUrl.searchParams.get("bet");
-    console.log(betAccountId)
+    console.log("Request URL: ",requestUrl)
+    const betAccountId = requestUrl.searchParams.get("betId");
+    console.log("Bet Account ID: ",betAccountId)
 
     const connection = new Connection(process.env.SOLANA_RPC! || clusterApiUrl("devnet"), "confirmed");
+    const wallet = { publicKey: new PublicKey("CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E") } as anchor.Wallet;
+    const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
+        
+    anchor.setProvider(provider);
     const betAccountKey = new PublicKey(betAccountId!)
-    const program = new Program<Betting>(IDL as Betting);
+    const program = new Program<Betting>(IDL as Betting, provider);
     const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
     const betTitle = betAccountInfo.title;
+    console.log("Bet Amount: ", betAccountInfo.betAmount.toNumber())
+    console.log("Total Yes Amount: ", betAccountInfo.totalYesAmount.toNumber())
+    console.log("Total No Amount: ", betAccountInfo.totalNoAmount.toNumber())
 
     console.log(betTitle)
 
@@ -73,6 +81,8 @@ export async function POST(req: Request){
         const body: ActionPostRequest = await req.json(); //the POST request body
         const bettorAccount = new PublicKey(body.account);
 
+        console.log("Bettor Account: ", bettorAccount.toBase58())
+
         const connection = new Connection(process.env.SOLANA_RPC! || clusterApiUrl("devnet"), "confirmed");
         const wallet = { publicKey: bettorAccount } as anchor.Wallet;
         const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
@@ -83,6 +93,8 @@ export async function POST(req: Request){
         if(side){
           betDirection = side === "YES" ? true : false;
         }
+        console.log(side)
+        console.log(betDirection)
 
         const betAccountKey = new PublicKey(betId!);
 
@@ -97,15 +109,19 @@ export async function POST(req: Request){
         );
         
         //amount is fixed here
-        const tx = await program.methods
+        //add signer aptly
+        const ixn = await program.methods
         .placeBet(betDirection)
         .accounts({
-          bet: betAccountKey,
           bettor: bettorAccount,
+          bet: betAccountKey,
           bettorTokenAccount: bettorTokenAccount,
           vaultTokenAccount: vaultTokenAccount,
         })
-        .transaction()
+        .instruction()
+
+        const tx = new Transaction();
+        tx.add(ixn);
 
         tx.feePayer = bettorAccount;
         tx.recentBlockhash = (
@@ -134,6 +150,13 @@ export async function POST(req: Request){
         });
     }
 }
+
+export const OPTIONS = async (req: Request) => {
+  return new Response(null, {
+    status: 204,
+    headers: ACTIONS_CORS_HEADERS,
+  });
+};
 
 function validatedQueryParams(requestUrl: URL) {
     let betId;
