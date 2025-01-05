@@ -18,6 +18,9 @@ import {
     SystemProgram,
     Transaction,
     TransactionInstruction,
+    TransactionMessage,
+    VersionedMessage,
+    VersionedTransaction,
   } from "@solana/web3.js";
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
 import { Betting,IDL } from "@/types/betting";
@@ -44,6 +47,8 @@ export const GET = async (req: Request) => {
     console.log("Bet Amount: ", betAccountInfo.betAmount.toNumber())
     console.log("Total Yes Amount: ", betAccountInfo.totalYesAmount.toNumber())
     console.log("Total No Amount: ", betAccountInfo.totalNoAmount.toNumber())
+    console.log("Total Yes Bettors:", betAccountInfo.yesBettors.toNumber())
+    console.log("Total No Bettors: ",betAccountInfo.noBettors.toNumber())
 
     console.log(betTitle)
 
@@ -83,7 +88,7 @@ export async function POST(req: Request){
 
         console.log("Bettor Account: ", bettorAccount.toBase58())
 
-        const connection = new Connection(process.env.SOLANA_RPC! || clusterApiUrl("devnet"), "confirmed");
+        const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
         const wallet = { publicKey: bettorAccount } as anchor.Wallet;
         const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
         
@@ -97,6 +102,7 @@ export async function POST(req: Request){
         console.log(betDirection)
 
         const betAccountKey = new PublicKey(betId!);
+        console.log("Bet Account: ",betAccountKey.toBase58())
 
         const [vaultTokenAccount] = PublicKey.findProgramAddressSync(
           [Buffer.from("vault_token_account"), betAccountKey.toBuffer()],
@@ -107,6 +113,9 @@ export async function POST(req: Request){
           bettorAccount,
           true
         );
+
+        console.log("Bettor Token Account: ", bettorTokenAccount.toBase58())
+        console.log("Vault token account: ", vaultTokenAccount.toBase58())
         
         //amount is fixed here
         //add signer aptly
@@ -120,21 +129,26 @@ export async function POST(req: Request){
         })
         .instruction()
 
-        const tx = new Transaction();
-        tx.add(ixn);
+        const tx = new VersionedTransaction(new TransactionMessage({
+          payerKey: bettorAccount,
+          recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+          instructions: [ixn],
+        }).compileToV0Message())
+        const serializedTransaction = tx.serialize();
+        const base64Transaction = Buffer.from(serializedTransaction).toString(
+          "base64"
+        );
 
-        tx.feePayer = bettorAccount;
-        tx.recentBlockhash = (
-          await connection.getLatestBlockhash()
-        ).blockhash;
+        console.log("transaction: ", tx)
 
         const payload: ActionPostResponse = await createPostResponse({
           fields: {
             transaction: tx,
             type: "transaction",
-            message: `Successfully Placed Bet for side ${side!}`,
+            message: `Ready to place bet for side ${side!}`,
           },
         }); 
+        console.log("does it go through?")
         
         return Response.json(payload, {
           headers: ACTIONS_CORS_HEADERS,
