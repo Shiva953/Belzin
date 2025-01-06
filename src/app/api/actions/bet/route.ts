@@ -23,7 +23,8 @@ import {
     VersionedTransaction,
   } from "@solana/web3.js";
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
-import { Betting,IDL } from "@/types/betting";
+  import { epochToDateString } from "@/app/lib/utils";
+  import { Betting,IDL } from "@/types/betting";
 // agent creates the bet already(using bet title and bet amount -> createBet), after that you get the blink = frontend for placeBet
 // get the params(bet title, bet amount) -> create bet -> WHEN BET CREATED, SHOW THE INTERFACE WITH SIDES ("YES"|"NO")
 
@@ -35,7 +36,7 @@ export const GET = async (req: Request) => {
     const betAccountId = requestUrl.searchParams.get("betId");
     console.log("Bet Account ID: ",betAccountId)
 
-    const connection = new Connection(process.env.SOLANA_RPC! || clusterApiUrl("devnet"), "confirmed");
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     const wallet = { publicKey: new PublicKey("CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E") } as anchor.Wallet;
     const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
         
@@ -44,6 +45,8 @@ export const GET = async (req: Request) => {
     const program = new Program<Betting>(IDL as Betting, provider);
     const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
     const betTitle = betAccountInfo.title;
+    const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
+    const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);
     console.log("Bet Amount: ", betAccountInfo.betAmount.toNumber())
     console.log("Total Yes Amount: ", betAccountInfo.totalYesAmount.toNumber())
     console.log("Total No Amount: ", betAccountInfo.totalNoAmount.toNumber())
@@ -55,7 +58,7 @@ export const GET = async (req: Request) => {
     const payload: ActionGetResponse = {
       title: betTitle,
       icon: 'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/',
-      description: "Place Bets using blinks",
+      description: `Bet Resolves on ${betResolutionDateString}`,
       label: "Bet",
       links: {
         actions: [
@@ -78,7 +81,7 @@ export const GET = async (req: Request) => {
       });
   }
 
-export async function POST(req: Request){
+export const POST = async(req: Request) => {
     try{
         const requestUrl = new URL(req.url);
         const { betId, side } = validatedQueryParams(requestUrl);
@@ -113,16 +116,11 @@ export async function POST(req: Request){
           bettorAccount,
           true
         );
-
-        console.log("Bettor Token Account: ", bettorTokenAccount.toBase58())
-        console.log("Vault token account: ", vaultTokenAccount.toBase58())
         
-        //amount is fixed here
-        //add signer aptly
         const ixn = await program.methods
         .placeBet(betDirection)
         .accounts({
-          bettor: bettorAccount,
+          bettor: provider.wallet.publicKey,
           bet: betAccountKey,
           bettorTokenAccount: bettorTokenAccount,
           vaultTokenAccount: vaultTokenAccount,
@@ -134,18 +132,15 @@ export async function POST(req: Request){
           recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
           instructions: [ixn],
         }).compileToV0Message())
-        const serializedTransaction = tx.serialize();
-        const base64Transaction = Buffer.from(serializedTransaction).toString(
-          "base64"
-        );
 
-        console.log("transaction: ", tx)
+
+        console.log("Signed transaction: ", tx)
 
         const payload: ActionPostResponse = await createPostResponse({
           fields: {
             transaction: tx,
             type: "transaction",
-            message: `Ready to place bet for side ${side!}`,
+            message: `Successfully Placed bet for side ${side!}`,
           },
         }); 
         console.log("does it go through?")
