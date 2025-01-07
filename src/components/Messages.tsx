@@ -13,17 +13,18 @@ import { fetchProfile } from '@/app/lib/utils';
 import { UserT } from './user-profile';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Copy } from 'lucide-react';
+import { Copy,Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from './ui/skeleton';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { Button } from './ui/button';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare,ExternalLink } from 'lucide-react';
 import { clusterApiUrl, Connection } from '@solana/web3.js';
 import { WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import '@dialectlabs/blinks/index.css';
+import Image from 'next/image';
 
 //REMOVE THE /user/getProfile(fetchUserData) call FOR EVERY SINGLE MESSAGE, IT SHOULD BE AN INHERENT PROPERTY OF THE MESSAGE(SENDER ID SHOULD BE MAPPED TO USER)
 //THE ABOVE SHOULD PREVENT RE-RENDER ISSUE
@@ -115,96 +116,101 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         return (
           <WalletProvider wallets={[]} autoConnect>
           <WalletModalProvider>
-          <div className='h-full overflow-y-auto'>
+          <div className='h-full overflow-y-auto bg-gradient-to-b from-background to-card'>
             <div className='flex flex-col-reverse gap-4 p-3'>
-              <div ref={scrollDownRef} />
-              { messages.length === 0 ? (
+                <div ref={scrollDownRef} />
+                {messages.length === 0 ? (
                     <div className="text-center text-muted-foreground py-4">
                         No messages yet. Start the conversation!
                     </div>
                 ) : 
-              (messages.map((message, index) => {
-                const isCurrentUser = message.senderId == currentUserId;
-                const user = users[message.senderId!];
-                const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
-                return (
-                  <div
-                    key={`${message.id}-${message.timestamp}`}
-                    className={cn('flex items-end gap-2', {
-                      'flex-row-reverse': isCurrentUser,
-                    })}
-                  >
-                    <Popover>
-                      <PopoverTrigger>
-                        <UserAvatar user={user} />
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <div className="flex flex-col gap-2 p-3">
-                          <div className="flex items-center gap-3">
-                            <UserAvatar user={user} size="large" />
-                            <button
-                              onClick={() => copyToClipboard(user?.walletPublicKey || '')}
-                              className="flex items-center gap-2 px-3 py-2 bg-secondary/80 hover:bg-secondary rounded-lg text-sm font-mono"
+                (messages.map((message, index) => {
+                    const isCurrentUser = message.senderId == currentUserId;
+                    const user = users[message.senderId!];
+                    const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
+                    return (
+                        <div
+                            key={`${message.id}-${message.timestamp}`}
+                            className={cn('flex items-end gap-2', {
+                                'flex-row-reverse': isCurrentUser,
+                            })}
+                        >
+                            <Popover>
+                                <PopoverTrigger>
+                                    <UserAvatar user={user} />
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 p-0">
+                                    <div className="flex flex-col bg-black rounded-lg overflow-hidden">
+                                        <div className="p-4 space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                    <UserAvatar user={user} size="large" />
+                                                    <div className="font-mono text-sm">
+                                                        {shortenPublicKey(user?.walletPublicKey || '')}
+                                                    </div>
+                                                </div>
+                                                <Button variant="ghost" size="sm" className="text-white" onClick={() => window.open(`https://solscan.io/account/${user.walletPublicKey}`)}>
+                                                    Account
+                                                </Button>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="text-3xl font-bold">$0.00</div>
+                                                <div className="text-sm text-gray-400">BALANCE</div>
+                                            </div>
+                                            <div className="flex items-center justify-between bg-gray-900 rounded-lg p-3">
+                                                <div className="flex items-center space-x-2">
+                                                    <Image src={"https://s3.coinmarketcap.com/static-gravity/image/5cc0b99a8dd84fbfa4e150d84b5531f2.png"} alt="Solana" width={"6"} height={"6"} className="w-6 h-6"/>
+                                                    <div>
+                                                        <div className="font-semibold">Solana</div>
+                                                        <div className="text-sm text-gray-400">0 SOL</div>
+                                                    </div>
+                                                </div>
+                                                <Button variant="secondary" size="sm">
+                                                    Swap
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                            <div
+                                className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative glow-effect', {
+                                    'bg-primary text-primary-foreground': isCurrentUser,
+                                    'bg-secondary text-secondary-foreground': !isCurrentUser,
+                                    'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
+                                    'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
+                                })}
                             >
-                              {shortenPublicKey(user?.walletPublicKey || '')}
-                              <Copy className="h-3.5 w-3.5 opacity-70" />
-                            </button>
-                          </div>
-                          {channel=='global-chat' && !isCurrentUser && (
-                            <Button 
-                            variant="secondary" 
-                            className="w-full"
-                            onClick={() => handleStartDM(user?.id)}
-                          >
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                            Start DM
-                          </Button>
-                        )}
+                                <MessageContent content={message.content || ''} />
+                                <div className="text-xs text-foreground/50 mt-1 text-right">
+                                    {formatTimestamp(Number(message.timestamp))}
+                                </div>
+                            </div>
                         </div>
-                      </PopoverContent>
-                    </Popover>
-                    <div
-                      className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative', {
-                        'bg-primary text-primary-foreground': isCurrentUser,
-                        'bg-secondary text-secondary-foreground': !isCurrentUser,
-                        'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
-                        'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
-                      })}
-                    >
-                      {/* <div className="break-words">{message.content}</div> */}
-                      <MessageContent content={message.content || ''} />
-                      <div className="text-xs text-foreground/50 mt-1 text-right">
-                        {formatTimestamp(Number(message.timestamp))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }))}
+                    );
+                }))}
             </div>
-          </div>
+        </div>
           </WalletModalProvider>
     </WalletProvider>
         );
 }
 
-function UserAvatar({ user, size = "default" }: { user: UserT, size?: "default" | "large" }) {
+export function UserAvatar({ user, size = "default" }: { user: UserT, size?: "default" | "large" }) {
   const gradient = getRandomGradient(user?.id);
-  const sizeClasses = size === "large" ? "w-10 h-10" : "w-8 h-8";
-  
-  return (
-    <Avatar className={cn(
-      sizeClasses,
-      "bg-gradient-to-br transition-all duration-300",
-      gradient.normal,
-      "hover:bg-gradient-to-br",
-      gradient.hover
-    )}>
-      <AvatarImage src={user?.imageUrl} alt={user?.username} />
-      <AvatarFallback className="bg-transparent text-primary-foreground">
-        {' '}
-      </AvatarFallback>
-    </Avatar>
-  );
+  const sizeClasses = size === "large" ? "w-12 h-12" : "w-10 h-10";
+    
+    return (
+        <Avatar className={cn(
+            sizeClasses,
+            `bg-gradient-to-br ${gradient.normal} hover:${gradient.hover}`
+        )}>
+            <AvatarImage src={user?.imageUrl} alt={user?.username} />
+            <AvatarFallback className="bg-transparent text-white font-bold">
+                {user?.username?.charAt(0).toUpperCase() || '?'}
+            </AvatarFallback>
+        </Avatar>
+    );
 }
 
 const MessageContent = ({ content }: { content: string }) => {
@@ -222,7 +228,7 @@ const MessageContent = ({ content }: { content: string }) => {
     );
   }
   
-  return <div>{content}</div>;
+  return <div className='font-bold tracking-tighter'>{content}</div>;
 };
 
 const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
@@ -233,7 +239,12 @@ const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
   // const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
   
   if (isLoading) {
-    return <Skeleton className="h-20 w-full" />;
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground mt-2 h-20 bg-muted/50 rounded-lg p-4">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span>Loading Blink...</span>
+      </div>
+    );
   }
 
   if (!action) {

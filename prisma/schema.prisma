@@ -13,6 +13,7 @@ model User {
   username                              String?
   imageUrl                              String?
   friendList                            String[]
+  messages                              Message[]
   Friendship_Friendship_friend_idToUser Friendship[] @relation("Friendship_friend_idToUser")
   Friendship_Friendship_user_idToUser   Friendship[] @relation("Friendship_user_idToUser")
 }
@@ -20,8 +21,8 @@ model User {
 model Message {
   id        Int      @id @default(autoincrement())
   content   String?
-  sender    String?
-  senderId  String?
+  sender    User?    @relation(fields: [senderId], references: [id]) // Make relation optional
+  senderId  Int?     // Make optional and use Int to match User.id
   timestamp String?
   isAgent   Boolean?
 }

@@ -75,16 +75,13 @@ export default function Home() {
     const userId = profile?.id?.toString() || '';
 
   return (
-    <div className="w-full h-screen flex flex-col">
-        <div className="flex flex-row flex-1 bg-background">
-          <div className='mr-16'>
-          <VerticalNavbar />
-          </div>
-          {/* <ChatArea /> */}
-          <div className="flex-1 flex">
-          {userId && initialMessages && initialMessages.length>0 && <PublicChat userId={userId} initialMessages={initialMessages}/>}
-          </div>
-        </div>
+    <div className="flex h-screen">
+    <VerticalNavbar />
+    <div className="flex-1 overflow-hidden">
+      {userId && initialMessages && initialMessages.length > 0 && (
+        <PublicChat userId={userId} initialMessages={initialMessages}/>
+      )}
     </div>
+  </div>
   );
 }

@@ -45,6 +45,7 @@ export const GET = async (req: Request) => {
     const program = new Program<Betting>(IDL as Betting, provider);
     const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
     const betTitle = betAccountInfo.title;
+    const isBetResolved = betAccountInfo.resolved;
     const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
     const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);
     const reverseTest = dateStringToEpoch("31st December, 2025");
@@ -57,7 +58,9 @@ export const GET = async (req: Request) => {
 
     console.log(betTitle)
 
-    const payload: ActionGetResponse = {
+  
+
+    let payload: ActionGetResponse = {
       title: betTitle,
       icon: 'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/',
       description: `Bet Resolves on ${betResolutionDateString}`,
@@ -67,16 +70,34 @@ export const GET = async (req: Request) => {
             {
               label: "YES",
               type: "post",
-              href: `/api/actions/bet?betId=${betAccountId}&side=YES`,
+              href: `/api/actions/bet?betId=${betAccountId}&side=YES&action=placeBet`,
             },
             {
                 label: "NO",
                 type: "post",
-                href: `/api/actions/bet?betId=${betAccountId}&side=NO`,
+                href: `/api/actions/bet?betId=${betAccountId}&side=NO&action=placeBet`,
               },
           ],
       },
     };
+
+    if(isBetResolved){
+      payload = {
+        title: betTitle,
+        icon: 'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/',
+        description: `Claim Win/Check Loss`,
+        label: "Bet",
+        links: {
+          actions: [
+              {
+                label: "Claim",
+                type: "post",
+                href: `/api/actions/bet?betId=${betAccountId}&action=claim`,
+              },
+            ],
+        },
+      };
+    }
   
     return Response.json(payload, {
         headers: ACTIONS_CORS_HEADERS,
@@ -86,12 +107,13 @@ export const GET = async (req: Request) => {
 export const POST = async(req: Request) => {
     try{
         const requestUrl = new URL(req.url);
-        const { betId, side } = validatedQueryParams(requestUrl);
-
+        const { action, betId } = checkAction(requestUrl)
         const body: ActionPostRequest = await req.json(); //the POST request body
         const bettorAccount = new PublicKey(body.account);
 
-        console.log("Bettor Account: ", bettorAccount.toBase58())
+        const betAccountKey = new PublicKey(betId!);
+        console.log("Bet Account: ",betAccountKey.toBase58())
+
 
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
         const wallet = { publicKey: bettorAccount } as anchor.Wallet;
@@ -99,58 +121,101 @@ export const POST = async(req: Request) => {
         
         anchor.setProvider(provider);
         const program = new Program<Betting>(IDL as Betting, provider);
-        let betDirection = false;
-        if(side){
-          betDirection = side === "YES" ? true : false;
-        }
-        console.log(side)
-        console.log(betDirection)
-
-        const betAccountKey = new PublicKey(betId!);
-        console.log("Bet Account: ",betAccountKey.toBase58())
+        const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
+        const tokenMint = betAccountInfo.tokenMint;
+        const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber()
 
         const [vaultTokenAccount] = PublicKey.findProgramAddressSync(
           [Buffer.from("vault_token_account"), betAccountKey.toBuffer()],
           program.programId
         );
         const bettorTokenAccount = await getAssociatedTokenAddress(
-          new PublicKey("GBmXkFGMxsYUM48vwQGGfSA1X4AVWj8Pf2oADAHdfAEa"),
+          tokenMint,
           bettorAccount,
           true
         );
-        
-        const ixn = await program.methods
-        .placeBet(betDirection)
+
+        // const currentTime = Date.now()/1000;
+        // if(currentTime >= betResolutionDateInEpochTimestamp){
+        //   //resolving the bet, this would involve checking from an external source like perplexity
+        //   const outcome = false;//??
+        //   const tx = await program.methods.
+        //   resolveBet(outcome)
+        //   .accounts()
+        // }
+
+        if(action == 'placeBet'){
+          const { side } = checkSide(requestUrl);
+
+          console.log("Bettor Account: ", bettorAccount.toBase58())
+
+          // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+          // const wallet = { publicKey: bettorAccount } as anchor.Wallet;
+          // const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
+          
+          // anchor.setProvider(provider);
+          // const program = new Program<Betting>(IDL as Betting, provider);
+          let betDirection = false;
+          if(side){
+            betDirection = side === "YES" ? true : false;
+          }
+ 
+          const ixn = await program.methods
+          .placeBet(betDirection)
+          .accounts({
+            bettor: provider.wallet.publicKey,
+            bet: betAccountKey,
+            bettorTokenAccount: bettorTokenAccount,
+            vaultTokenAccount: vaultTokenAccount,
+          })
+          .instruction()
+
+          const tx = new VersionedTransaction(new TransactionMessage({
+            payerKey: bettorAccount,
+            recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+            instructions: [ixn],
+          }).compileToV0Message())
+
+          const payload: ActionPostResponse = await createPostResponse({
+            fields: {
+              transaction: tx,
+              type: "transaction",
+              message: `Successfully Placed bet for side ${side!}`,
+            },
+          }); 
+          
+          return Response.json(payload, {
+            headers: ACTIONS_CORS_HEADERS,
+          });
+      }
+      else if(action == 'claim'){
+        const claimIxn = await program.methods.claimWinnings()
         .accounts({
-          bettor: provider.wallet.publicKey,
           bet: betAccountKey,
-          bettorTokenAccount: bettorTokenAccount,
+          user: bettorAccount,
           vaultTokenAccount: vaultTokenAccount,
+          userTokenAccount: bettorTokenAccount 
         })
         .instruction()
 
-        const tx = new VersionedTransaction(new TransactionMessage({
-          payerKey: bettorAccount,
-          recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-          instructions: [ixn],
-        }).compileToV0Message())
+      const tx = new VersionedTransaction(new TransactionMessage({
+        payerKey: bettorAccount,
+        recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+        instructions: [claimIxn],
+      }).compileToV0Message())
 
-
-        console.log("Signed transaction: ", tx)
-
-        const payload: ActionPostResponse = await createPostResponse({
-          fields: {
-            transaction: tx,
-            type: "transaction",
-            message: `Successfully Placed bet for side ${side!}`,
-          },
-        }); 
-        console.log("does it go through?")
-        
-        return Response.json(payload, {
-          headers: ACTIONS_CORS_HEADERS,
-        });
-
+      const payload: ActionPostResponse = await createPostResponse({
+        fields: {
+          transaction: tx,
+          type: "transaction",
+          message: `Successfully Claimed`,
+        },
+      }); 
+      
+      return Response.json(payload, {
+        headers: ACTIONS_CORS_HEADERS,
+      });
+    }
     } catch(err){
         console.log(err);
         let message = "An unknown error occurred";
@@ -169,16 +234,8 @@ export const OPTIONS = async (req: Request) => {
   });
 };
 
-function validatedQueryParams(requestUrl: URL) {
-    let betId;
+function checkSide(requestUrl: URL) {
     let side;
-    try {
-      if (requestUrl.searchParams.get("betId")) {
-        betId = requestUrl.searchParams.get("betId")!;
-      }
-    } catch (err) {
-      throw "Invalid input query parameters";
-    }
     try {
       if (requestUrl.searchParams.get("side")) {
         side = requestUrl.searchParams.get("side");
@@ -187,5 +244,26 @@ function validatedQueryParams(requestUrl: URL) {
       throw "Invalid input query parameters";
     }
   
-    return { betId, side };
+    return { side };
+  }
+
+  function checkAction(requestUrl: URL) {
+    let action;
+    let betId;
+    try {
+      if (requestUrl.searchParams.get("action")) {
+        action = requestUrl.searchParams.get("action")!;
+      }
+    } catch (err) {
+      throw "Invalid input query parameters";
+    }
+    try {
+      if (requestUrl.searchParams.get("betId")) {
+        betId = requestUrl.searchParams.get("betId")!;
+      }
+    } catch (err) {
+      throw "Invalid input query parameters";
+    }
+  
+    return { action, betId };
   }

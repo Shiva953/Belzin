@@ -21,6 +21,16 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's3.coinmarketcap.com',
+        port: '',
+        pathname: '/static-gravity/image/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

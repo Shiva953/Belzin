@@ -8,6 +8,7 @@ import axios from "axios"
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Send } from 'lucide-react'
 
 export function MessageInput({chatId} : {chatId?: string}){
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -72,26 +73,30 @@ export function MessageInput({chatId} : {chatId?: string}){
       }
 
       return (
-          <div className="relative w-full p-3 border-t bg-background">
-            <div className="flex items-center space-x-2">
-              <div className="flex-1">
+        <div className="relative w-full p-3 border-t border-border bg-card">
+        <div className="flex items-center space-x-2">
+            <div className="flex-1">
                 <Input 
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder='Send Message in Global Chat'
-                  className="w-full rounded-full px-4 py-2 border focus:ring-2 focus:ring-primary/50 transition-all"
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder='Send Message'
+                    className="w-full rounded-full px-4 py-2 border-primary focus:ring-2 focus:ring-primary/50 transition-all glow-effect bg-muted"
                 />
-              </div>
-              <Button 
-                onClick={sendMessage} 
-                disabled={!input.trim()}
-                className="rounded-full px-4 py-2 transition-all hover:bg-primary/90 disabled:opacity-50"
-              >
-                Send
-              </Button>
             </div>
-          </div>
+            <Button 
+                onClick={sendMessage} 
+                disabled={!input.trim() || isLoading}
+                className="rounded-full px-4 py-2 transition-all hover:bg-primary/90 disabled:opacity-50 gradient-bg"
+            >
+                {isLoading ? (
+                    <div className="w-6 h-6 border-t-2 border-b-2 border-primary rounded-full animate-spin"></div>
+                ) : (
+                    <Send className="w-5 h-5" />
+                )}
+            </Button>
+        </div>
+    </div>
       );
 }
