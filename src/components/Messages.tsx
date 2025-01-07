@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import {pusherClient} from '@/lib/pusher';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Action, Blink, ActionsRegistry, useAction } from "@dialectlabs/blinks";
 import { useActionSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana"
 import { format } from "date-fns";
@@ -20,7 +20,12 @@ import { shortenPublicKey } from '@/app/lib/utils';
 import { Button } from './ui/button';
 import { MessageSquare } from 'lucide-react';
 import { clusterApiUrl, Connection } from '@solana/web3.js';
+import { WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 
+//REMOVE THE /user/getProfile(fetchUserData) call FOR EVERY SINGLE MESSAGE, IT SHOULD BE AN INHERENT PROPERTY OF THE MESSAGE(SENDER ID SHOULD BE MAPPED TO USER)
+//THE ABOVE SHOULD PREVENT RE-RENDER ISSUE
 export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [users, setUsers] = useState<Record<string, UserT>>({});
@@ -105,24 +110,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
             }
         }
         };
-        // const fetchUserData = async (userId: string | number) => {
-        //   if (userId && !users[userId]) {
-        //     if (userCache[userId]) {
-        //       setUsers((prev) => ({ ...prev, [userId]: userCache[userId] }));
-        //       return;
-        //     }
-            
-        //     try {
-        //       const profile = await fetchProfile('', Number(userId));
-        //       setUsers((prev) => ({ ...prev, [userId]: profile.user }));
-        //       setUserCache((prev) => ({ ...prev, [userId]: profile.user }));
-        //     } catch (error) {
-        //       console.error('Error fetching user profile:', error);
-        //     }
-        //   }
-        // };
-
-        
 
         return (
           <div className='h-full overflow-y-auto'>
@@ -226,7 +213,7 @@ const MessageContent = ({ content }: { content: string }) => {
     const actionUrl = match[0];
     return (
       <div>
-        <div className="mb-2">{content}</div>
+        {/* <div className="mb-2">{content}</div> */}
         <BlinkComponent actionApiUrl={actionUrl} />
       </div>
     );
@@ -236,8 +223,11 @@ const MessageContent = ({ content }: { content: string }) => {
 };
 
 const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
+  console.log("Action API Url: ",actionApiUrl)
   const { adapter } = useActionSolanaWalletAdapter(new Connection(clusterApiUrl("devnet"), "confirmed"));
   const { action, isLoading } = useAction({url: actionApiUrl});
+
+  const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
   
   if (isLoading) {
     return <Skeleton className="h-20 w-full" />;
@@ -247,5 +237,13 @@ const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
     return <div className="text-sm text-muted-foreground">Failed to load bet details</div>;
   }
 
-  return <Blink action={action!} stylePreset='x-dark' adapter={adapter} />;
+  return (
+    <WalletProvider wallets={wallets} autoConnect>
+      <WalletModalProvider>
+      <div className='h-full w-[32rem]'>
+      <Blink action={action} stylePreset='x-dark' adapter={adapter} />
+      </div>
+    </WalletModalProvider>
+    </WalletProvider>
+    );
 };
