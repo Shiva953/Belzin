@@ -75,9 +75,6 @@ export default function Home() {
     const userId = profile?.id?.toString() || '';
 
   return (
-
-    <WalletProvider wallets={[]} autoConnect>
-    <WalletModalProvider>
     <div className="w-full h-screen flex flex-col">
         <div className="flex flex-row flex-1 bg-background">
           <div className='mr-16'>
@@ -89,8 +86,5 @@ export default function Home() {
           </div>
         </div>
     </div>
-    </WalletModalProvider>
-    </WalletProvider>
-
   );
 }
