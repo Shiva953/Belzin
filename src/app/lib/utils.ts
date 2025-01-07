@@ -3,7 +3,6 @@
 
 import { SolanaSignInInput, SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { WalletAccount } from '@wallet-standard/base';
-import { SolanaAgentKit, createSolanaTools } from 'solana-agent-kit';
 import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
@@ -144,4 +143,12 @@ export function getOrdinalSuffix(day: number): string {
       case 3: return 'rd';
       default: return 'th';
   }
+}
+
+export function dateStringToEpoch(dateStr: string): number {
+  const cleanDateStr = dateStr.replace(/(st|nd|rd|th)/, '');
+  const date = new Date(cleanDateStr);
+  const epochTimestamp = Math.floor(date.getTime() / 1000);
+  
+  return epochTimestamp;
 }

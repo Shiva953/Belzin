@@ -5,6 +5,7 @@ import { nanoid } from "nanoid"
 import { Message } from "@/components/chat/public/PublicChat";
 import prisma from "@/lib/prisma";
 import { ChatOpenAI } from "@langchain/openai";
+// import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
@@ -25,7 +26,7 @@ async function initializeAgent() {
       const memory = new MemorySaver();
       const config = { configurable: { thread_id: "Solana Agent Kit!" } };
 
-      const blinktool = tools.find(t => t.name==="solana_blink_url")?.name;
+      const blinktool = tools.find(t => t.name==="solana_betting_blink_url")?.name;
       console.log("solana blink tool: ", blinktool)
   
       const agent = createReactAgent({
@@ -112,14 +113,14 @@ export async function POST(req: Request){
 
             // Process the stream
             for await (const { event, data } of eventStream) {
-                // console.log("Iteration Start")
-                // console.log("Event: ",event)
-                // console.log("Data: ",data)
+                console.log("Iteration Start")
+                console.log("Event: ",event)
+                console.log("Data: ",data)
                 if (event === 'on_chat_model_stream') {
                     if (!!data.chunk.content) {
-                        // console.log("Message Content: ", data.chunk.content)
+                        console.log("Message Content: ", data.chunk.content)
                         agentResponse += data.chunk.content;
-                        // console.log("Agent Response", agentResponse)
+                        console.log("Agent Response", agentResponse)
                     }
                 }
             }

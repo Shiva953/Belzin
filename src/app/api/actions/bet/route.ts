@@ -23,7 +23,7 @@ import {
     VersionedTransaction,
   } from "@solana/web3.js";
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
-  import { epochToDateString } from "@/app/lib/utils";
+  import { epochToDateString,dateStringToEpoch } from "@/app/lib/utils";
   import { Betting,IDL } from "@/types/betting";
 // agent creates the bet already(using bet title and bet amount -> createBet), after that you get the blink = frontend for placeBet
 // get the params(bet title, bet amount) -> create bet -> WHEN BET CREATED, SHOW THE INTERFACE WITH SIDES ("YES"|"NO")
@@ -47,11 +47,13 @@ export const GET = async (req: Request) => {
     const betTitle = betAccountInfo.title;
     const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
     const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);
+    const reverseTest = dateStringToEpoch("31st December, 2025");
     console.log("Bet Amount: ", betAccountInfo.betAmount.toNumber())
     console.log("Total Yes Amount: ", betAccountInfo.totalYesAmount.toNumber())
     console.log("Total No Amount: ", betAccountInfo.totalNoAmount.toNumber())
     console.log("Total Yes Bettors:", betAccountInfo.yesBettors.toNumber())
     console.log("Total No Bettors: ",betAccountInfo.noBettors.toNumber())
+    console.log(reverseTest)
 
     console.log(betTitle)
 

@@ -2,6 +2,8 @@
 'use client';
 import {pusherClient} from '@/lib/pusher';
 import { useState, useEffect, useRef } from 'react';
+import { Action, Blink, ActionsRegistry, useAction } from "@dialectlabs/blinks";
+import { useActionSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana"
 import { format } from "date-fns";
 import { Message } from './chat/public/PublicChat';
 import { cn } from '@/lib/utils';
@@ -13,9 +15,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Copy } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from './ui/skeleton';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { Button } from './ui/button';
 import { MessageSquare } from 'lucide-react';
+import { clusterApiUrl, Connection } from '@solana/web3.js';
 
 export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -134,6 +138,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                 const user = users[message.senderId!];
                 const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
                 
+                const hasActionUrl = message.content?.includes("http://localhost:3000/api/actions/bet?betId=")
                 return (
                   <div
                     key={`${message.id}-${message.timestamp}`}
@@ -178,7 +183,8 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                         'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
                       })}
                     >
-                      <div className="break-words">{message.content}</div>
+                      {/* <div className="break-words">{message.content}</div> */}
+                      <MessageContent content={message.content || ''} />
                       <div className="text-xs text-foreground/50 mt-1 text-right">
                         {formatTimestamp(Number(message.timestamp))}
                       </div>
@@ -210,3 +216,36 @@ function UserAvatar({ user, size = "default" }: { user: UserT, size?: "default" 
     </Avatar>
   );
 }
+
+const MessageContent = ({ content }: { content: string }) => {
+  // Regular expression to match the betting action URL
+  const betUrlRegex = /http:\/\/localhost:3000\/api\/actions\/bet\?betId=[a-zA-Z0-9]+/;
+  const match = content.match(betUrlRegex);
+  
+  if (match) {
+    const actionUrl = match[0];
+    return (
+      <div>
+        <div className="mb-2">{content}</div>
+        <BlinkComponent actionApiUrl={actionUrl} />
+      </div>
+    );
+  }
+  
+  return <div>{content}</div>;
+};
+
+const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
+  const { adapter } = useActionSolanaWalletAdapter(new Connection(clusterApiUrl("devnet"), "confirmed"));
+  const { action, isLoading } = useAction({url: actionApiUrl});
+  
+  if (isLoading) {
+    return <Skeleton className="h-20 w-full" />;
+  }
+
+  if (!action) {
+    return <div className="text-sm text-muted-foreground">Failed to load bet details</div>;
+  }
+
+  return <Blink action={action!} stylePreset='x-dark' adapter={adapter} />;
+};
