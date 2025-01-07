@@ -23,6 +23,7 @@ import { clusterApiUrl, Connection } from '@solana/web3.js';
 import { WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
+import '@dialectlabs/blinks/index.css';
 
 //REMOVE THE /user/getProfile(fetchUserData) call FOR EVERY SINGLE MESSAGE, IT SHOULD BE AN INHERENT PROPERTY OF THE MESSAGE(SENDER ID SHOULD BE MAPPED TO USER)
 //THE ABOVE SHOULD PREVENT RE-RENDER ISSUE
@@ -112,6 +113,8 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         };
 
         return (
+          <WalletProvider wallets={[]} autoConnect>
+          <WalletModalProvider>
           <div className='h-full overflow-y-auto'>
             <div className='flex flex-col-reverse gap-4 p-3'>
               <div ref={scrollDownRef} />
@@ -124,8 +127,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                 const isCurrentUser = message.senderId == currentUserId;
                 const user = users[message.senderId!];
                 const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
-                
-                const hasActionUrl = message.content?.includes("http://localhost:3000/api/actions/bet?betId=")
                 return (
                   <div
                     key={`${message.id}-${message.timestamp}`}
@@ -181,6 +182,8 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
               }))}
             </div>
           </div>
+          </WalletModalProvider>
+    </WalletProvider>
         );
 }
 
@@ -227,7 +230,7 @@ const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
   const { adapter } = useActionSolanaWalletAdapter(new Connection(clusterApiUrl("devnet"), "confirmed"));
   const { action, isLoading } = useAction({url: actionApiUrl});
 
-  const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
+  // const wallets = useMemo(() => [new PhantomWalletAdapter()].filter((item) => item && item.name && item.icon), []);
   
   if (isLoading) {
     return <Skeleton className="h-20 w-full" />;
@@ -238,12 +241,12 @@ const BlinkComponent = ({actionApiUrl}: {actionApiUrl: string}) => {
   }
 
   return (
-    <WalletProvider wallets={wallets} autoConnect>
-      <WalletModalProvider>
+    // <WalletProvider wallets={[]} autoConnect>
+    //   <WalletModalProvider>
       <div className='h-full w-[32rem]'>
-      <Blink action={action} stylePreset='x-dark' adapter={adapter} />
+      <Blink action={action} stylePreset='x-dark' adapter={adapter} securityLevel={"all"}/>
       </div>
-    </WalletModalProvider>
-    </WalletProvider>
+    // </WalletModalProvider>
+    // </WalletProvider>
     );
 };

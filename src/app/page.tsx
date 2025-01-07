@@ -5,12 +5,14 @@ import { VerticalNavbar } from '@/components/vertical-navbar'
 import { PublicChat } from '@/components/chat/public/PublicChat';
 import { useState, useEffect } from 'react';
 import { Message } from '@/components/chat/public/PublicChat';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, WalletProvider } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
-// ADD BLINK CLIENT SUPPORT, MAKE THE BETS WORK ON THE CHAT
-// MODIFY TO USE ANY TOKEN & CORRECT RESOLUTION SOURCE
+
+// FIX WALLET ISSUES(BLINK WALLET PROVIDER + CONNECTION + SIGN-IN STATE BUGS)
+// FIX INFINITE PROFILE RE-RENDERS IN MESSAGES + IMPROVE UI STATE(ONCE AND FOR ALL)
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading, error } = useProfile(publicKey?.toString());
@@ -73,7 +75,9 @@ export default function Home() {
     const userId = profile?.id?.toString() || '';
 
   return (
-    <>
+
+    <WalletProvider wallets={[]} autoConnect>
+    <WalletModalProvider>
     <div className="w-full h-screen flex flex-col">
         <div className="flex flex-row flex-1 bg-background">
           <div className='mr-16'>
@@ -85,6 +89,8 @@ export default function Home() {
           </div>
         </div>
     </div>
-  </>
+    </WalletModalProvider>
+    </WalletProvider>
+
   );
 }

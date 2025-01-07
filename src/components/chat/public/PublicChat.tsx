@@ -2,6 +2,8 @@
 // Public GC Interface
 import { Messages } from '@/components/Messages';
 import { MessageInput } from '@/components/MessageInput';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { WalletProvider } from '@solana/wallet-adapter-react';
 
 export interface Message{
     id: string | number,
@@ -40,6 +42,8 @@ export function PublicChat({ userId, initialMessages } : { userId: string, initi
 
     //make this more stateful
     return (
+    <WalletProvider wallets={[]} autoConnect>
+        <WalletModalProvider>
         <div className='flex flex-col h-full w-full'>
             <div className='flex-1 overflow-hidden'>
                 {(initialMessages.length > 0) && userId && (
@@ -55,5 +59,7 @@ export function PublicChat({ userId, initialMessages } : { userId: string, initi
                 <MessageInput />
             </div>
         </div>
+        </WalletModalProvider>
+    </WalletProvider>
       );
 }
