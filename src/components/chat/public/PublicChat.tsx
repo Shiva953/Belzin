@@ -4,11 +4,12 @@ import { Messages } from '@/components/Messages';
 import { MessageInput } from '@/components/MessageInput';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { WalletProvider } from '@solana/wallet-adapter-react';
+import { User } from '@prisma/client';
 
 export interface Message{
     id: string | number,
     content: string | null,
-    sender: string | null,
+    sender: User | null,
     senderId: string | null,
     timestamp: string | null
     isAgent: boolean | null
@@ -17,7 +18,7 @@ export interface Message{
 export interface ChatMessage{
     id: string | number,
     content: string | null,
-    sender: string | null,
+    sender: User | null,
     senderId: string | null,
     chatId: string | null,
     timestamp: string | null,

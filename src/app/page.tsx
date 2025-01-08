@@ -11,8 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 
 
-// FIX WALLET ISSUES(BLINK WALLET PROVIDER + CONNECTION + SIGN-IN STATE BUGS)
-// FIX INFINITE PROFILE RE-RENDERS IN MESSAGES + IMPROVE UI STATE(ONCE AND FOR ALL)
+// FIX INFINITE PROFILE RE-RENDERS IN MESSAGES(MESSAGE SENDER -> USER RELATION) + IMPROVE UI STATE(ONCE AND FOR ALL)
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading, error } = useProfile(publicKey?.toString());
@@ -33,6 +32,8 @@ export default function Home() {
         }
         getChatMessages();
     }, [])
+
+    console.log("Initial Messages from route: ", initialMessages)
 
 
     if (!connected) {

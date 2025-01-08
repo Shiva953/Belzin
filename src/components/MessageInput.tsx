@@ -9,40 +9,14 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react'
+import { User } from '@prisma/client';
 
 export function MessageInput({chatId} : {chatId?: string}){
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [input, setInput] = useState<string>('')
     const wallet = useWallet();
-    const [sender, setSender] = useState<string>('')
-    const [senderId, setSenderId] = useState<string>('')
 
     const textareaRef = useRef<HTMLInputElement | null>(null);
-
-    useEffect(() => {
-        const userPubkey = wallet.publicKey?.toString() || '';
-        setSenderId(userPubkey);
-        async function getUser(pubkey: string){
-            const res = await fetch(`/api/getProfile`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-            },
-              body: JSON.stringify({
-                pubkey: pubkey,
-                userId: 0
-              })
-            })
-            const data = await res.json();
-            const user = data.user;
-            const username = user?.username || 'InvalidUser';
-            setSender(username)
-            const senderId = user?.id || 0;
-            const senderIdToString = senderId.toString()
-            setSenderId(senderIdToString);
-        }
-        getUser(userPubkey);
-    }, [wallet.publicKey])
 
     const sendMessage = async () => {
         if(!input) return
@@ -51,10 +25,10 @@ export function MessageInput({chatId} : {chatId?: string}){
         setInput('')
         try {
           if(!chatId){
-            await axios.post('/api/message/send', { messageContent: optimisticInput, sender: sender, senderId: senderId, isAgent: false})
+            await axios.post('/api/message/send', { messageContent: optimisticInput, walletPublicKey: wallet?.publicKey?.toString() || '', isAgent: false})
           }
           if(chatId){
-            await axios.post('/api/message/sendToPrivateChat', { messageContent: optimisticInput, sender: sender, senderId: senderId, chatId: chatId})
+            await axios.post('/api/message/sendToPrivateChat', { messageContent: optimisticInput, walletPublicKey: wallet?.publicKey?.toString() || '', chatId: chatId})
           }
           setInput('')
           textareaRef.current?.focus()

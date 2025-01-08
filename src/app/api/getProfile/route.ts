@@ -44,12 +44,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ 
       exists: true, 
-      user: { 
-        id: user.id,
-        username: user.username, 
-        walletPublicKey: user.walletPublicKey,
-        imageUrl: user.imageUrl
-      } 
+      user: user 
     }, { status: 200 })
   } catch (error) {
     console.error('Error fetching user profile:', error)

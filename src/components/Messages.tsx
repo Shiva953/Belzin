@@ -25,44 +25,43 @@ import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import '@dialectlabs/blinks/index.css';
 import Image from 'next/image';
+import { User } from '@prisma/client';
 
 //REMOVE THE /user/getProfile(fetchUserData) call FOR EVERY SINGLE MESSAGE, IT SHOULD BE AN INHERENT PROPERTY OF THE MESSAGE(SENDER ID SHOULD BE MAPPED TO USER)
 //THE ABOVE SHOULD PREVENT RE-RENDER ISSUE
 export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
     const [messages, setMessages] = useState<Message[]>(initialMessages)
-    const [users, setUsers] = useState<Record<string, UserT>>({});
 
     const { toast } = useToast();
 
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({
-        description: "Copied to clipboard",
-        duration: 2000,
-      });
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        description: "Failed to copy to clipboard",
-        duration: 2000,
-      });
-    }
-  };
-  
+    const copyToClipboard = async (text: string) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        toast({
+          description: "Copied to clipboard",
+          duration: 2000,
+        });
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          description: "Failed to copy to clipboard",
+          duration: 2000,
+        });
+      }
+    };
 
     useEffect(() => {
         pusherClient.subscribe(channel)
         const messageHandler = (message: Message) => {
             setMessages((prev) => [message, ...prev])
-            fetchUserData(message.senderId!);
+            // fetchUserData(message.senderId!);
         }
         pusherClient.bind(event, messageHandler)
         // initialMessages.forEach((message) => fetchUserData(message.senderId!));
         initialMessages.forEach((message) => {
-          if (message.senderId) {
-              fetchUserData(message.senderId);
-          }
+          // if (message.senderId) {
+          //     fetchUserData(message.senderId);
+          // }
       });
 
         return () => {
@@ -102,16 +101,16 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
           }
         };
 
-        const fetchUserData = async (userId: string | number) => {
-          if (userId && !users[userId]) {
-            try {
-                const profile = await fetchProfile('', Number(userId));
-                setUsers((prev) => ({ ...prev, [userId]: profile.user }));
-            } catch (error) {
-                console.error('Error fetching user profile:', error);
-            }
-        }
-        };
+        // const fetchUserData = async (userId: string | number) => {
+        //   if (userId && !users[userId]) {
+        //     try {
+        //         const profile = await fetchProfile('', Number(userId));
+        //         setUsers((prev) => ({ ...prev, [userId]: profile.user }));
+        //     } catch (error) {
+        //         console.error('Error fetching user profile:', error);
+        //     }
+        // }
+        // };
 
         return (
           <WalletProvider wallets={[]} autoConnect>
@@ -126,7 +125,9 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                 ) : 
                 (messages.map((message, index) => {
                     const isCurrentUser = message.senderId == currentUserId;
-                    const user = users[message.senderId!];
+                    // const user = users[message.senderId!];
+                    const userN = message.sender;
+                    console.log("User: ",userN)
                     const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
                     return (
                         <div
@@ -137,19 +138,19 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                         >
                             <Popover>
                                 <PopoverTrigger>
-                                    <UserAvatar user={user} />
+                                    {userN && <UserAvatar user={userN} />}
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80 p-0">
                                     <div className="flex flex-col bg-black rounded-lg overflow-hidden">
                                         <div className="p-4 space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2">
-                                                    <UserAvatar user={user} size="large" />
+                                                    {userN && <UserAvatar user={userN} size="large" />}
                                                     <div className="font-mono text-sm">
-                                                        {shortenPublicKey(user?.walletPublicKey || '')}
+                                                        {shortenPublicKey(userN?.walletPublicKey || 'So11111111111111111111111111111111111111112')}
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" size="sm" className="text-white" onClick={() => window.open(`https://solscan.io/account/${user.walletPublicKey}`)}>
+                                                <Button variant="ghost" size="sm" className="text-white" onClick={() => window.open(`https://solscan.io/account/${userN?.walletPublicKey}`)}>
                                                     Account
                                                 </Button>
                                             </div>
@@ -196,7 +197,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         );
 }
 
-export function UserAvatar({ user, size = "default" }: { user: UserT, size?: "default" | "large" }) {
+export function UserAvatar({ user, size = "default" }: { user: User, size?: "default" | "large" }) {
   const gradient = getRandomGradient(user?.id);
   const sizeClasses = size === "large" ? "w-12 h-12" : "w-10 h-10";
     
@@ -205,7 +206,7 @@ export function UserAvatar({ user, size = "default" }: { user: UserT, size?: "de
             sizeClasses,
             `bg-gradient-to-br ${gradient.normal} hover:${gradient.hover}`
         )}>
-            <AvatarImage src={user?.imageUrl} alt={user?.username} />
+            <AvatarImage src={user?.imageUrl || ''} alt={user?.username || 'InvalidUser'} />
             <AvatarFallback className="bg-transparent text-white font-bold">
                 {user?.username?.charAt(0).toUpperCase() || '?'}
             </AvatarFallback>

@@ -9,6 +9,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { User } from "@prisma/client";
 
 async function initializeAgent() {
     try {
@@ -54,18 +55,30 @@ async function initializeAgent() {
 
 export async function POST(req: Request){
   try{
-    const { messageContent, sender, senderId, isAgent } = await req.json();
-    if(!sender){
+    const { messageContent, walletPublicKey, isAgent } = await req.json();
+    if(!walletPublicKey){
         return NextResponse.json({error: "Invalid Sender"}, {status: 401})
     }
 
-    const timestamp = Date.now()
 
-    const message: Message = {
+    const user = await prisma.user.findFirst({
+        where: {
+          walletPublicKey: walletPublicKey
+        }
+      });
+
+      if (!user) {
+        return NextResponse.json({error: "Invalid User, Does not Exist"}, {status: 401})
+      }
+
+    const timestamp = Date.now()
+    const senderId = user.id;
+
+    const message = {
         id: nanoid(),
-        sender: sender || '',
+        sender: user,
         content: messageContent || '',
-        senderId: senderId || '',
+        senderId: senderId.toString() || '',
         timestamp: timestamp.toString(),
         isAgent: isAgent
     }
@@ -76,9 +89,9 @@ export async function POST(req: Request){
 
     await prisma.message.create({
         data: {
-            sender: message.sender,
+            // sender: message.sender,
             content: message.content,
-            senderId: message.senderId,
+            senderId: Number(message.senderId || '0'),
             timestamp: message.timestamp
         }
     })
@@ -89,7 +102,13 @@ export async function POST(req: Request){
             
             const agentMessage: Message = {
                 id: nanoid(),
-                sender: 'PolyAgent',
+                sender: {
+                    id: 14,
+                    walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
+                    username: 'PolyAgent',
+                    imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
+                    friendList: []
+                },
                 content: 'Default',
                 senderId: '14',
                 timestamp: Date.now().toString(),
@@ -132,12 +151,12 @@ export async function POST(req: Request){
             await pusherServer.trigger("global-chat", 'incoming-message', agentMessage);
             await pusherServer.trigger("global-chat", 'new-send-message', agentMessage);
 
-            // Store agent response in DB
+
             await prisma.message.create({
                 data: {
-                    sender: agentMessage.sender,
+                    // sender: agentMessage.sender,
                     content: agentMessage.content,
-                    senderId: agentMessage.senderId,
+                    senderId: Number(agentMessage.senderId || '0'),
                     timestamp: agentMessage.timestamp,
                     isAgent: true,
                 }
@@ -146,7 +165,13 @@ export async function POST(req: Request){
             console.error('Agent processing error:', error);
             const errorMessage: Message = {
                 id: nanoid(),
-                sender: 'PolyAgent',
+                sender: {
+                    id: 14,
+                    walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
+                    username: 'PolyAgent',
+                    imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
+                    friendList: []
+                },
                 content: 'Sorry, I encountered an error processing your request. Please try again.',
                 senderId: '14',
                 timestamp: Date.now().toString(),
