@@ -29,6 +29,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/static-gravity/image/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'we-assets.pinit.io',
+        port: '',
+        pathname: '/DHcjHDtfTwchgYfwN6wPCesaWmLhyWY9KYcdRugGMsAr/**',
+      },
     ],
   },
 };

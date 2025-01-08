@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Popover,PopoverContent,PopoverTrigger } from './ui/popover';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ChevronDown, ExternalLink, Copy } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {toast} from 'sonner';
+import { shortenPublicKey } from '@/app/lib/utils';
+import Image from 'next/image';
+import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 
 
 export type UserT = {
@@ -33,52 +38,90 @@ interface UserProfileProps {
 }
 
 export function UserProfile({ user, onSignOut }: UserProfileProps) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<boolean>(false)
+  const [solAmount, setSolAmount] = useState<string>('0')
 
   const copyToClipboard = () => {
     if (user?.walletPublicKey) {
       navigator.clipboard.writeText(user.walletPublicKey)
       setCopied(true)
+      toast.success("Copied Wallet Address")
       setTimeout(() => setCopied(false), 2000)
     }
   }
 
+  useEffect(() => {
+    const getSolBalance = async (wallet: PublicKey) => {
+      const balanceInLamports = await connection.getBalance(wallet);
+      const solBalance = balanceInLamports/LAMPORTS_PER_SOL
+      setSolAmount(solBalance.toFixed(2));
+    }
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const wallet = new PublicKey(user.walletPublicKey);
+    getSolBalance(wallet)
+  }, [user.walletPublicKey])
+
 
   return (
     <div className="flex items-center justify-between space-x-4 bg-background p-2 rounded-lg shadow-sm">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="p-0 hover:bg-transparent">
-            <div className="flex items-center space-x-2">
-              <Avatar>
-                <AvatarImage src={user.imageUrl} alt={user.username} />
-                <AvatarFallback>{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <span className="font-bold tracking-wide">{user.username || 'InvalidUser'}</span>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+      <Popover>
+        <PopoverTrigger asChild>
+          <div className="flex items-center space-x-2 cursor-pointer">
+            <Avatar>
+              <AvatarImage src={user.imageUrl} alt={user.username} />
+              <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="font-bold text-base tracking-tight my-auto font-mono">
+              {user.username || 'InvalidUser'}
+            </span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0">
+          <div className="flex flex-col bg-black rounded-lg overflow-hidden">
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Avatar>
+                    <AvatarImage src={user.imageUrl} alt={user.username} />
+                  </Avatar>
+                  <div className="font-mono text-[1rem] font-bold tracking-tight cursor-pointer hover:underline glow-effect-text-large opacity-80 hover:opacity-100" onClick={() => window.open(`https://solscan.io/account/${user?.walletPublicKey}`)}>
+                    {shortenPublicKey(user?.walletPublicKey || 'So11111111111111111111111111111111111111112')}
+                   </div>
+                </div>
+                <Button size="sm" className="text-[rgb(81,252,161)] bg-[rgb(10,46,27)] hover:bg-[rgb(5,21,12)] hover:text-[rgb(78,241,154)]" onClick={() => window.open(`https://solscan.io/account/${user?.walletPublicKey}`)}>
+                 Account<ExternalLink/>
+                </Button>
+              </div>
+              
+              <div className="space-y-1">
+                <div className="text-3xl font-bold">{solAmount} SOL</div>
+                <div className="text-sm text-gray-400">BALANCE</div>
+              </div>
+
+              <Button className="bg-[rgb(46,10,23)] text-[rgb(236,72,153)] w-full rounded-xl">
+                View Your Bets
+              </Button>
             </div>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem>
-            <ExternalLink className="mr-2 h-4 w-4" />
-            <span>View Account</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            {user.walletPublicKey && (<Button
-              variant="outline"
-              size="sm"
-              className="font-mono text-xs"
-              onClick={copyToClipboard}
-            >
-              {user.walletPublicKey.slice(0, 4)}...{user.walletPublicKey.slice(-4)}
-              <Copy className="ml-2 h-3 w-3" />
-            </Button>)}
+            {user.walletPublicKey && (
+              <Button
+                variant="outline"
+                size="default"
+                className="font-mono text-sm font-bold"
+                onClick={copyToClipboard}
+              >
+                {shortenPublicKey(user.walletPublicKey)}
+                <Copy className="ml-2 h-3 w-3" />
+              </Button>
+            )}
           </TooltipTrigger>
           <TooltipContent>
             <p>{copied ? 'Copied!' : 'Copy wallet address'}</p>

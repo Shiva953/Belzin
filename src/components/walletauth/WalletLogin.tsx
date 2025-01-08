@@ -193,7 +193,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
               {isAuthenticated && userProfile && (
                 <button
                   onClick={handleSignOut}
-                  className="px-3 font-medium py-2 bg-[rgb(46,10,23)] text-[rgb(236,72,153)] hover:text-opacity-70 rounded-md transition-colors"
+                  className="px-3 font-bold tracking-tight rounded-full text-white py-2 bg-[rgb(241,17,73)] hover:bg-opacity-50 hover:text-opacity-70 transition-colors"
                 >
                   Sign out
                 </button>

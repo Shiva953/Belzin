@@ -21,8 +21,8 @@ model User {
 model Message {
   id        Int      @id @default(autoincrement())
   content   String?
-  sender    User?    @relation(fields: [senderId], references: [id]) // Make relation optional
-  senderId  Int?     // Make optional and use Int to match User.id
+  sender    User?    @relation(fields: [senderId], references: [id])
+  senderId  Int?    
   timestamp String?
   isAgent   Boolean?
 }

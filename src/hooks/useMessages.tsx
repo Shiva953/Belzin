@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { ChatMessage } from '@/components/chat/public/PublicChat';
+import { Message } from '@/components/chat/public/PublicChat';
 
 interface UseChatMessagesResult {
-  initialMessages: ChatMessage[]|null;
+  initialMessages: Message[]|null;
   loading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
 }
 
-export function useChatMessages(chatId: string): UseChatMessagesResult {
-  const [initialMessages, setInitialMessages] = useState<ChatMessage[]|null>(null);
+export function useChatMessages(chatId?: string): UseChatMessagesResult {
+  const [initialMessages, setInitialMessages] = useState<Message[]|null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -18,10 +18,9 @@ export function useChatMessages(chatId: string): UseChatMessagesResult {
     setError(null);
 
     try {
-      const res = await fetch('/api/getMessagesForGivenChat', {
-        method: 'POST',
+      const res = await fetch('/api/getMessages', {
+        method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatId })
       });
 
       if (!res.ok) {
@@ -30,7 +29,7 @@ export function useChatMessages(chatId: string): UseChatMessagesResult {
 
       const messages = await res.json();
       
-      const sortedMessages = messages.sort((a: ChatMessage, b: ChatMessage) => 
+      const sortedMessages = messages.sort((a: Message, b: Message) => 
         Number(b.timestamp) - Number(a.timestamp)
       );
 
@@ -44,9 +43,7 @@ export function useChatMessages(chatId: string): UseChatMessagesResult {
   }
 
   useEffect(() => {
-    if (chatId) {
       fetchChatMessages();
-    }
   }, [chatId]);
 
   return {

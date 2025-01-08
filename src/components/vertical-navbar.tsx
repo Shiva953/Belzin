@@ -10,8 +10,8 @@ export function VerticalNavbar() {
   const pathname = usePathname()
 
   return (
-    <nav className="w-64 h-full bg-card border-r border-border">
-          <div className="flex flex-col h-full p-4">
+    <nav className="w-64 bg-white h-full bg-card border-r border-border">
+          <div className="flex flex-col h-full p-4 overflow-y-hidden fixed">
             <Link href="/" className="w-full mb-4">
               <Button
                 variant="ghost"

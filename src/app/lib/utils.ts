@@ -6,6 +6,7 @@ import { WalletAccount } from '@wallet-standard/base';
 import { MemorySaver } from "@langchain/langgraph";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
+import { format } from "date-fns";
 
 export type SerialisableWalletAccount = {
   address: string;
@@ -151,4 +152,8 @@ export function dateStringToEpoch(dateStr: string): number {
   const epochTimestamp = Math.floor(date.getTime() / 1000);
   
   return epochTimestamp;
+}
+
+export const formatTimestamp = (timestamp: number) => {
+  return format(timestamp, 'HH:mm')
 }

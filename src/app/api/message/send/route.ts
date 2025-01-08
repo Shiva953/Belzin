@@ -5,11 +5,9 @@ import { nanoid } from "nanoid"
 import { Message } from "@/components/chat/public/PublicChat";
 import prisma from "@/lib/prisma";
 import { ChatOpenAI } from "@langchain/openai";
-// import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { User } from "@prisma/client";
 
 async function initializeAgent() {
     try {

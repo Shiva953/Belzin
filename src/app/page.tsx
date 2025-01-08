@@ -5,33 +5,17 @@ import { VerticalNavbar } from '@/components/vertical-navbar'
 import { PublicChat } from '@/components/chat/public/PublicChat';
 import { useState, useEffect } from 'react';
 import { Message } from '@/components/chat/public/PublicChat';
-import { useWallet, WalletProvider } from '@solana/wallet-adapter-react';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { useChatMessages } from '@/hooks/useMessages';
 
 
-// FIX INFINITE PROFILE RE-RENDERS IN MESSAGES(MESSAGE SENDER -> USER RELATION) + IMPROVE UI STATE(ONCE AND FOR ALL)
+// MAKE UI CLEANER
 export default function Home() {
   const { connected, publicKey } = useWallet()
-  const { profile, loading, error } = useProfile(publicKey?.toString());
-
-  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
-
-    useEffect(() => {
-        async function getChatMessages(){
-            try{
-                const res = await fetch('/api/getMessages');
-                const messages = await res.json();
-                setInitialMessages(messages)
-                console.log(messages)
-                return messages;
-            } catch(error){
-                console.log("Error fetching messages: ",error)
-            }
-        }
-        getChatMessages();
-    }, [])
+  const { profile, loading: profileLoading, error } = useProfile(publicKey?.toString());
+  const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages()
 
     console.log("Initial Messages from route: ", initialMessages)
 
@@ -44,20 +28,12 @@ export default function Home() {
       )
     }
 
-    if (loading) {
+    if (messagesLoading) {
       return (
-        <div className="w-full h-screen flex flex-col">
-          <div className="flex flex-row flex-1 bg-background">
-            <div className='mr-16'>
-              <VerticalNavbar />
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <div className="space-y-4">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
+        <div className="flex h-screen">
+          <VerticalNavbar />
+          <div className="flex-1 overflow-hidden">
+            <ChatSkeleton />
           </div>
         </div>
       )
@@ -73,7 +49,17 @@ export default function Home() {
     )
   }
 
-    const userId = profile?.id?.toString() || '';
+  if (messagesError) {
+    return (
+      <div className="flex-1 w-full flex items-center justify-center">
+        <p className="text-lg text-destructive">
+          Error loading messages. Please try again.
+        </p>
+      </div>
+    )
+  }
+
+  const userId = profile?.id?.toString() || '';
 
   return (
     <div className="flex h-screen">
@@ -85,4 +71,25 @@ export default function Home() {
     </div>
   </div>
   );
+}
+
+function ChatSkeleton() {
+  return (
+    <div className="flex flex-col h-full w-full bg-background">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6 w-full">
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'} w-full`}>
+            <div className={`flex items-end space-x-3 ${i % 2 === 0 ? 'flex-row-reverse space-x-reverse' : ''} max-w-[80%] w-full`}>
+              <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+              <div className={`space-y-2 flex-grow ${i % 2 === 0 ? 'items-end' : 'items-start'}`}>
+                {/* <Skeleton className={`h-4 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}`} /> */}
+                <Skeleton className={`h-8 w-[68rem] rounded-2xl`} />
+                {/* <Skeleton className={`h-2 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}`} /> */}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
