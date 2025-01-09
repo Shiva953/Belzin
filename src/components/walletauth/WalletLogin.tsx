@@ -3,20 +3,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { verifySignIn } from '@solana/wallet-standard-util';
-import Link from "next/link";
 import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
-import styles from "./header.module.css";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { SigninMessage } from "@/app/lib/signMessage";
-import bs58 from "bs58";
 import React, { useEffect, useState } from "react";
 import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile, { UserProfile } from '../user-profile';
 import { UserT } from '../user-profile';
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const { data: session, status } = useSession();
@@ -26,6 +22,17 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
   const [userProfile, setUserProfile] = useState<UserT|null>(null);
   const [showProfileCreation, setShowProfileCreation] = useState(false);
+
+  interface UserProfile {
+    username: string
+    imageUrl: string
+    walletPublicKey: string
+  }
+  
+  interface NavMenuProps {
+    userProfile: UserProfile
+    onSignOut: () => void
+  }
 
 
   const handleSignIn = async () => {
@@ -99,12 +106,6 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
   const fetchUserProfile = async (publicKey: string) => {
     try {
-      // const response = await fetch(`/api/getProfile`, {
-      //   body: JSON.stringify({
-      //     pubkey: publicKey,
-      //     userId: ''
-      //   })
-      // });
       const response = await fetch(`/api/getProfile`, {
         method: 'POST',
         headers: {
@@ -170,12 +171,11 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
             />
           )}
 
-            <header className="fixed top-0 left-0 right-0 h-16 p-4 bg-background shadow-sm z-20">
+            {/* <header className="fixed top-0 left-0 right-0 rounded-full bg-[rgb(22,18,18)] mx-auto items-center h-16 p-4 shadow-sm z-20">
               <div className="container mx-auto flex justify-between items-center h-full">
               {isAuthenticated && userProfile && (
                 <UserProfile user={userProfile} onSignOut={handleSignOut}/>
               )}
-
               {!isAuthenticated && (
                 <div className="flex flex-col items-center space-x-4 mx-auto">
                   <span className="text-muted-foreground m-4 pt-16">
@@ -197,6 +197,38 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
                 >
                   Sign out
                 </button>
+              )}
+            </div>
+          </header> */}
+          <header className="fixed top-0 left-0 right-0 rounded-full bg-transparent mx-auto p-4 shadow-sm z-20">
+            <div className="container mx-auto h-full flex justify-center items-center">
+              {isAuthenticated && userProfile ? (
+                <HoverBorderGradient 
+                  containerClassName="rounded-full"
+                  className="bg-[rgb(18,17,20)] flex items-center gap-4"
+                >
+                  <div className="flex items-center gap-4">
+                    <UserProfile user={userProfile} onSignOut={handleSignOut} />
+                    <button
+                      onClick={handleSignOut}
+                      className="px-3 font-bold tracking-tight rounded-full text-white py-2 bg-[rgb(241,17,73)] hover:bg-opacity-50 hover:text-opacity-70 transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </HoverBorderGradient>
+              ) : (
+                <div className="flex flex-col items-center space-x-4">
+                  <span className="text-muted-foreground m-4 pt-16">
+                    You are not signed in
+                  </span>
+                  <button 
+                    onClick={handleSignIn} 
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    Sign in
+                  </button>
+                </div>
               )}
             </div>
           </header>

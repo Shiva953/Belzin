@@ -63,7 +63,7 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
 
 
   return (
-    <div className="flex items-center justify-between space-x-4 bg-background p-2 rounded-lg shadow-sm">
+    <div className="flex items-center justify-between space-x-4 p-2 rounded-lg shadow-sm">
       <Popover>
         <PopoverTrigger asChild>
           <div className="flex items-center space-x-2 cursor-pointer">
@@ -72,7 +72,7 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
               <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <span className="font-bold text-base tracking-tight my-auto font-mono">
+            <span className="font-extrabold text-base tracking-tight my-auto">
               {user.username || 'InvalidUser'}
             </span>
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -115,7 +115,7 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
               <Button
                 variant="outline"
                 size="default"
-                className="font-mono text-sm font-bold"
+                className="font-mono text-sm font-bold rounded-xl"
                 onClick={copyToClipboard}
               >
                 {shortenPublicKey(user.walletPublicKey)}

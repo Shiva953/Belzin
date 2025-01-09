@@ -31,7 +31,6 @@ export default function Home() {
     if (messagesLoading) {
       return (
         <div className="flex h-screen">
-          <VerticalNavbar />
           <div className="flex-1 overflow-hidden">
             <ChatSkeleton />
           </div>
@@ -63,7 +62,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen">
-    <VerticalNavbar />
+    {/* <VerticalNavbar /> */}
     <div className="flex-1 overflow-hidden">
       {userId && initialMessages && initialMessages.length > 0 && (
         <PublicChat userId={userId} initialMessages={initialMessages}/>

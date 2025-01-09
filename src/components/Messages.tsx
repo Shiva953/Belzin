@@ -231,8 +231,8 @@ const MessageContainer = ({message,isCurrentUser,hasNextMessageFromSameUser}: {m
   return (
     <div
     className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative overflow-hidden text-white', {
-        'bg-secondary': isCurrentUser,
-        'bg-[rgb(31,166,139)]': !isCurrentUser,
+        'bg-[rgb(31,166,139)]': isCurrentUser,
+        'bg-secondary': !isCurrentUser,
         'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
         'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
     })}>
