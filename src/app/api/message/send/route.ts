@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {pusherServer} from "@/lib/pusher";
 import { NextResponse } from "next/server";
-import { nanoid } from "nanoid"
-import { Message } from "@/components/chat/public/PublicChat";
 import prisma from "@/lib/prisma";
 import { ChatOpenAI } from "@langchain/openai";
 import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
+import { createExtendedSolanaTools } from "@/langchain";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { User } from "@prisma/client";
 
 async function initializeAgent() {
     try {
@@ -21,7 +21,7 @@ async function initializeAgent() {
         process.env.OPENAI_API_KEY!
       );
   
-      const tools = createSolanaTools(solanaKit);
+      const tools = createExtendedSolanaTools(solanaKit);
       const memory = new MemorySaver();
       const config = { configurable: { thread_id: "Solana Agent Kit!" } };
 
@@ -51,144 +51,110 @@ async function initializeAgent() {
     }
   }
 
-export async function POST(req: Request){
-  try{
-    const { messageContent, walletPublicKey, isAgent } = await req.json();
-    if(!walletPublicKey){
-        return NextResponse.json({error: "Invalid Sender"}, {status: 401})
-    }
 
-
-    const user = await prisma.user.findFirst({
-        where: {
-          walletPublicKey: walletPublicKey
+  export async function POST(req: Request){
+    try {
+        const { messageContent, walletPublicKey, isAgent } = await req.json();
+        if(!walletPublicKey) {
+            return NextResponse.json({error: "Invalid Sender"}, {status: 401})
         }
-      });
 
-      if (!user) {
-        return NextResponse.json({error: "Invalid User, Does not Exist"}, {status: 401})
-      }
-
-    const timestamp = Date.now()
-    const senderId = user.id;
-
-    const message = {
-        id: nanoid(),
-        sender: user,
-        content: messageContent || '',
-        senderId: senderId.toString() || '',
-        timestamp: timestamp.toString(),
-        isAgent: isAgent
-    }
-
-    await pusherServer.trigger("global-chat", 'incoming-message', message);
-
-    await pusherServer.trigger("global-chat", 'new-send-message', message);
-
-    await prisma.message.create({
-        data: {
-            // sender: message.sender,
-            content: message.content,
-            senderId: Number(message.senderId || '0'),
-            timestamp: message.timestamp
-        }
-    })
-
-    if (messageContent.toLowerCase().includes('@polyagent')) {
-        try {
-            const { agent } = await initializeAgent();
-            
-            const agentMessage: Message = {
-                id: nanoid(),
-                sender: {
-                    id: 14,
-                    walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
-                    username: 'PolyAgent',
-                    imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
-                    friendList: []
-                },
-                content: 'Default',
-                senderId: '14',
-                timestamp: Date.now().toString(),
-                isAgent: true
-            };
-
-            const eventStream = agent.streamEvents(
-                {
-                    messages: [{
-                        role: 'user',
-                        content: messageContent.replace('@polyagent', '').trim()
-                    }]
-                },
-                {
-                    version: 'v2',
-                    configurable: { thread_id: 'Solana Agent Kit!' }
-                }
-            );
-
-            let agentResponse = '';
-
-            // Process the stream
-            for await (const { event, data } of eventStream) {
-                console.log("Iteration Start")
-                console.log("Event: ",event)
-                console.log("Data: ",data)
-                if (event === 'on_chat_model_stream') {
-                    if (!!data.chunk.content) {
-                        console.log("Message Content: ", data.chunk.content)
-                        agentResponse += data.chunk.content;
-                        console.log("Agent Response", agentResponse)
-                    }
-                }
+        const user = await prisma.user.findFirst({
+            where: {
+                walletPublicKey: walletPublicKey
             }
+        });
 
-            console.log("Final Agent Response: ", agentResponse)
-            agentMessage.content = agentResponse;
-            console.log("Final Agent Message Content: ", agentMessage.content)
-
-            await pusherServer.trigger("global-chat", 'incoming-message', agentMessage);
-            await pusherServer.trigger("global-chat", 'new-send-message', agentMessage);
-
-
-            await prisma.message.create({
-                data: {
-                    // sender: agentMessage.sender,
-                    content: agentMessage.content,
-                    senderId: Number(agentMessage.senderId || '0'),
-                    timestamp: agentMessage.timestamp,
-                    isAgent: true,
-                }
-            });
-        } catch (error) {
-            console.error('Agent processing error:', error);
-            const errorMessage: Message = {
-                id: nanoid(),
-                sender: {
-                    id: 14,
-                    walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
-                    username: 'PolyAgent',
-                    imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
-                    friendList: []
-                },
-                content: 'Sorry, I encountered an error processing your request. Please try again.',
-                senderId: '14',
-                timestamp: Date.now().toString(),
-                isAgent: true
-            };
-            
-            await pusherServer.trigger("global-chat", 'incoming-message', errorMessage);
+        if (!user) {
+            return NextResponse.json({error: "Invalid User, Does not Exist"}, {status: 401})
         }
-    }
 
-    return NextResponse.json({
-        message: message,
-        res: 'Successfully Transmitted Event to client and sent message'
-    }, {status: 200})
+        const messageData = {
+            content: messageContent || '',
+            senderId: user.id,
+            timestamp: Date.now().toString(),
+            isAgent: isAgent || false
+        }
 
-    } catch(err){
+        const createdMessage = await prisma.message.create({
+            data: messageData,
+            include: {
+                sender: true // Include the related user data
+            }
+        });
+
+        await Promise.all([
+            pusherServer.trigger("global-chat", 'incoming-message', createdMessage),
+            pusherServer.trigger("global-chat", 'new-send-message', createdMessage)
+        ]);
+
+        if (messageContent.toLowerCase().includes('@polyagent')) {
+            processAgentMessage(messageContent).catch(console.error);
+        }
+
+        return NextResponse.json({
+            message: createdMessage,
+            res: 'Successfully Transmitted Event to client'
+        }, {status: 200})
+
+    } catch(err) {
         if (err instanceof Error) {
             return NextResponse.json({error: err.message}, {status: 500})
         }
         return NextResponse.json({error: 'Internal Server Error'}, {status: 500})
+    }
+}
+
+async function processAgentMessage(messageContent: string) {
+    try {
+        const { agent } = await initializeAgent();
+
+        const agentUser:User = {
+            id: 14,
+            walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
+            username: 'PolyAgent',
+            imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
+            friendList: []
+        }
+
+        const eventStream = agent.streamEvents(
+            {
+                messages: [{
+                    role: 'user',
+                    content: messageContent.replace('@polyagent', '').trim()
+                }]
+            },
+            {
+                version: 'v2',
+                configurable: { thread_id: 'Solana Agent Kit!' }
+            }
+        );
+
+        let agentResponse = '';
+        for await (const { event, data } of eventStream) {
+            if (event === 'on_chat_model_stream' && data.chunk.content) {
+                agentResponse += data.chunk.content;
+            }
+        }
+
+        const agentMessage = await prisma.message.create({
+            data: {
+                content: agentResponse,
+                senderId: agentUser.id,
+                timestamp: Date.now().toString(),
+                isAgent: true
+            },
+            include: {
+                sender: true
+            }
+        });
+
+        await Promise.all([
+            pusherServer.trigger("global-chat", 'incoming-message', agentMessage),
+            pusherServer.trigger("global-chat", 'new-send-message', agentMessage)
+        ]);
+    } catch (error) {
+        console.error('Agent processing error:', error);
+
     }
 }

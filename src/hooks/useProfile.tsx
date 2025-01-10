@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserT } from '@/components/user-profile';
+import { UserT } from '@/types';
 
 export function useProfile(pubkey?: string, userId?: number | string) {
   const [profile, setProfile] = useState<UserT | null>(null);
@@ -8,7 +8,6 @@ export function useProfile(pubkey?: string, userId?: number | string) {
 
   useEffect(() => {
     async function fetchUserProfile() {
-      // Reset state for each fetch
       setLoading(true);
       setError(null);
 

@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PublicKey } from '@solana/web3.js';
 import { SolanaSignInInput } from "@solana/wallet-standard-features";
+import { User } from '@prisma/client';
+import { CoreMessage } from "ai";
 
 type DisplayEncoding = 'utf8' | 'hex';
 
@@ -36,4 +39,47 @@ export interface TLog {
   confirmation?: {signature: string, link: string};
   message: string;
   messageTwo?: string;
+}
+
+export interface Message{
+    id: string | number,
+    content: string | null,
+    sender: User | null,
+    senderId: string | null,
+    timestamp: string | null
+    isAgent: boolean | null
+}
+
+export interface ChatMessage{
+    id: string | number,
+    content: string | null,
+    sender: User | null,
+    senderId: string | null,
+    chatId: string | null,
+    timestamp: string | null,
+    isAgent: boolean | null
+}
+
+export type UserT = {
+  id: string|number,
+  username: string,
+  walletPublicKey: string
+  imageUrl: string
+}
+
+export interface UserProfileProps {
+  user: UserT
+  onSignOut: () => void
+}
+
+export type SignMessage = {
+  domain: string;
+  publicKey: string;
+  nonce: string;
+  statement: string;
+};
+
+export interface ChatState {
+  base64Images: string[] | null;
+  messages: CoreMessage[];
 }

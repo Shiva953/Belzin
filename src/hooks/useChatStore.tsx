@@ -1,10 +1,6 @@
-import { CoreMessage } from "ai";
 import { create } from "zustand";
-
-interface ChatState {
-    base64Images: string[] | null;
-    messages: CoreMessage[];
-}
+import { ChatState } from "@/types";
+import { CoreMessage } from "ai";
 
 interface ChatActions {
     setBase64Images: (images: string[] | null) => void;

@@ -1,12 +1,6 @@
 import bs58 from "bs58";
 import nacl from "tweetnacl";
-// import { PublicKey } from "@solana/web3.js";
-type SignMessage = {
-  domain: string;
-  publicKey: string;
-  nonce: string;
-  statement: string;
-};
+import { SignMessage } from "@/types";
 
 export class SigninMessage {
   domain: string;

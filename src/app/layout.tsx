@@ -5,17 +5,14 @@ import { Inter } from "next/font/google"
 import localFont from "next/font/local";
 import "./globals.css";
 import { getServerSession } from "next-auth";
-import { getSession } from "next-auth/react";
 import { authOptions } from "./lib/auth";
 import { cn } from "@/lib/utils";
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
-import { WalletLoginInterface } from "@/components/walletauth/WalletLogin";
+import { WalletLoginInterface } from "@/components/auth/WalletLogin";
 import { Toaster } from 'sonner'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
-
-const inter = Inter({subsets: ["latin"]});
 
 export const metadata: Metadata = {
   title: "Group Chat Betting using Blinks",

@@ -2,13 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 'use client';
-import * as Ably from 'ably';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import axios from "axios"
 import { useWallet } from '@solana/wallet-adapter-react';
+import { pusherClient } from '@/lib/pusher';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send } from 'lucide-react'
+import { Message } from '@/types';
+import { shortenPublicKey } from '@/app/lib/utils';
 
 export function MessageInput({chatId} : {chatId?: string}){
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -22,6 +23,23 @@ export function MessageInput({chatId} : {chatId?: string}){
         setIsLoading(true)
         const optimisticInput = input;
         setInput('')
+
+        const optimisticMessage: Message = {
+          id: -Date.now(), // Negative ID for optimistic messages
+          content: optimisticInput,
+          senderId: null, // Since we don't know the actual user ID until server responds
+          timestamp: Date.now().toString(),
+          isAgent: false,
+          sender: {
+              id: -1, 
+              walletPublicKey: wallet?.publicKey?.toString() || '',
+              username: shortenPublicKey(wallet?.publicKey?.toString() || ''),
+              imageUrl: '',
+              friendList: []
+          }
+      };
+      // onOptimisticMessage(optimisticMessage);
+
         try {
           if(!chatId){
             await axios.post('/api/message/send', { messageContent: optimisticInput, walletPublicKey: wallet?.publicKey?.toString() || '', isAgent: false})
@@ -33,6 +51,11 @@ export function MessageInput({chatId} : {chatId?: string}){
           textareaRef.current?.focus()
         } catch(err) {
           console.log(err)
+        //   onOptimisticMessage({
+        //     ...optimisticMessage,
+        //     id: optimisticMessage.id,
+        //     content: 'Error sending message'
+        // });
         } finally {
           setIsLoading(false)
         }
@@ -46,7 +69,7 @@ export function MessageInput({chatId} : {chatId?: string}){
       }
 
       return (
-          <div className="relative w-full p-3 border-t border-border bg-card">
+          <div className="relative w-full p-6 pb-12 border-t border-border bg-card">
             <form onSubmit={(e) => {
               e.preventDefault()
               sendMessage()

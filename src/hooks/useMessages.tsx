@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Message } from '@/components/chat/public/PublicChat';
+import { Message } from '@/types';
 
 interface UseChatMessagesResult {
   initialMessages: Message[]|null;

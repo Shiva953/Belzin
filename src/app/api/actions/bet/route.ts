@@ -55,10 +55,7 @@ export const GET = async (req: Request) => {
     console.log("Total Yes Bettors:", betAccountInfo.yesBettors.toNumber())
     console.log("Total No Bettors: ",betAccountInfo.noBettors.toNumber())
     console.log(reverseTest)
-
     console.log(betTitle)
-
-  
 
     let payload: ActionGetResponse = {
       title: betTitle,

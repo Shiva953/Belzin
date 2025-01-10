@@ -1,19 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-import {pusherClient} from '@/lib/pusher';
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Action, Blink, ActionsRegistry, useAction } from "@dialectlabs/blinks";
+import { pusherClient } from '@/lib/pusher';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { Blink, useAction } from "@dialectlabs/blinks";
 import { useActionSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana"
 import { User } from '@prisma/client';
-import { Message } from './chat/public/PublicChat';
+import { Message,ChatMessage } from '@/types';
 import { cn } from '@/lib/utils';
-import { ChatMessage } from './chat/public/PublicChat';
 import { getRandomGradient } from '@/app/lib/gradient';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Loader2,ExternalLink } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from './ui/skeleton';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { Button } from './ui/button';
 import { clusterApiUrl, Connection } from '@solana/web3.js';
@@ -21,6 +19,7 @@ import { WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import Image from 'next/image';
 import { formatTimestamp } from '@/app/lib/utils';
+import { StarsBackground } from './ui/stars-background';
 import '@dialectlabs/blinks/index.css';
 
 export function Messages({initialMessages, currentUserId, channel, event} : {initialMessages: Message[]|ChatMessage[], currentUserId: string, channel: string, event: string}){
@@ -28,6 +27,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
     const senderColors = useMemo(() => new Map(), []);
     const scrollDownRef = useRef<HTMLDivElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
+    const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
 
   const getSenderColor = (senderId: string) => {
     if (!senderColors.has(senderId)) {
@@ -56,32 +56,91 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         });
       }
     };
-
-    useEffect(() => {
-      if (containerRef.current) {
+    const scrollToBottom = () => {
+      if (containerRef.current && shouldScrollToBottom) {
           containerRef.current.scrollTop = containerRef.current.scrollHeight;
       }
-  }, []);
+  };
 
+  // const addMessage = useCallback((message: Message) => {
+  //   setMessages((prev) => [message, ...prev]);
+  //   setShouldScrollToBottom(true);
+  // }, []);
+  const addMessage = useCallback((message: Message) => {
+    setMessages((prev) => {
+        if (Number(message.id) > 0) {
+            // If this is a real message, replace any matching optimistic message
+            const optimisticIndex = prev.findIndex(m => 
+                m.content === message.content && 
+                Number(m.id) < 0
+            );
+            if (optimisticIndex !== -1) {
+                const newMessages = [...prev];
+                newMessages[optimisticIndex] = message;
+                return newMessages;
+            }
+        }
+        return [message, ...prev];
+    });
+    setShouldScrollToBottom(true);
+    }, []);
+
+
+  //   useEffect(() => {
+  //     if (containerRef.current && shouldScrollToBottom) {
+  //         containerRef.current.scrollTop = containerRef.current.scrollHeight;
+          
+  //     }
+  // }, []);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+        const { scrollTop, scrollHeight, clientHeight } = container;
+        const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+        setShouldScrollToBottom(isNearBottom);
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+}, []);
+
+    // useEffect(() => {
+    //     pusherClient.subscribe(channel)
+    //     const messageHandler = (message: Message) => {
+    //         setMessages((prev) => [message, ...prev])
+    //         setTimeout(() => {
+    //           if (containerRef.current) {
+    //               containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    //           }
+    //       }, 0);
+    //     }
+    //     pusherClient.bind(event, messageHandler)
+
+    //     return () => {
+    //       pusherClient.unsubscribe(
+    //         channel
+    //       )
+    //       pusherClient.unbind(event, messageHandler)
+    //     }
+    // }, [initialMessages])
     useEffect(() => {
-        pusherClient.subscribe(channel)
-        const messageHandler = (message: Message) => {
-            setMessages((prev) => [message, ...prev])
-            setTimeout(() => {
-              if (containerRef.current) {
-                  containerRef.current.scrollTop = containerRef.current.scrollHeight;
-              }
-          }, 0);
-        }
-        pusherClient.bind(event, messageHandler)
+      pusherClient.subscribe(channel)
+      const messageHandler = (message: Message) => {
+          addMessage(message);
+      }
+      pusherClient.bind(event, messageHandler)
 
-        return () => {
-          pusherClient.unsubscribe(
-            channel
-          )
+      return () => {
+          pusherClient.unsubscribe(channel)
           pusherClient.unbind(event, messageHandler)
-        }
-    }, [initialMessages])
+      }
+  }, [channel, event, addMessage]);
 
         const handleStartDM = async (friendId: string | number) => {
           // Handle DM logic here
@@ -109,7 +168,7 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
         return (
           <WalletProvider wallets={[]} autoConnect>
           <WalletModalProvider>
-          <div ref={containerRef} className='h-full overflow-y-auto bg-gradient-to-b from-background to-card'>
+          <div ref={containerRef} className='h-full overflow-y-scroll overflow-scroll bg-gradient-to-b from-background to-card'>
             <div className='flex flex-col-reverse gap-4 p-3'>
                 {/* <div ref={scrollDownRef} /> */}
                 {messages.length === 0 ? (
@@ -139,13 +198,16 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                                     {userN && <UserAvatar user={userN} />}
                                 </PopoverTrigger>
                                 <PopoverContent className="w-80 p-0 rounded-xl">
-                                    <div className="flex flex-col bg-black rounded-xl overflow-hidden">
+                                    <div className="flex flex-col bg-[rgb(14,15,15)] rounded-xl overflow-hidden">
                                         <div className="p-4 space-y-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center space-x-2">
                                                     {userN && <UserAvatar user={userN} size="large" />}
+                                                    <div className='flex flex-col'>
+                                                    <span className="text-sm font-semibold opacity-50">{message.sender?.username || 'Unknown User'}</span>
                                                     <div className="font-mono text-[1rem] font-bold tracking-tight cursor-pointer hover:underline glow-effect-text-large opacity-80 hover:opacity-100" onClick={() => window.open(`https://solscan.io/account/${userN?.walletPublicKey}`)}>
                                                         {shortenPublicKey(userN?.walletPublicKey || 'So11111111111111111111111111111111111111112')}
+                                                    </div>
                                                     </div>
                                                 </div>
                                                 <Button size="sm" className="text-[rgb(81,252,161)] bg-[rgb(10,46,27)] hover:bg-[rgb(5,21,12)] hover:text-[rgb(78,241,154)]" onClick={() => window.open(`https://solscan.io/account/${userN?.walletPublicKey}`)}>
@@ -203,7 +265,7 @@ export function UserAvatar({ user, size = "default" }: { user: User, size?: "def
     );
 }
 
-const MessageContainer = ({message,isCurrentUser,hasNextMessageFromSameUser}: {message: Message, isCurrentUser: boolean, hasNextMessageFromSameUser: boolean}) => {
+const MessageContainer = ({message, isCurrentUser, hasNextMessageFromSameUser}: {message: Message, isCurrentUser: boolean, hasNextMessageFromSameUser: boolean}) => {
   const betUrlRegex = /http:\/\/localhost:3000\/api\/actions\/bet\?betId=[a-zA-Z0-9]+/;
   const content = message.content || '';
   const match = content.match(betUrlRegex);
@@ -212,35 +274,40 @@ const MessageContainer = ({message,isCurrentUser,hasNextMessageFromSameUser}: {m
     const actionUrl = match[0];
     return (
       <div
-    className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative overflow-hidden', {
-        'bg-secondary text-white': isCurrentUser,
-        'text-secondary-foreground': !isCurrentUser,
-        'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
-        'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
-    })}>
-      <div>
-        <BlinkComponent actionApiUrl={actionUrl} />
+        className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative overflow-hidden', {
+          'bg-secondary text-white': isCurrentUser,
+          'text-secondary-foreground': !isCurrentUser,
+          'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
+          'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
+        })}
+      >
+        <div>
+          <BlinkComponent actionApiUrl={actionUrl} />
         </div>
         <div className="text-xs text-foreground/50 mt-1 text-right">
           {formatTimestamp(Number(message.timestamp))}
+        </div>
       </div>
-    </div>
     );
   }
 
   return (
     <div
-    className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative overflow-hidden text-white', {
+      className={cn('max-w-[70%] rounded-2xl px-4 py-2 relative overflow-hidden text-white', {
         'bg-[rgb(31,166,139)]': isCurrentUser,
         'bg-secondary': !isCurrentUser,
         'rounded-br-sm': isCurrentUser && !hasNextMessageFromSameUser,
         'rounded-bl-sm': !isCurrentUser && !hasNextMessageFromSameUser
-    })}>
-    <div className='font-bold tracking-tighter glow-effect-text container break-words whitespace-pre-wrap'>{content}</div>
-    <div className="text-xs text-foreground/50 mt-1 text-right">
+      })}
+    >
+      <div className="flex flex-col">
+        <span className="text-sm font-semibold opacity-70 mb-1">{message.sender?.username || 'Unknown User'}</span>
+        <div className='font-medium tracking-tight glow-effect-text container break-words whitespace-pre-wrap'>{content}</div>
+      </div>
+      <div className="text-xs text-foreground/50 mt-1 text-right">
         {formatTimestamp(Number(message.timestamp))}
+      </div>
     </div>
-  </div>
   )
 }
 

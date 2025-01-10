@@ -5,14 +5,7 @@ import { SolanaAgentKit, createSolanaTools } from '../../../../../solana-agent-k
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenAI } from "@langchain/openai";
 import { MemorySaver } from "@langchain/langgraph";
-import {
-  AIMessage,
-  BaseMessage,
-  ChatMessage,
-  HumanMessage,
-  SystemMessage,
-} from "@langchain/core/messages";
-import {ChatXAI} from "@langchain/xai"
+
 
 const AGENT_SYSTEM_TEMPLATE = ` You are a helpful agent that can interact onchain using the Solana Agent Kit. You are 
           empowered to interact onchain using your tools. If you ever need funds, you can request them from the 
@@ -44,11 +37,6 @@ function validateEnvironment(): void {
 
 async function initializeAgent() {
     try {
-      // const llm = new ChatXAI({
-      //   model: "grok-2-latest",
-      //   temperature: 0.7,
-      //   apiKey: process.env.GROK_API_KEY,
-      // })
       const llm = new ChatOpenAI({
         model: "gpt-4o-mini",
         temperature: 0.7,
@@ -60,8 +48,6 @@ async function initializeAgent() {
       );
   
       const tools = createSolanaTools(solanaKit);
-      const check = tools[tools.length-1].name
-      console.log("Last Tool: ",check)
       const memory = new MemorySaver();
       const config = { configurable: { thread_id: "Solana Agent Kit!" } };
   

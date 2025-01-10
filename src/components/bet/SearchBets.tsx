@@ -1,1 +1,0 @@
-// show existing bets from db

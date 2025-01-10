@@ -1,19 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/lib/auth'
 import prisma from '@/lib/prisma'
-import { error } from 'console';
-// import { NextApiRequest, NextApiResponse } from 'next'
 
 export async function POST(req: NextRequest, res: NextResponse) {
     try {
-      // const session = await getServerSession(authOptions)
-      // console.log("Session: ",session);
-      // if (!session?.user) {
-      //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      // }
-  
       const { username, walletPublicKey, imageUrl } = await req.json();
 
       if(!username || !walletPublicKey){

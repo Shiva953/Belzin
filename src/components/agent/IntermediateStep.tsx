@@ -12,6 +12,7 @@ export function IntermediateStep(props: { message: Message }) {
 		>
 			<div
 				className={`text-right ${expanded ? "w-full" : ""}`}
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				onClick={(e) => setExpanded(!expanded)}
 			>
 				<code className="mr-2 bg-slate-600 px-2 py-1 rounded hover:text-blue-600">

@@ -1,17 +1,12 @@
 'use client'
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { VerticalNavbar } from '@/components/vertical-navbar'
 import { PublicChat } from '@/components/chat/public/PublicChat';
-import { useState, useEffect } from 'react';
-import { Message } from '@/components/chat/public/PublicChat';
 import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChatMessages } from '@/hooks/useMessages';
 
-
-// MAKE UI CLEANER
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading: profileLoading, error } = useProfile(publicKey?.toString());
@@ -62,7 +57,6 @@ export default function Home() {
 
   return (
     <div className="flex h-screen">
-    {/* <VerticalNavbar /> */}
     <div className="flex-1 overflow-hidden">
       {userId && initialMessages && initialMessages.length > 0 && (
         <PublicChat userId={userId} initialMessages={initialMessages}/>

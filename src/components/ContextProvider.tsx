@@ -2,8 +2,6 @@
 'use client'
 import dynamic from 'next/dynamic'
 import {
-//   useConnection,
-//   useWallet,
   ConnectionProvider,
   WalletProvider,
 } from '@solana/wallet-adapter-react'
@@ -11,7 +9,7 @@ import { getSession, SessionProvider } from "next-auth/react"
 import { Session, getServerSession } from 'next-auth'
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets'
-import { ReactNode, useMemo, useState, useEffect } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { Cluster, clusterApiUrl } from '@solana/web3.js'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports

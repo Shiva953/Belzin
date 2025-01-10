@@ -11,31 +11,12 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover,PopoverContent,PopoverTrigger } from './ui/popover';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { ChevronDown, ExternalLink, Copy } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {toast} from 'sonner';
 import { shortenPublicKey } from '@/app/lib/utils';
-import Image from 'next/image';
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
-
-
-export type UserT = {
-  id: string|number,
-  username: string,
-  walletPublicKey: string
-  imageUrl: string
-}
-
-interface UserProfileProps {
-  user: UserT
-  onSignOut: () => void
-}
+import { UserProfileProps } from '@/types';
 
 export function UserProfile({ user, onSignOut }: UserProfileProps) {
   const [copied, setCopied] = useState<boolean>(false)
