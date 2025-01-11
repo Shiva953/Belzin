@@ -266,7 +266,7 @@ export function UserAvatar({ user, size = "default" }: { user: User, size?: "def
 }
 
 const MessageContainer = ({message, isCurrentUser, hasNextMessageFromSameUser}: {message: Message, isCurrentUser: boolean, hasNextMessageFromSameUser: boolean}) => {
-  const betUrlRegex = /http:\/\/azenticbets.vercel.app\/api\/actions\/bet\?betId=[a-zA-Z0-9]+/;
+  const betUrlRegex = /https?:\/\/azenticbets\.vercel\.app\/api\/actions\/bet\?betId=[a-zA-Z0-9]+(?:&[^&\s]*)*$/;
   const content = message.content || '';
   const match = content.match(betUrlRegex);
 
