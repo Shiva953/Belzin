@@ -13,7 +13,10 @@ async function initializeAgent() {
     try {
       const llm = new ChatOpenAI({
         model: "gpt-4o-mini",
-        temperature: 0.7
+        temperature: 0.7,
+        streaming: true,
+        maxRetries: 3,
+        timeout: 6000,
       })
       const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,
@@ -79,7 +82,7 @@ async function initializeAgent() {
         const createdMessage = await prisma.message.create({
             data: messageData,
             include: {
-                sender: true // Include the related user data
+                sender: true
             }
         });
 
