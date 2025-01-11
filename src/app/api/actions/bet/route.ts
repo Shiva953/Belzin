@@ -42,7 +42,8 @@ export const GET = async (req: Request) => {
         
     anchor.setProvider(provider);
     const betAccountKey = new PublicKey(betAccountId!)
-    const program = new Program<Betting>(IDL as Betting, provider);
+    const programId = new PublicKey("JkF3zxfbf7pvwqbyCvYActhnqYgiw2iCaht5JvKSrVY");
+    const program = new Program<Betting>(IDL as Betting, programId, provider);
     const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
     const betTitle = betAccountInfo.title;
     const isBetResolved = betAccountInfo.resolved;
@@ -116,8 +117,9 @@ export const POST = async(req: Request) => {
         const wallet = { publicKey: bettorAccount } as anchor.Wallet;
         const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
         
+        const programId = new PublicKey("JkF3zxfbf7pvwqbyCvYActhnqYgiw2iCaht5JvKSrVY");
         anchor.setProvider(provider);
-        const program = new Program<Betting>(IDL as Betting, provider);
+        const program = new Program<Betting>(IDL as Betting, programId, provider);
         const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
         const tokenMint = betAccountInfo.tokenMint;
         const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber()
@@ -131,27 +133,16 @@ export const POST = async(req: Request) => {
           bettorAccount,
           true
         );
-
-        // const currentTime = Date.now()/1000;
-        // if(currentTime >= betResolutionDateInEpochTimestamp){
-        //   //resolving the bet, this would involve checking from an external source like perplexity
-        //   const outcome = false;//??
-        //   const tx = await program.methods.
-        //   resolveBet(outcome)
-        //   .accounts()
-        // }
+        const [userBet] = PublicKey.findProgramAddressSync(
+          [Buffer.from("user_bet"), betAccountKey.toBuffer(), bettorAccount.toBuffer()],
+          program.programId
+        );
 
         if(action == 'placeBet'){
           const { side } = checkSide(requestUrl);
 
           console.log("Bettor Account: ", bettorAccount.toBase58())
 
-          // const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-          // const wallet = { publicKey: bettorAccount } as anchor.Wallet;
-          // const provider = new AnchorProvider(connection, wallet, {commitment: "confirmed"});
-          
-          // anchor.setProvider(provider);
-          // const program = new Program<Betting>(IDL as Betting, provider);
           let betDirection = false;
           if(side){
             betDirection = side === "YES" ? true : false;
@@ -162,6 +153,7 @@ export const POST = async(req: Request) => {
           .accounts({
             bettor: provider.wallet.publicKey,
             bet: betAccountKey,
+            userBet: userBet,
             bettorTokenAccount: bettorTokenAccount,
             vaultTokenAccount: vaultTokenAccount,
           })

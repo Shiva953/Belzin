@@ -58,28 +58,39 @@ import {
         const provider = new AnchorProvider(connection, wallet, {
             commitment: "confirmed",
         });
-
+        anchor.setProvider(provider);
   
-      anchor.setProvider(provider);
-      const program = new Program<Betting>(IDL as Betting, provider);
+      const programId = new PublicKey("JkF3zxfbf7pvwqbyCvYActhnqYgiw2iCaht5JvKSrVY");
+      const program = new Program<Betting>(IDL as Betting, programId, provider);
       const [betAccount] = PublicKey.findProgramAddressSync(
         [Buffer.from(betTitle)],
         program.programId,
       );
+      const [vaultAuthority] = PublicKey.findProgramAddressSync(
+        [Buffer.from("vault"), betAccount.toBuffer()],
+        program.programId
+      );
+      const [vaultTokenAccount] = PublicKey.findProgramAddressSync(
+        [Buffer.from("vault_token_account"), betAccount.toBuffer()],
+        program.programId
+      );
       const actionURL = `http://localhost:3000/api/actions/bet?betId=${betAccount.toBase58()}`;
   
-      const betResolutionUnixEpochTimestamp = dateStringToEpoch(
-        betResolutionDateString,
-      );
+      // const betResolutionUnixEpochTimestamp = dateStringToEpoch(
+      //   betResolutionDateString,
+      // );
       //createBet
       await program.methods
         .createBet(
           betTitle,
           new BN(betAmount * Math.pow(10, 9)),
-          new BN(betResolutionUnixEpochTimestamp),
+          new BN(1767182400),
         )
         .accounts({
+          bet: betAccount,
           signer: agent.wallet.publicKey,
+          vaultAuthority: vaultAuthority,
+          vaultTokenAccount: vaultTokenAccount,
           tokenMint: mint,
         })
         .rpc({commitment: "confirmed"});

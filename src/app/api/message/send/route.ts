@@ -25,7 +25,7 @@ async function initializeAgent() {
       const memory = new MemorySaver();
       const config = { configurable: { thread_id: "Solana Agent Kit!" } };
 
-      const blinktool = tools.find(t => t.name==="solana_betting_blink_url")?.name;
+      const blinktool = tools.find(t => t.name==="solana_bet_blink_url")?.name;
       console.log("solana blink tool: ", blinktool)
   
       const agent = createReactAgent({
@@ -132,9 +132,14 @@ async function processAgentMessage(messageContent: string) {
 
         let agentResponse = '';
         for await (const { event, data } of eventStream) {
+            console.log("Iteration Start")
+            console.log("Event: ",event)
+            console.log("Data: ",data)
             if (event === 'on_chat_model_stream' && data.chunk.content) {
                 agentResponse += data.chunk.content;
+                console.log("Agent Response: ",agentResponse);
             }
+            console.log("Iteration End")
         }
 
         const agentMessage = await prisma.message.create({

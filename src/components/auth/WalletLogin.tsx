@@ -203,6 +203,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
                   </div>
                 </HoverBorderGradient>
               ) : (
+                // add the landing page here
                 <div className="flex min-h-[200px] flex-col items-center justify-center mt-16 space-y-8 rounded-xl bg-[rgb(14,15,15)] p-8 text-white">
                   <div className="flex items-center gap-4">
                     <Wallet className="h-8 w-8" />

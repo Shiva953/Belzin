@@ -12,15 +12,14 @@
   "resolutions": {
     "typescript": "^4.9.5",
     "**/typescript": "^4.9.5",
-    "solana-agent-kit/typescript": "^4.9.5",
-    "solana-agent-kit/@coral-xyz/anchor": "0.29.0"
+    "solana-agent-kit/typescript": "^4.9.5"
   },
   "dependencies": {
     "@ai-sdk/xai": "^1.0.12",
     "@ai16z/eliza": "^0.1.6-alpha.4",
     "@babel/runtime": "^7.26.0",
     "@cks-systems/manifest-sdk": "^0.1.73",
-    "@coral-xyz/anchor": "^0.30.1",
+    "@coral-xyz/anchor": "^0.29.0",
     "@dialectlabs/blinks": "^0.18.3",
     "@goat-sdk/adapter-vercel-ai": "^0.2.0",
     "@goat-sdk/plugin-jupiter": "^0.2.4",
@@ -80,7 +79,7 @@
     "socket-io": "^1.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "solana-agent-kit": "^1.3.7",
+    "solana-agent-kit": "^1.3.8",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Tool } from "langchain/tools";
 import { SolanaAgentKit, createSolanaTools } from "solana-agent-kit";
 import { get_bet_blink } from "@/tools/get_blink";
@@ -29,7 +30,9 @@ declare module "solana-agent-kit" {
   
     protected async _call(input: string): Promise<string> {
       try {
-        const parsedInput = JSON.parse(input);
+        const parsed = JSON.parse(input);
+        const parsedInput = parsed.input || parsed;
+        console.log("PARSED INPUT: ",parsedInput)
   
         const blink = await this.solanaKit.getBetBlink(
           parsedInput.betTitle,
