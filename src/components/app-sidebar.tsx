@@ -33,7 +33,7 @@ export function AppSidebar() {
     <Sidebar className="z-20 bg-gradient-to-b from-gray-900 to-gray-800 text-white border-r border-gray-800">
       <SidebarHeader className={`p-4`}>
         <h1 className={`text-2xl tracking-tighter font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600`}>
-          AzenticChat
+          Belzin
         </h1>
       </SidebarHeader>
       <SidebarContent>

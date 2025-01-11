@@ -74,7 +74,8 @@ import {
         [Buffer.from("vault_token_account"), betAccount.toBuffer()],
         program.programId
       );
-      const actionURL = `http://azenticbets.vercel.app/api/actions/bet?betId=${betAccount.toBase58()}`;
+      const actionURL = `http://belzin.vercel.app/api/actions/bet?betId=${betAccount.toBase58()}`;
+      // const actionURL = `http://localhost:3000/api/actions/bet?betId=${betAccount.toBase58()}`;
   
       // const betResolutionUnixEpochTimestamp = dateStringToEpoch(
       //   betResolutionDateString,

@@ -16,7 +16,7 @@ export function WelcomePage({handleSignIn}: {handleSignIn: () => Promise<void>})
           {/* <Banner /> */}
           
           <h1 className="mt-24 mb-6 text-5xl md:text-7xl font-serif glow-text tracking-tight">
-            AzenticBets
+            Belzin
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12">
@@ -26,22 +26,12 @@ export function WelcomePage({handleSignIn}: {handleSignIn: () => Promise<void>})
           <Button 
             size="lg"
             onClick={handleSignIn}
-            className="bg-white text-black rounded-full hover:bg-gray-100 transition-colors group"
+            className="bg-white text-black text-[1rem] w-72 h-16 rounded-full hover:bg-gray-100 transition-colors group"
           >
             Sign In With Solana
             <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Button>
         </div>
-{/* 
-        <div className="relative w-full aspect-[16/9] rounded-t-xl overflow-hidden border border-white/10"> */}
-          {/* <Image
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-01-11%20at%204.13.28%20PM-VwZ0e9NSihKeGaqaSqFcViOOaRWDtu.png"
-            alt="Kino platform interface"
-            fill
-            className="object-cover"
-            priority
-          /> */}
-        {/* </div> */}
       </div>
     </main>
   )
