@@ -25,11 +25,7 @@ import {
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
   import { epochToDateString,dateStringToEpoch } from "@/app/lib/utils";
   import { Betting,IDL } from "@/types/betting";
-// agent creates the bet already(using bet title and bet amount -> createBet), after that you get the blink = frontend for placeBet
-// get the params(bet title, bet amount) -> create bet -> WHEN BET CREATED, SHOW THE INTERFACE WITH SIDES ("YES"|"NO")
 
-// bet is ALREADY CREATED BY THE AGENT, YOU SEE THE PLACEBET INTERFACE HERE
-// ex - /api/actions/bet?betId=8qh4Gnua1xzAyw2EyHiVHR5A9F2fbqRDLfZ21MNdMvyu
 export const GET = async (req: Request) => {
     const requestUrl = new URL(req.url as string);
     console.log("Request URL: ",requestUrl)
