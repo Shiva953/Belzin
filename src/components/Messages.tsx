@@ -62,10 +62,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
       }
   };
 
-  // const addMessage = useCallback((message: Message) => {
-  //   setMessages((prev) => [message, ...prev]);
-  //   setShouldScrollToBottom(true);
-  // }, []);
   const addMessage = useCallback((message: Message) => {
     setMessages((prev) => {
         if (Number(message.id) > 0) {
@@ -110,25 +106,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
     return () => container.removeEventListener('scroll', handleScroll);
 }, []);
 
-    // useEffect(() => {
-    //     pusherClient.subscribe(channel)
-    //     const messageHandler = (message: Message) => {
-    //         setMessages((prev) => [message, ...prev])
-    //         setTimeout(() => {
-    //           if (containerRef.current) {
-    //               containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    //           }
-    //       }, 0);
-    //     }
-    //     pusherClient.bind(event, messageHandler)
-
-    //     return () => {
-    //       pusherClient.unsubscribe(
-    //         channel
-    //       )
-    //       pusherClient.unbind(event, messageHandler)
-    //     }
-    // }, [initialMessages])
     useEffect(() => {
       pusherClient.subscribe(channel)
       const messageHandler = (message: Message) => {
@@ -143,7 +120,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
   }, [channel, event, addMessage]);
 
         const handleStartDM = async (friendId: string | number) => {
-          // Handle DM logic here
           console.log('Starting DM with user:', friendId);
 
           const fid = typeof friendId === 'string' ? Number(friendId) : friendId;
@@ -159,9 +135,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
           const data = await res.json();
           if(data){
             console.log(data)
-            // toast({
-            //   content: ""
-            // })
           }
         };
 

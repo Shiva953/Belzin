@@ -1,5 +1,3 @@
-// wallet auth(signing in with wallet + adding user to db + persisting user session)
-//1. ONCLICK WALLET SIGN IN BUTTON -> SIGN IN -> IF USER EXISTS IN DB FETCH USER PROFILE, ELSE PROMPT USER TO CREATE PROFILE -> ADD USER IN DB -> FETCH USER
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
