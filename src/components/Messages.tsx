@@ -65,7 +65,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
   const addMessage = useCallback((message: Message) => {
     setMessages((prev) => {
         if (Number(message.id) > 0) {
-            // If this is a real message, replace any matching optimistic message
             const optimisticIndex = prev.findIndex(m => 
                 m.content === message.content && 
                 Number(m.id) < 0
@@ -82,12 +81,6 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
     }, []);
 
 
-  //   useEffect(() => {
-  //     if (containerRef.current && shouldScrollToBottom) {
-  //         containerRef.current.scrollTop = containerRef.current.scrollHeight;
-          
-  //     }
-  // }, []);
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -155,8 +148,8 @@ export function Messages({initialMessages, currentUserId, channel, event} : {ini
                     const userN = message.sender;
                     console.log("User: ",userN)
                     const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId;
-                    const red = Math.floor(Math.random() * 100) + 100; // Range: 100-199
-                    const green = Math.floor(Math.random() * 100) + 100; // Range: 100-199
+                    const red = Math.floor(Math.random() * 100) + 100;
+                    const green = Math.floor(Math.random() * 100) + 100;
                     const color = `rgb(${red},${green},184)`;
                     const bgColourForNonCurrentUser = message.senderId ? `bg-[${color}] text-secondary-foreground`: `bg-[rgb(18,25,180)] text-secondary-foreground`
                     return (
@@ -239,7 +232,8 @@ export function UserAvatar({ user, size = "default" }: { user: User, size?: "def
 }
 
 const MessageContainer = ({message, isCurrentUser, hasNextMessageFromSameUser}: {message: Message, isCurrentUser: boolean, hasNextMessageFromSameUser: boolean}) => {
-  const betUrlRegex = /https?:\/\/azenticbets\.vercel\.app\/api\/actions\/bet\?betId=[a-zA-Z0-9]+(?:&[^&\s]*)*$/;
+  const betUrlRegex = /http?:\/\/azenticbets\.vercel\.app\/api\/actions\/bet\?betId=[a-zA-Z0-9]+(?:&[^&\s]*)*$/;
+  // const betUrlRegex = /http:\/\/localhost:3000\/api\/actions\/bet\?betId=[a-zA-Z0-9]+/;
   const content = message.content || '';
   const match = content.match(betUrlRegex);
 

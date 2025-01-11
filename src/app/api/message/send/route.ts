@@ -15,8 +15,7 @@ async function initializeAgent() {
         model: "gpt-4o-mini",
         temperature: 0.7,
         streaming: true,
-        maxRetries: 3,
-        timeout: 6000,
+        maxRetries: 10,
       })
       const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,

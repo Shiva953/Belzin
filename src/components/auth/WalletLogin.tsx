@@ -13,6 +13,7 @@ import { UserT } from "@/types";
 import { Button } from "../ui/button";
 import { Wallet } from "lucide-react";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import { WelcomePage } from "../WelcomePage";
 
 export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const { data: session, status } = useSession();
@@ -202,7 +203,9 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
                 </HoverBorderGradient>
               ) : (
                 // add the landing page here
-                <div className="flex min-h-[200px] flex-col items-center justify-center mt-16 space-y-8 rounded-xl bg-[rgb(14,15,15)] p-8 text-white">
+                <div key={"outerdivX"}>
+                  <WelcomePage handleSignIn={handleSignIn}/>
+                {/* <div className="flex min-h-[200px] flex-col items-center justify-center mt-16 space-y-8 rounded-xl bg-[rgb(14,15,15)] p-8 text-white">
                   <div className="flex items-center gap-4">
                     <Wallet className="h-8 w-8" />
                     <h1 className="text-3xl font-semibold">Connect Wallet</h1>
@@ -220,6 +223,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
                     <span className="text-lg">Sign in</span>
                     <span className="ml-2">→</span>
                   </Button>
+                </div> */}
             </div>
               )}
             </div>
