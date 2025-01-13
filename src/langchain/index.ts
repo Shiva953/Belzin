@@ -57,7 +57,6 @@ declare module "solana-agent-kit" {
 
   export function createExtendedSolanaTools(solanaKit: SolanaAgentKit) {
     const tools = createSolanaTools(solanaKit);
-    // Add your new tool
     const toolsWithBlinkToolAdded = [...tools, new SolanaBetBlinkTool(solanaKit)]
 
     return toolsWithBlinkToolAdded;
