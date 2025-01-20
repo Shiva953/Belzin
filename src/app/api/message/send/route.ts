@@ -9,7 +9,7 @@ import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { User } from "@prisma/client";
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 async function initializeAgent() {
     try {
