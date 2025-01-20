@@ -15,8 +15,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 
 export const metadata: Metadata = {
-  title: "Group Chat Betting using Blinks",
-  description: "Bet without leaving the chat, using solana blinks!",
+  title: "Belzin",
+  description: "AI-Agent Powered Group Chat P2P Betting",
 };
 
 export default async function RootLayout({

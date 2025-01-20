@@ -9,13 +9,14 @@ import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { User } from "@prisma/client";
 
+export const runtime = 'edge';
+
 async function initializeAgent() {
     try {
       const llm = new ChatOpenAI({
         model: "gpt-4o-mini",
         temperature: 0.7,
         streaming: true,
-        // maxRetries: 10,
       })
       const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,
@@ -91,7 +92,19 @@ async function initializeAgent() {
         ]);
 
         if (messageContent.toLowerCase().includes('@polyagent')) {
-            processAgentMessage(messageContent).catch(console.error);
+            // await processAgentMessage(messageContent).catch(console.error);
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Agent processing timeout')), 50000);
+            });
+
+            try {
+                await Promise.race([
+                    processAgentMessage(messageContent),
+                    timeoutPromise
+                ]);
+            } catch (error) {
+                console.error('Agent processing error or timeout:', error);
+            }
         }
 
         return NextResponse.json({
