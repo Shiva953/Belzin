@@ -214,7 +214,7 @@ async function processAgentMessageWithTimeout(messageContent: string): Promise<s
     return new Promise(async (resolve, reject) => {
         const timeoutId = setTimeout(() => {
             reject(new Error('Agent processing timeout'));
-        }, 9000); // Set to 8 seconds to ensure we stay under Vercel's 10s limit
+        }, 40000);
 
         try {
             let agentResponse = '';
@@ -232,8 +232,12 @@ async function processAgentMessageWithTimeout(messageContent: string): Promise<s
             );
 
             for await (const { event, data } of eventStream) {
+                console.log("Iteration Start")
+                console.log("Event: ",event)
+                console.log("Data: ",data)
                 if (event === 'on_chat_model_stream' && data.chunk.content) {
                     agentResponse += data.chunk.content;
+                    console.log("Agent Response: ",agentResponse);
                 }
             }
 
