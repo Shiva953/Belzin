@@ -11,49 +11,39 @@ import { User } from "@prisma/client";
 
 // export const runtime = 'edge';
 
-async function initializeAgent() {
-    try {
-      const llm = new ChatOpenAI({
+    const llm = new ChatOpenAI({
         model: "gpt-4o-mini",
         temperature: 0.7,
         streaming: true,
-      })
-      const solanaKit = new SolanaAgentKit(
+    })
+    const solanaKit = new SolanaAgentKit(
         process.env.SOLANA_PRIVATE_KEY!,
         process.env.RPC_URL!,
         process.env.OPENAI_API_KEY!
-      );
-  
-      const tools = createExtendedSolanaTools(solanaKit);
-      const memory = new MemorySaver();
-      const config = { configurable: { thread_id: "Solana Agent Kit!" } };
+    );
 
-      const blinktool = tools.find(t => t.name==="solana_bet_blink_url")?.name;
-      console.log("solana blink tool: ", blinktool)
-  
-      const agent = createReactAgent({
-        llm,
-        tools,
-        checkpointSaver: memory,
-        messageModifier: `
-          You are a helpful agent that can interact onchain using the Solana Agent Kit. You are 
-          empowered to interact onchain using your tools. If you ever need funds, you can request them from the 
-          faucet. If not, you can provide your wallet details and request funds from the user. If there is a 5XX 
-          (internal) HTTP error code, ask the user to try again later. If someone asks you to do something you 
-          can't do with your currently available tools, you must say so, and encourage them to implement it 
-          themselves using the Solana Agent Kit, recommend they go to https://www.solanaagentkit.xyz for more information. Be 
-          concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is 
-          explicitly requested.
-        `,
-      });
+    const tools = createExtendedSolanaTools(solanaKit);
+    const memory = new MemorySaver();
+    const config = { configurable: { thread_id: "Solana Agent Kit!" } };
 
-      return { agent, config };
-    } catch (error) {
-      console.error("Failed to initialize agent:", error);
-      throw error;
-    }
-  }
+    const blinktool = tools.find(t => t.name==="solana_bet_blink_url")?.name;
+    console.log("solana blink tool: ", blinktool)
 
+    const agent = createReactAgent({
+    llm,
+    tools,
+    checkpointSaver: memory,
+    messageModifier: `
+        You are a helpful agent that can interact onchain using the Solana Agent Kit. You are 
+        empowered to interact onchain using your tools. If you ever need funds, you can request them from the 
+        faucet. If not, you can provide your wallet details and request funds from the user. If there is a 5XX 
+        (internal) HTTP error code, ask the user to try again later. If someone asks you to do something you 
+        can't do with your currently available tools, you must say so, and encourage them to implement it 
+        themselves using the Solana Agent Kit, recommend they go to https://www.solanaagentkit.xyz for more information. Be 
+        concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is 
+        explicitly requested.
+    `,
+    });
 
   export async function POST(req: Request){
     try {
@@ -122,7 +112,6 @@ async function initializeAgent() {
 
 async function processAgentMessage(messageContent: string) {
     try {
-        const { agent } = await initializeAgent();
 
         const agentUser:User = {
             id: 14,
