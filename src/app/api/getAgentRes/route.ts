@@ -20,8 +20,6 @@ const solanaKit = new SolanaAgentKit(
     process.env.OPENAI_API_KEY!
 );
 
-// FIX AGENT RES + FIX UI BUGS
-
 const tools = createExtendedSolanaTools(solanaKit);
 const memory = new MemorySaver();
 const config = { configurable: { thread_id: "Solana Agent Kit!" } };
@@ -61,12 +59,49 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Message content is required" }, { status: 400 });
         }
 
-        const agentResponse = await processAgentMessageWithTimeout(messageContent);
+        // const agentResponse = await processAgentMessageWithTimeout(messageContent);
 
-        return NextResponse.json({
-            response: agentResponse,
-            res: 'Agent response successfully retrieved'
-        }, { status: 200 });
+        // return NextResponse.json({
+        //     response: agentResponse,
+        //     res: 'Agent response successfully retrieved'
+        // }, { status: 200 });
+
+        const textEncoder = new TextEncoder();
+        const transformStream = new ReadableStream({
+            async start(controller) {
+                try {
+                    const eventStream = agent.streamEvents(
+                        {
+                            messages: [{
+                                role: 'user',
+                                content: messageContent
+                            }]
+                        },
+                        {
+                            version: 'v2',
+                            configurable: { thread_id: 'Solana Agent Kit!' }
+                        }
+                    );
+
+                    for await (const { event, data } of eventStream) {
+                        console.log("Iteration Start")
+                        console.log("Event: ",event)
+                        console.log("Data: ",data)
+                        if (event === 'on_chat_model_stream') {
+                            if (data.chunk.content) {
+                                controller.enqueue(textEncoder.encode(data.chunk.content));
+                            }
+                        }
+                    }
+                    controller.close();
+                } catch (error) {
+                    controller.error(error);
+                }
+            }
+        });
+
+        // Return the streaming response
+        return new Response(transformStream);
 
     } catch (err) {
         if (err instanceof Error) {

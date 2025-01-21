@@ -2,13 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef } from 'react';
 import axios from "axios"
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, Bot } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAgentStream } from '@/hooks/useAgentStream';
 
 const AGENT_USER = {
   id: 14,
@@ -19,6 +20,7 @@ const AGENT_USER = {
 };
 
 export function MessageInput({chatId} : {chatId?: string}){
+  const { streamAgentResponse, isStreaming } = useAgentStream();
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [input, setInput] = useState<string>('')
     const wallet = useWallet();
@@ -34,7 +36,6 @@ export function MessageInput({chatId} : {chatId?: string}){
           const isAgent = optimisticInput.toLowerCase().includes("@polyagent");
           const walletPublicKey = wallet?.publicKey?.toString() || '';
 
-          // Send user message to the database
           await axios.post('/api/send', { 
               messageContent: optimisticInput, 
               walletPublicKey, 
@@ -44,21 +45,38 @@ export function MessageInput({chatId} : {chatId?: string}){
         //   if (isAgent) {
         //     await handleAgentStream(optimisticInput.replace('@polyagent', '').trim());
         // }
-          if (isAgent) {
-              const agentResponse = await axios.post('/api/getAgentRes', { 
-                  messageContent: optimisticInput.replace('@polyagent', '').trim() 
-              });
+          // if (isAgent) {
+          //     const agentResponse = await axios.post('/api/getAgentRes', { 
+          //         messageContent: optimisticInput.replace('@polyagent', '').trim() 
+          //     });
 
-              if (agentResponse.data.response) {
-                  await axios.post('/api/send', { 
-                      messageContent: agentResponse.data.response, 
-                      walletPublicKey: AGENT_USER.walletPublicKey, 
-                      isAgent: true 
-                  });
-              }
+          //     if (agentResponse.data.response) {
+          //         await axios.post('/api/send', { 
+          //             messageContent: agentResponse.data.response, 
+          //             walletPublicKey: AGENT_USER.walletPublicKey, 
+          //             isAgent: true 
+          //         });
+          //     }
+          // }
+          if (isAgent) {
+            let accumulatedResponse = '';
+            // Stream the agent response
+            const fullResponse = await streamAgentResponse(
+              optimisticInput.replace('@polyagent', '').trim(),
+                (chunk) => {
+                  accumulatedResponse += chunk;
+                },
+                () => {
+                }
+            );
+    
+            await axios.post('/api/send', {
+              messageContent: fullResponse,
+              walletPublicKey: AGENT_USER.walletPublicKey,
+              isAgent: true
+            });
           }
 
-          // If it's a private chat
           if (chatId) {
               await axios.post('/api/message/sendToPrivateChat', { 
                   messageContent: optimisticInput, 
@@ -66,12 +84,9 @@ export function MessageInput({chatId} : {chatId?: string}){
                   chatId 
               });
           }
-
-          // Focus back on input
           inputRef.current?.focus()
       } catch (err) {
           console.error("Error sending message:", err);
-          // Optionally, show an error notification to the user
       } finally {
           setIsLoading(false);
       }
