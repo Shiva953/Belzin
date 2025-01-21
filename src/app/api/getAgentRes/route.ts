@@ -43,14 +43,6 @@ messageModifier: `
 `,
 });
 
-const AGENT_USER: User = {
-    id: 14,
-    walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
-    username: 'PolyAgent',
-    imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
-    friendList: []
-};
-
 export async function POST(req: Request) {
     try {
         const { messageContent } = await req.json();

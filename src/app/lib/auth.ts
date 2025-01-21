@@ -5,7 +5,6 @@ import { deserializeData } from "./utils";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { cookies } from "next/headers";
-// import bs58 from 'bs58';
 
 export const providers = [
     CredentialsProvider({
