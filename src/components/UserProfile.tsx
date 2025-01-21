@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
+import { useWallet } from '@solana/wallet-adapter-react';
 import { X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,8 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover,PopoverContent,PopoverTrigger } from './ui/popover';
-import { ChevronDown, ExternalLink, Copy } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ChevronDown, Copy, ExternalLink, LogOut } from "lucide-react"
 import {toast} from 'sonner';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
@@ -20,7 +20,8 @@ import { UserProfileProps } from '@/types';
 
 export function UserProfile({ user, onSignOut }: UserProfileProps) {
   const [copied, setCopied] = useState<boolean>(false)
-  const [solAmount, setSolAmount] = useState<string>('0')
+  const [solAmount, setSolAmount] = useState<string>("0")
+  const wallet = useWallet()
 
   const copyToClipboard = () => {
     if (user?.walletPublicKey) {
@@ -33,83 +34,69 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
 
   useEffect(() => {
     const getSolBalance = async (wallet: PublicKey) => {
-      const balanceInLamports = await connection.getBalance(wallet);
-      const solBalance = balanceInLamports/LAMPORTS_PER_SOL
-      setSolAmount(solBalance.toFixed(2));
+      const connection = new Connection(clusterApiUrl("devnet"), "confirmed")
+      const balanceInLamports = await connection.getBalance(wallet)
+      const solBalance = balanceInLamports / LAMPORTS_PER_SOL
+      setSolAmount(solBalance.toFixed(2))
     }
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-    const wallet = new PublicKey(user.walletPublicKey);
-    getSolBalance(wallet)
-  }, [user.walletPublicKey])
 
+    if (wallet.publicKey) {
+      getSolBalance(wallet.publicKey)
+    }
+  }, [wallet.publicKey])
 
   return (
-    <div className="flex items-center justify-between space-x-4 p-2 rounded-lg shadow-sm">
-      <Popover>
-        <PopoverTrigger asChild>
-          <div className="flex items-center space-x-2 cursor-pointer">
-            <Avatar>
-              <AvatarImage src={user.imageUrl} alt={user.username} />
-              <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}
-              </AvatarFallback>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={user.imageUrl} alt={user.username} />
+            <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0">
+        <div className="flex flex-col space-y-4 p-4">
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={user.imageUrl} />
+              <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
-            <span className="font-extrabold text-base tracking-tight my-auto">
-              {user.username || 'InvalidUser'}
-            </span>
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          </div>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-0">
-          <div className="flex flex-col bg-black rounded-lg overflow-hidden">
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Avatar>
-                    <AvatarImage src={user.imageUrl} alt={user.username} />
-                  </Avatar>
-                  <div className="font-mono text-[1rem] font-bold tracking-tight cursor-pointer hover:underline glow-effect-text-large opacity-80 hover:opacity-100" onClick={() => window.open(`https://solscan.io/account/${user?.walletPublicKey}`)}>
-                    {shortenPublicKey(user?.walletPublicKey || 'So11111111111111111111111111111111111111112')}
-                   </div>
-                </div>
-                <Button size="sm" className="text-[rgb(81,252,161)] bg-[rgb(10,46,27)] hover:bg-[rgb(5,21,12)] hover:text-[rgb(78,241,154)]" onClick={() => window.open(`https://solscan.io/account/${user?.walletPublicKey}`)}>
-                 Account<ExternalLink/>
-                </Button>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-3xl font-bold">{solAmount} SOL</div>
-                <div className="text-sm text-gray-400">BALANCE</div>
-              </div>
-
-              <Button className="bg-[rgb(46,10,23)] text-[rgb(236,72,153)] w-full rounded-xl">
-                View Your Bets
-              </Button>
+            <div className="space-y-1">
+              <h4 className="text-sm font-semibold">{user.username}</h4>
+              <p className="text-xs text-muted-foreground">{shortenPublicKey(user.walletPublicKey)}</p>
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
-
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            {user.walletPublicKey && (
-              <Button
-                variant="outline"
-                size="default"
-                className="font-mono text-sm font-bold rounded-xl"
-                onClick={copyToClipboard}
-              >
-                {shortenPublicKey(user.walletPublicKey)}
-                <Copy className="ml-2 h-3 w-3" />
-              </Button>
-            )}
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{copied ? 'Copied!' : 'Copy wallet address'}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+          <div className="flex items-center space-x-4 rounded-md bg-secondary p-4">
+            <div>
+              <p className="text-sm font-medium leading-none">Balance</p>
+              <p className="text-xl font-bold">{solAmount} SOL</p>
+            </div>
+            <Button size="sm" className="ml-auto">
+              Add Funds
+            </Button>
+          </div>
+          <div className="flex flex-col space-y-2">
+            <Button
+              variant="outline"
+              className="justify-start"
+              onClick={() => window.open(`https://solscan.io/account/${user.walletPublicKey}`)}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" />
+              View on Solscan
+            </Button>
+            <Button variant="outline" className="justify-start" onClick={copyToClipboard}>
+              <Copy className="mr-2 h-4 w-4" />
+              {copied ? "Copied!" : "Copy Address"}
+            </Button>
+            <Button variant="outline" className="justify-start text-destructive" onClick={onSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign out
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 

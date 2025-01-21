@@ -4,7 +4,6 @@ import { Messages } from '@/components/Messages';
 import { MessageInput } from '@/components/MessageInput';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { WalletProvider } from '@solana/wallet-adapter-react';
-import { User } from '@prisma/client';
 import { Message } from '@/types';
 import { StarsBackground } from "@/components/ui/stars-background";
 

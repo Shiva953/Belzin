@@ -154,36 +154,6 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
               onProfileCreated={handleProfileCreated} 
             />
           )}
-
-            {/* <header className="fixed top-0 left-0 right-0 rounded-full bg-[rgb(22,18,18)] mx-auto items-center h-16 p-4 shadow-sm z-20">
-              <div className="container mx-auto flex justify-between items-center h-full">
-              {isAuthenticated && userProfile && (
-                <UserProfile user={userProfile} onSignOut={handleSignOut}/>
-              )}
-              {!isAuthenticated && (
-                <div className="flex flex-col items-center space-x-4 mx-auto">
-                  <span className="text-muted-foreground m-4 pt-16">
-                    You are not signed in
-                  </span>
-                  <button 
-                    onClick={handleSignIn} 
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-                  >
-                    Sign in
-                  </button>
-                </div>
-              )}
-
-              {isAuthenticated && userProfile && (
-                <button
-                  onClick={handleSignOut}
-                  className="px-3 font-bold tracking-tight rounded-full text-white py-2 bg-[rgb(241,17,73)] hover:bg-opacity-50 hover:text-opacity-70 transition-colors"
-                >
-                  Sign out
-                </button>
-              )}
-            </div>
-          </header> */}
           <header className="fixed flex-shrink-0 top-0 left-0 right-0 rounded-full bg-transparent mx-auto p-4 shadow-sm z-40">
             <div className="container mx-auto h-full flex justify-center items-center">
               {isAuthenticated && userProfile ? (
@@ -202,28 +172,8 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
                   </div>
                 </HoverBorderGradient>
               ) : (
-                // add the landing page here
                 <div key={"outerdivX"}>
                   <WelcomePage handleSignIn={handleSignIn}/>
-                {/* <div className="flex min-h-[200px] flex-col items-center justify-center mt-16 space-y-8 rounded-xl bg-[rgb(14,15,15)] p-8 text-white">
-                  <div className="flex items-center gap-4">
-                    <Wallet className="h-8 w-8" />
-                    <h1 className="text-3xl font-semibold">Connect Wallet</h1>
-                  </div>
-                  
-                  <p className="max-w-[400px] text-center text-xl">
-                    Before entering the chat, sign in with solana.
-                  </p>
-
-                  <Button 
-                    onClick={handleSignIn}
-                    size="lg" 
-                    className="w-full max-w-[400px] rounded-full bg-white text-black hover:bg-white/90"
-                  >
-                    <span className="text-lg">Sign in</span>
-                    <span className="ml-2">→</span>
-                  </Button>
-                </div> */}
             </div>
               )}
             </div>

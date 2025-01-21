@@ -105,6 +105,8 @@ import { User } from "@prisma/client";
         //         console.error('Agent processing error or timeout:', error);
         //     }
         // }
+
+        // YOU POST USER MESSAGE TO DB -> GET AGENT RESPONSE -> (IF VALID RES)POST AGENT RESPONSE TO DB 
         const [createdMessage, agentResponse] = await Promise.all([
             createAndBroadcastMessage(user.id, messageContent, isAgent),
             messageContent.toLowerCase().includes('@polyagent') 
@@ -214,7 +216,7 @@ async function processAgentMessageWithTimeout(messageContent: string): Promise<s
     return new Promise(async (resolve, reject) => {
         const timeoutId = setTimeout(() => {
             reject(new Error('Agent processing timeout'));
-        }, 40000);
+        }, 9000);
 
         try {
             let agentResponse = '';

@@ -1,20 +1,14 @@
 import { NavBar } from '@/components/nav-bar'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-// import { StarsBackground } from './ui/stars-background'
-// import Image from 'next/image'
-// import '@/styles/glow.css'
 
-export function WelcomePage({handleSignIn}: {handleSignIn: () => Promise<void>}) {
+export function WelcomePage({ handleSignIn }: { handleSignIn: () => Promise<void> }) {
   return (
     <main className="min-h-screen text-white overflow-hidden">
-        {/* <StarsBackground/> */}
       <NavBar />
       
       <div className="max-w-7xl mx-auto px-6">
         <div className="pt-24 pb-32 flex flex-col items-center text-center">
-          {/* <Banner /> */}
-          
           <h1 className="mt-24 mb-6 text-5xl md:text-7xl font-serif glow-text tracking-tight">
             Belzin
           </h1>

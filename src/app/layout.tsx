@@ -28,29 +28,32 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
   return (
     <html lang="en" className="dark">
-      <body className={cn(
-          "min-h-screen font-sans antialiased",
-          GeistSans.className
-        )}>
-          <div 
+      <body
+        className={cn(
+          "min-h-screen font-sans antialiased bg-gradient-to-b from-background to-background/80",
+          GeistSans.className,
+        )}
+      >
+        <div 
         className="z--40 absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                    w-[48rem] h-[40rem] rounded-full 
+                    w-[48rem] h-[40rem] rounded-full opacity-50 
                     bg-gradient-to-r from-blue-300/50 via-cyan-400/30 to-green-300/30 
                     blur-[220px] items-center my-auto mt-72 ml-32"
-      ></div>
-    <SolanaProvider session={session}>
-      <WalletLoginInterface>
-      <SidebarProvider>
-        <AppSidebar/>
-        <main>
-          <SidebarTrigger />
-          {children}
-        </main>
-        <Toaster />
-        </SidebarProvider>
-        </WalletLoginInterface>
+        ></div>
+        <SolanaProvider session={session}>
+          <WalletLoginInterface>
+            <SidebarProvider>
+              <div className="flex h-screen">
+                <AppSidebar />
+                <main className="flex-1 flex flex-col overflow-hidden">{children}</main>
+              </div>
+              <Toaster position="top-center" />
+            </SidebarProvider>
+          </WalletLoginInterface>
         </SolanaProvider>
       </body>
     </html>
   );
 }
+
+
