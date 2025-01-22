@@ -16,13 +16,14 @@ declare module "solana-agent-kit" {
 
   export class SolanaBetBlinkTool extends Tool {
     name = "solana_bet_blink_url";
-    description = `Get the blink url for a given bet having bet title, bet amount and bet resolution date.
+    description = `Get the blink url for a given bet having betTitle, betAmount, betResolutionDate and tokenTicker.
   
-    Inputs ( input is a JSON string ):
-    betTitle: string, the title of the bet, eg: "Will spain win the race?" (required)
-    betAmount: number, the amount to be put on the bet, eg: 100 (required)
-    betResolutionDateString: string, the date when the bet will be resolved, eg: "31st December, 2025" (required)
-    tokenTicker: string, the ticker associated with a token, eg: "USDC", "JUP"(required)`;
+    Inputs( input is a JSON string ):
+    betTitle (required): string, the title of the bet, eg: "Will spain win the race?"
+    betAmount (required): number, the amount to be put on the bet, eg: 100
+    betResolutionDate (required): string, the date when the bet will be resolved, eg: "31st December, 2025"
+    tokenTicker (required): string, the ticker associated with a token, eg: "USDC"
+    `;
   
     constructor(private solanaKit: SolanaAgentKit) {
       super();
@@ -30,20 +31,20 @@ declare module "solana-agent-kit" {
   
     protected async _call(input: string): Promise<string> {
       try {
-        const parsed = JSON.parse(input);
-        const parsedInput = parsed.input || parsed;
-        console.log("PARSED INPUT: ",parsedInput)
+        input = input.trim();
+        const parsedInput = JSON.parse(input);
   
         const blink = await this.solanaKit.getBetBlink(
           parsedInput.betTitle,
-          parsedInput.betAmount,
-          parsedInput.betResolutionDateString,
+          Number(parsedInput.betAmount),
+          parsedInput.betResolutionDate,
           parsedInput.tokenTicker
         );
   
         return JSON.stringify({
           status: "success",
           blink: blink,
+          message: "Blink returned successfully"
         });
       } catch (error: any) {
         return JSON.stringify({

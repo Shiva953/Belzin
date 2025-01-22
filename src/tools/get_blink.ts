@@ -37,7 +37,7 @@ import {
     tokenTicker: string,
   ): Promise<string> {
     try {
-      if (!betAmount || !betTitle || !betResolutionDateString) {
+      if (!betAmount || !betTitle || !betResolutionDateString || !tokenTicker) {
         return "Error, please give valid params for blink";
       }
 

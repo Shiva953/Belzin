@@ -133,8 +133,8 @@ export function MessageInput({chatId} : {chatId?: string}){
                 input.includes("@polyagent") && "text-emerald-500 placeholder:text-emerald-500/50",
               )}
             />
-            <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="shrink-0">
-              <Send className="h-5 w-5" />
+            <Button type="submit" size="icon" disabled={!input.trim() || isLoading} className="rounded-full w-24">
+              Send
             </Button>
           </form>
         </div>

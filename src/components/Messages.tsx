@@ -34,35 +34,7 @@ export function Messages({
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
-
-  // Preserve all existing logic
-  const getSenderColor = (senderId: string) => {
-    if (!senderColors.has(senderId)) {
-      const red = Math.floor(Math.random() * 100) + 100
-      const green = Math.floor(Math.random() * 100) + 100
-      const color = `rgb(${red},${green},184)`
-      senderColors.set(senderId, color)
-    }
-    return senderColors.get(senderId)
-  }
-
   const { toast } = useToast()
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      toast({
-        description: "Copied to clipboard",
-        duration: 2000,
-      })
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        description: "Failed to copy to clipboard",
-        duration: 2000,
-      })
-    }
-  }
 
   const scrollToBottom = () => {
     if (containerRef.current && shouldScrollToBottom) {
@@ -173,7 +145,7 @@ export function Messages({
                               <div className="flex items-center space-x-3">
                                 {userN && <UserAvatar user={userN} size="large" />}
                                 <div className="flex flex-col">
-                                  <span className="text-sm font-medium text-gray-200">
+                                  <span className="text-sm font-medium opacity-80 text-white">
                                     {message.sender?.username || "Unknown User"}
                                   </span>
                                   <div
@@ -201,7 +173,7 @@ export function Messages({
                             </div>
                             <Button
                               className="w-full bg-pink-500/10 text-pink-400 hover:bg-pink-500/20"
-                              onClick={() => handleStartDM(userN?.id || "")}
+                              onClick={() => window.open(`/bets/${userN?.walletPublicKey || ''}`)}
                             >
                               View Bets
                             </Button>
@@ -248,7 +220,6 @@ export function UserAvatar({ user, size = "default" }: { user: User; size?: "def
   )
 }
 
-// Preserve the existing MessageContainer with enhanced styling
 const MessageContainer = ({
   message,
   isCurrentUser,
@@ -263,15 +234,15 @@ const MessageContainer = ({
     return (
       <div
         className={cn(
-          "max-w-[70%] rounded-xl p-3 bg-gradient-to-br relative group transition-all",
+          "max-w-[70%] w-full rounded-xl p-3 bg-gradient-to-br relative group transition-all",
           isCurrentUser
             ? "from-emerald-500/20 to-emerald-600/20 text-emerald-50"
             : "from-gray-800/90 to-gray-900/90 text-gray-100",
           "hover:shadow-lg hover:from-emerald-500/30 hover:to-emerald-600/30",
         )}
       >
-        <div className="overflow-hidden rounded-lg">
-          <BlinkComponent actionApiUrl={actionUrl} />
+        <div className="w-full overflow-hidden rounded-lg">
+          <BlinkComponent actionApiUrl={actionUrl}/>
         </div>
         <div className="text-xs text-gray-400 mt-2 text-right">{formatTimestamp(Number(message.timestamp))}</div>
       </div>
@@ -290,7 +261,7 @@ const MessageContainer = ({
     >
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-medium opacity-90">{message.sender?.username || "Unknown User"}</span>
+          <span className="text-sm font-bold opacity-80">{message.sender?.username || "Unknown User"}</span>
           <Button
             variant="ghost"
             size="icon"
@@ -299,14 +270,15 @@ const MessageContainer = ({
             <ThumbsUp className="h-4 w-4" />
           </Button>
         </div>
-        <div className="font-medium tracking-tight break-words whitespace-pre-wrap">{content}</div>
+        <div className="font-medium tracking-tight break-words whitespace-pre-wrap">
+          {formatMessageContent(content)}
+        </div>
       </div>
       <div className="text-xs text-white/50 mt-1 text-right">{formatTimestamp(Number(message.timestamp))}</div>
     </div>
   )
 }
 
-// Preserve the existing BlinkComponent with enhanced styling
 const BlinkComponent = ({ actionApiUrl }: { actionApiUrl: string }) => {
   const { adapter } = useActionSolanaWalletAdapter(new Connection(clusterApiUrl("devnet"), "confirmed"))
   const { action, isLoading } = useAction({ url: actionApiUrl })
@@ -333,4 +305,24 @@ const BlinkComponent = ({ actionApiUrl }: { actionApiUrl: string }) => {
       <Blink action={action} stylePreset="x-dark" adapter={adapter} securityLevel="all" />
     </div>
   )
+}
+
+const formatMessageContent = (content: string) => {
+  const parts = content.split(/(@polyagent)/g)
+  return parts.map((part, index) => {
+    if (part === "@polyagent") {
+      return (
+        <span 
+          key={index} 
+          className="font-bold text-white glow-text hover:cursor-pointer hover:underline"
+          style={{
+            textShadow: "0 0 10px rgba(16, 185, 129, 0.5)"
+          }}
+        >
+          {part}
+        </span>
+      )
+    }
+    return part
+  })
 }

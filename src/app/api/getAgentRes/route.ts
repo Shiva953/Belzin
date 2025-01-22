@@ -7,7 +7,6 @@ import { SolanaAgentKit,createSolanaTools } from "solana-agent-kit";
 import { createExtendedSolanaTools } from "@/langchain";
 import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { User } from "@prisma/client";
 
 const llm = new ChatOpenAI({
     model: "gpt-4o-mini",

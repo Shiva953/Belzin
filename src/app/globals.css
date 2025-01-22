@@ -75,13 +75,15 @@ body {
   body {
     @apply bg-background text-foreground;
   }
-  /* body {
-    @apply bg-background text-foreground relative min-h-screen;
-    background: black;
-  } */
 }
+
 .glow-effect {
   box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.glow-effect-box {
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
   transition: box-shadow 0.3s ease-in-out;
 }
 
@@ -90,7 +92,7 @@ body {
 }
 
 .glow-effect-text {
-  text-shadow: 0 0 7px rgba(255, 255, 255, 0.2);
+  text-shadow: 0 0 7px rgba(255, 255, 255, 0.6);
   transition: box-shadow 0.3s ease-in-out;
 }
 

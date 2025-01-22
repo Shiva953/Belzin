@@ -83,3 +83,11 @@ export interface ChatState {
   base64Images: string[] | null;
   messages: CoreMessage[];
 }
+
+export interface Bet{
+  betTitle: string,
+  betAmount: number,
+  isResolved: boolean,
+  side: "YES" | "NO",
+  finalOutcome: boolean
+}
