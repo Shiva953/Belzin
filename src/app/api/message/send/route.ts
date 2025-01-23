@@ -49,6 +49,7 @@ import { User } from "@prisma/client";
         id: 14,
         walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
         username: 'PolyAgent',
+        betAmount: '1000',
         imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
         friendList: []
     };
@@ -70,42 +71,6 @@ import { User } from "@prisma/client";
             return NextResponse.json({error: "Invalid User, Does not Exist"}, {status: 401})
         }
 
-        // const messageData = {
-        //     content: messageContent || '',
-        //     senderId: user.id,
-        //     timestamp: Date.now().toString(),
-        //     isAgent: isAgent || false
-        // }
-
-        // // this is taking a lot of overhead time, should be processed parallelly
-        // const createdMessage = await prisma.message.create({
-        //     data: messageData,
-        //     include: {
-        //         sender: true
-        //     }
-        // });
-
-        // await Promise.all([
-        //     pusherServer.trigger("global-chat", 'incoming-message', createdMessage),
-        //     pusherServer.trigger("global-chat", 'new-send-message', createdMessage)
-        // ]);
-
-        // if (messageContent.toLowerCase().includes('@polyagent')) {
-        //     // await processAgentMessage(messageContent).catch(console.error);
-        //     const timeoutPromise = new Promise((_, reject) => {
-        //         setTimeout(() => reject(new Error('Agent processing timeout')), 50000);
-        //     });
-
-        //     try {
-        //         await Promise.race([
-        //             processAgentMessage(messageContent),
-        //             timeoutPromise
-        //         ]);
-        //     } catch (error) {
-        //         console.error('Agent processing error or timeout:', error);
-        //     }
-        // }
-
         // YOU POST USER MESSAGE TO DB -> GET AGENT RESPONSE -> (IF VALID RES)POST AGENT RESPONSE TO DB 
         const [createdMessage, agentResponse] = await Promise.all([
             createAndBroadcastMessage(user.id, messageContent, isAgent),
@@ -114,7 +79,6 @@ import { User } from "@prisma/client";
                 : Promise.resolve(null)
         ]);
 
-        // If there's an agent response, create and broadcast it
         if (agentResponse) {
             await createAndBroadcastMessage(AGENT_USER.id, agentResponse, true);
         }
@@ -134,14 +98,6 @@ import { User } from "@prisma/client";
 
 async function processAgentMessage(messageContent: string) {
     try {
-
-        const agentUser:User = {
-            id: 14,
-            walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
-            username: 'PolyAgent',
-            imageUrl: 'https://na-assets.pinit.io/BDzbq7VxG5b2yg4vc11iPvpj51RTbmsnxaEPjwzbWQft/dc240c0d-e772-466f-b493-13eab770ab79/4731',
-            friendList: []
-        }
 
         const eventStream = agent.streamEvents(
             {
@@ -171,7 +127,7 @@ async function processAgentMessage(messageContent: string) {
         const agentMessage = await prisma.message.create({
             data: {
                 content: agentResponse,
-                senderId: agentUser.id,
+                senderId: AGENT_USER.id,
                 timestamp: Date.now().toString(),
                 isAgent: true
             },
@@ -203,7 +159,6 @@ async function createAndBroadcastMessage(senderId: number, content: string, isAg
         include: { sender: true }
     });
 
-    // Broadcast messages in parallel
     await Promise.all([
         pusherServer.trigger("global-chat", 'incoming-message', message),
         pusherServer.trigger("global-chat", 'new-send-message', message)

@@ -19,7 +19,6 @@ import { WalletProvider } from "@solana/wallet-adapter-react"
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
 import Image from "next/image"
 import { formatTimestamp } from "@/app/lib/utils"
-import { StarsBackground } from "./ui/stars-background"
 import "@dialectlabs/blinks/index.css"
 import { Card } from "./ui/card"
 
@@ -30,7 +29,6 @@ export function Messages({
   event,
 }: { initialMessages: Message[] | ChatMessage[]; currentUserId: string; channel: string; event: string }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages)
-  const senderColors = useMemo(() => new Map(), [])
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
@@ -123,9 +121,9 @@ export function Messages({
             ) : (
               messages.map((message, index) => {
                 const isCurrentUser = message.senderId == currentUserId
-                const userN = message.sender
+                const userN = message.sender;
+                const betAmount = message.sender?.betAmount || '0';
                 const hasNextMessageFromSameUser = index > 0 && messages[index - 1]?.senderId === message.senderId
-
                 return (
                   <div
                     key={`${message.id}-${message.timestamp}`}
@@ -168,7 +166,7 @@ export function Messages({
                               </Button>
                             </div>
                             <div className="space-y-1 bg-gray-800/50 rounded-lg p-3">
-                              <div className="text-2xl font-bold text-emerald-400">$12,000</div>
+                              <div className="text-2xl font-bold text-emerald-400">${betAmount}</div>
                               <div className="text-sm text-gray-400">Total Amount Betted</div>
                             </div>
                             <Button
@@ -198,7 +196,6 @@ export function Messages({
   )
 }
 
-// Preserve the existing UserAvatar component with enhanced styling
 export function UserAvatar({ user, size = "default" }: { user: User; size?: "default" | "large" }) {
   const gradient = getRandomGradient(user?.id)
   const sizeClasses = size === "large" ? "w-12 h-12" : "w-8 h-8"

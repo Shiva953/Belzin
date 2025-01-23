@@ -4,7 +4,6 @@ import prisma from '@/lib/prisma'
 
 export async function POST(req: NextRequest) {
   try {
-
     const {pubkey, userId} = await req.json();
 
     if (!pubkey && !userId) {
@@ -27,6 +26,32 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
+
+    const response = await fetch('http://localhost:3000/api/betsForUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        userAddress: user.walletPublicKey || ''
+      }),
+    })
+    const betsForGivenUser = await response.json();
+    console.log("Bets For Given User: ", betsForGivenUser)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const totalBetVolume = betsForGivenUser.reduce((total: number, bet: any) => total + bet.betAmount, 0) || 0;
+    console.log("Total Bet Volume: ",totalBetVolume)
+    const totalBetAmount = totalBetVolume.toFixed(2);
+    console.log("Total Bet Amount: ", totalBetAmount)
+    
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        betAmount: totalBetAmount,
+      }
+    })
 
     return NextResponse.json({ 
       exists: true, 

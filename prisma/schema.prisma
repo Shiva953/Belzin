@@ -12,6 +12,7 @@ model User {
   walletPublicKey                       String?
   username                              String?
   imageUrl                              String?
+  betAmount                             String?
   friendList                            String[]
   messages                              Message[]
   Friendship_Friendship_friend_idToUser Friendship[] @relation("Friendship_friend_idToUser")

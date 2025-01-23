@@ -45,7 +45,6 @@ export const providers = [
             }
             console.log("Successfully Verified")
             return {
-              // id: bs58.encode(Buffer.from(output.account.publicKey)),
               name: input.address?.toString()
             };
           } catch (error) {
@@ -62,31 +61,4 @@ export const authOptions: NextAuthOptions = {
     pages: {
         signIn: "/",
     },
-  //   callbacks: {
-  //     async jwt({ token, user }) {
-  //         // Add publicKey to token if it exists
-  //         console.log("User from next-auth: ",user)
-  //         if (user?.id) {
-  //             token.sub = user.id;
-  //         }
-  //         console.log("Token from NextAuth: ",token)
-  //         return token;
-  //     },
-  //     async session({ session, token }) {
-  //         // Add publicKey to session
-  //         console.log("Session Token: ",token)
-  //         console.log("Session before token.sub check: ", session)
-  //         if (token.sub) {
-  //           console.log("Session before public key init: ",session)
-  //             session.publicKey = token.sub;
-  //             console.log("Session after public key init: ",session)
-  //             if (session.user) {
-  //                 session.user.name = token.sub;
-  //                 console.log("Does username get set in the session: ",session)
-  //             }
-  //             console.log("Do we get the session up until here: ",session)
-  //         }
-  //         return session;
-  //     }
-  // }
 }

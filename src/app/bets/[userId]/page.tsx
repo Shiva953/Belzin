@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BetsPlaced } from "@/components/bet/BetsForUser";
-import { Bet } from "@/types";
 
 export default async function BetForGivenUser({ params }: { params: { userId: Promise<string> } }){
     const { userId } = await params;

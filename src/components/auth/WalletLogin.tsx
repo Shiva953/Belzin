@@ -10,8 +10,6 @@ import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-fe
 import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile, { UserProfile } from '../UserProfile';
 import { UserT } from "@/types";
-import { Button } from "../ui/button";
-import { Wallet } from "lucide-react";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { WelcomePage } from "../WelcomePage";
 
@@ -25,7 +23,6 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
   const [showProfileCreation, setShowProfileCreation] = useState(false);
 
   const handleSignIn = async () => {
-
     if (!wallet.connected) {
       walletModal.setVisible(true);
       return;
@@ -76,7 +73,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
       console.log(result)
       if(result?.ok == true){
         console.log("Session when I get apt result: ",session)
-        setIsAuthenticated(true);
+        setIsAuthenticated(true); //maintaining the state in the frontend using useState instead of useSession
         const publicKey = wallet.publicKey?.toBase58();
         await fetchUserProfile(publicKey || '');
       }
