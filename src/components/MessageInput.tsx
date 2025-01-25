@@ -92,13 +92,6 @@ export function MessageInput({chatId} : {chatId?: string}){
       }
   };
 
-      const handleKeyPress = (event: any) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-          event.preventDefault()
-          sendMessage()
-        }
-      }
-
       return (
         <div className="p-4 border-t border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-3xl mx-auto flex items-center gap-2">

@@ -49,7 +49,7 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-8 w-8 ring-2 ring-teal-500/70 ring-offset-2 ring-offset-background transition-all">
             <AvatarImage src={user.imageUrl} alt={user.username} />
             <AvatarFallback>{user.username?.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>

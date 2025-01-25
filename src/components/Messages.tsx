@@ -233,9 +233,9 @@ const MessageContainer = ({
         className={cn(
           "max-w-[70%] w-full rounded-xl p-3 bg-gradient-to-br relative group transition-all",
           isCurrentUser
-            ? "from-emerald-500/20 to-emerald-600/20 text-emerald-50"
+            ? "from-[rgb(1,255,255,0.2)] to-[rgb(1,255,255,0.3)] text-emerald-50"
             : "from-gray-800/90 to-gray-900/90 text-gray-100",
-          "hover:shadow-lg hover:from-emerald-500/30 hover:to-emerald-600/30",
+          "hover:shadow-lg",
         )}
       >
         <div className="w-full overflow-hidden rounded-lg">
@@ -249,10 +249,10 @@ const MessageContainer = ({
   return (
     <div
       className={cn(
-        "max-w-[70%] rounded-xl px-4 py-2 relative group transition-all",
+        "max-w-[70%] rounded-3xl px-4 py-2 relative group transition-all",
         isCurrentUser
-          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white"
-          : "bg-gradient-to-br from-gray-800/90 to-gray-900/90 text-gray-100",
+          ? "bg-gradient-to-r from-[rgb(10,255,255,0.8)] to-[rgb(1,255,255,0.8)] text-white" //from-[rgb(28,155,239,0.7)]
+          : "bg-[rgb(10,10,10)] text-gray-100",
         "hover:shadow-lg",
       )}
     >

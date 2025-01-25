@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useWallet } from '@solana/wallet-adapter-react'
 import { shortenPublicKey } from '@/app/lib/utils'
-import { UserProfile } from './UserProfile'
+// import { UserProfile } from './UserProfile'
 
 const menuItems = [
   { href: '/', icon: Users, label: 'Public Chat' },

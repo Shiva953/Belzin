@@ -8,12 +8,26 @@ import React, { useEffect, useState } from "react";
 import { SignInResponse } from 'next-auth/react';
 import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { serializeData } from '@/app/lib/utils';
-import CreateUserProfile, { UserProfile } from '../UserProfile';
+import CreateUserProfile from '../UserProfile';
 import { UserT } from "@/types";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { WelcomePage } from "../WelcomePage";
+import Sidebar from "../sidebar/sidebar";
+import { SidebarProvider } from "../ui/sidebar";
+import { createAppKit } from '@reown/appkit'
+import { DefaultSIWX } from '@reown/appkit-siwx'
 
-export function WalletLoginInterface({children}: {children: React.ReactNode}){
+// const appkit = createAppKit({
+//   siwx: new DefaultSIWX(),
+//   projectId: "belzin-173052",
+//   networks: []
+// })
+
+export function WalletLoginInterface({
+  children
+}: {
+  children: React.ReactNode
+}){
   const { data: session, status } = useSession();
   const wallet = useWallet();
   const walletModal = useWalletModal()
@@ -144,7 +158,7 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
 
   return (
     <>
-      <div className="h-screen flex flex-col">
+      {/* <div className="h-screen flex flex-col">
           {showProfileCreation && (
             <CreateUserProfile 
               pubkey={wallet.publicKey?.toString() || ''} 
@@ -179,6 +193,37 @@ export function WalletLoginInterface({children}: {children: React.ReactNode}){
         {isAuthenticated && userProfile && (
           <main className="flex flex-1 overflow-hidden">
             {children}
+          </main>
+        )}
+      </div> */}
+      <div className="h-screen flex flex-col">
+        {showProfileCreation && (
+          <CreateUserProfile 
+            pubkey={wallet.publicKey?.toString() || ''} 
+            onProfileCreated={handleProfileCreated} 
+          />
+        )}
+        <header className="fixed flex-shrink-0 top-0 left-0 right-0 rounded-full bg-transparent mx-auto p-4 shadow-sm z-40">
+          <div className="container mx-auto h-full flex justify-center items-center">
+            {isAuthenticated && userProfile ? (
+                <></>
+            ) : (
+              <div key={"outerdivX"}>
+                <WelcomePage handleSignIn={handleSignIn}/>
+              </div>
+            )}
+          </div>
+        </header>
+
+        {isAuthenticated && userProfile && (
+          <main className="flex flex-1 overflow-hidden">
+             <SidebarProvider>
+            <Sidebar 
+          userProfile={userProfile} 
+          onSignOut={handleSignOut}
+        />
+            {children}
+            </SidebarProvider>
           </main>
         )}
       </div>
