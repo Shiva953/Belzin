@@ -26,8 +26,12 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ exists: false }, { status: 200 })
     }
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                   (process.env.NODE_ENV === 'development' 
+                    ? 'http://localhost:3000' 
+                    : 'https://yourdomain.com');
 
-    const response = await fetch('http://localhost:3000/api/betsForUser', {
+    const response = await fetch(`${baseUrl}/api/betsForUser`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

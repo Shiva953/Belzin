@@ -5,7 +5,11 @@ export default async function BetForGivenUser({ params }: { params: Promise<{ us
     const { userId } = await params;
     const userAddress = userId;
     console.log(userAddress)
-    const response = await fetch('http://localhost:3000/api/betsForUser', {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                   (process.env.NODE_ENV === 'development' 
+                    ? 'http://localhost:3000' 
+                    : 'https://belzin.vercel.app');
+    const response = await fetch(`${baseUrl}/api/betsForUser`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
