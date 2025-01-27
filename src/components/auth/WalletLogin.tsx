@@ -10,7 +10,6 @@ import { SolanaSignInInput,SolanaSignInOutput } from '@solana/wallet-standard-fe
 import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile from '../UserProfile';
 import { UserT } from "@/types";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { WelcomePage } from "../WelcomePage";
 import Sidebar from "../sidebar/sidebar";
 import { SidebarProvider } from "../ui/sidebar";
