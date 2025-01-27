@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BetsPlaced } from "@/components/bet/BetsForUser";
 
-export default async function BetForGivenUser({ params }: { params: { userId: Promise<string> } }){
+export default async function BetForGivenUser({ params }: { params: Promise<{ userId: string }> }){
     const { userId } = await params;
-    const userAddress = await userId;
+    const userAddress = userId;
     console.log(userAddress)
     const response = await fetch('http://localhost:3000/api/betsForUser', {
         method: 'POST',
