@@ -1,5 +1,5 @@
 {
-  "name": "mega-dapp-one",
+  "name": "belzin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -17,7 +17,7 @@
     "solana-agent-kit/typescript": "^4.9.5"
   },
   "dependencies": {
-    "@ai-sdk/xai": "^1.0.12",
+    "@ai-sdk/openai": "^1.1.4",
     "@ai16z/eliza": "^0.1.6-alpha.4",
     "@babel/runtime": "^7.26.0",
     "@cks-systems/manifest-sdk": "^0.1.73",
@@ -27,6 +27,7 @@
     "@goat-sdk/plugin-jupiter": "^0.2.4",
     "@goat-sdk/plugin-spl-token": "^0.2.5",
     "@goat-sdk/wallet-solana": "^0.2.4",
+    "@langchain/langgraph-checkpoint-postgres": "^0.0.2",
     "@langchain/xai": "^0.0.1",
     "@nanostores/react": "github:ai/react",
     "@onsol/tldparser": "^0.6.7",
@@ -60,7 +61,7 @@
     "@tabler/icons-react": "^3.29.0",
     "@tiplink/api": "^0.3.1",
     "ably": "^2.6.0",
-    "ai": "^4.0.22",
+    "ai": "^4.1.7",
     "axios": "^1.7.9",
     "bs58": "^6.0.0",
     "class-variance-authority": "^0.7.1",
@@ -86,7 +87,7 @@
     "socket-io": "^1.0.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
-    "solana-agent-kit": "^1.3.0",
+    "solana-agent-kit": "^1.3.2",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",

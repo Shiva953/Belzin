@@ -10,11 +10,13 @@ export function useAgentStream() {
   ) => {
     setIsStreaming(true);
     try {
+      console.log("Message content: ",messageContent)
       const response = await fetch('/api/getAgentRes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({messageContent: messageContent}),
+        body: JSON.stringify({ messageContent: messageContent }),
       });
+      console.log("Are we getting the response? ",response)
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error('No reader available');

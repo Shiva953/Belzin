@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
     const totalBetAmount = totalBetVolume.toFixed(2);
     console.log("Total Bet Amount: ", totalBetAmount)
     
+    //this should be updated when the user places a bet, instead of fetching it while fetching the profile
     await prisma.user.update({
       where: {
         id: user.id,

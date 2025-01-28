@@ -231,7 +231,7 @@ const MessageContainer = ({
     return (
       <div
         className={cn(
-          "max-w-[70%] w-full rounded-xl p-3 bg-gradient-to-br relative group transition-all",
+          "max-w-[40%] w-full rounded-xl p-3 bg-gradient-to-br relative group transition-all",
           isCurrentUser
             ? "from-[rgb(1,255,255,0.2)] to-[rgb(1,255,255,0.3)] text-emerald-50"
             : "from-gray-800/90 to-gray-900/90 text-gray-100",
