@@ -1,8 +1,8 @@
 import { NavBar } from '@/components/nav-bar'
-import { ArrowRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-export function WelcomePage({ handleSignIn }: { handleSignIn: () => Promise<void> }) {
+export function WelcomePage({ handleSignIn, buttonText }: { handleSignIn: () => Promise<void>, buttonText: string }) {
   return (
     <main className="min-h-screen text-white overflow-hidden">
       <NavBar />
@@ -22,8 +22,8 @@ export function WelcomePage({ handleSignIn }: { handleSignIn: () => Promise<void
             onClick={handleSignIn}
             className="bg-white text-black text-[1rem] w-72 h-16 rounded-full hover:bg-gray-100 transition-colors group"
           >
-            Sign In With Solana
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            {buttonText}
+            <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Button>
         </div>
       </div>

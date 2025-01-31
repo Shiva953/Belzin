@@ -7,6 +7,7 @@ import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChatMessages } from '@/hooks/useMessages';
 
+
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading: profileLoading, error } = useProfile(publicKey?.toString());
@@ -30,7 +31,7 @@ export default function Home() {
             <ChatSkeleton />
           </div>
         </div>
-      )
+      );
     }
 
   if (error || !profile) {
@@ -70,14 +71,14 @@ function ChatSkeleton() {
   return (
     <div className="flex flex-col h-full w-full bg-background">
       <div className="flex-1 overflow-y-auto p-4 space-y-6 w-full">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(10)].map((_, i) => (
           <div key={i} className={`flex ${i % 2 === 0 ? 'justify-end' : 'justify-start'} w-full`}>
             <div className={`flex items-end space-x-3 ${i % 2 === 0 ? 'flex-row-reverse space-x-reverse' : ''} max-w-[80%] w-full`}>
               <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-              <div className={`space-y-2 flex-grow ${i % 2 === 0 ? 'items-end' : 'items-start'}`}>
-                {/* <Skeleton className={`h-4 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}`} /> */}
-                <Skeleton className={`h-8 w-[68rem] rounded-2xl`} />
-                {/* <Skeleton className={`h-2 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}`} /> */}
+              <div className={`space-y-4 flex-grow ${i % 2 === 0 ? 'items-end' : 'items-start'}`}>
+                {/* <Skeleton className={h-4 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}} /> */}
+                <Skeleton className={`h-14 py-4 w-[80rem] rounded-xl`} />
+                {/* <Skeleton className={h-2 w-[72rem] ${i % 2 === 0 ? 'ml-auto' : ''}} /> */}
               </div>
             </div>
           </div>

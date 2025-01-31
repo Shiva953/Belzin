@@ -26,16 +26,22 @@ export async function POST(req: Request){
             const betAmount = bet.betAmount
             const isResolved = bet.resolved;
             const finalOutcome = bet.outcome;
+            const resolutionDate = bet.endTime.toNumber();
+            const totalYes = bet.totalYesAmount.toNumber();
+            const totalNo = bet.totalNoAmount.toNumber();
             const tokenMint = bet.tokenMint;
             const decimals = 9;
             const finalBetAmount = (betAmount.toNumber()/(10 ** decimals));
             const side = b.direction == true ? "YES" : "NO";
-            return{
+            return {
                 betTitle: betTitle,
                 betAmount: finalBetAmount,
                 isResolved: isResolved,
                 side: side,
                 finalOutcome: finalOutcome,
+                totalYes: totalYes,
+                totalNo: totalNo,
+                betResolutionDateInEpochTime: resolutionDate,
             }
         }))
 

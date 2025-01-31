@@ -2,6 +2,7 @@
 "use client"
 import { pusherClient } from "@/lib/pusher"
 import { useState, useEffect, useRef, useMemo, useCallback } from "react"
+import Link from "next/link"
 import { Blink, useAction } from "@dialectlabs/blinks"
 import { useActionSolanaWalletAdapter } from "@dialectlabs/blinks/hooks/solana"
 import type { User } from "@prisma/client"
@@ -21,6 +22,11 @@ import Image from "next/image"
 import { formatTimestamp } from "@/app/lib/utils"
 import "@dialectlabs/blinks/index.css"
 import { Card } from "./ui/card"
+import {DM_Sans} from "next/font/google"
+
+const dmsans = DM_Sans({style: 'normal', subsets: ["latin"]});
+
+
 
 export function Messages({
   initialMessages,
@@ -171,9 +177,10 @@ export function Messages({
                             </div>
                             <Button
                               className="w-full bg-pink-500/10 text-pink-400 hover:bg-pink-500/20"
-                              onClick={() => window.open(`/bets/${userN?.walletPublicKey || ''}`)}
                             >
+                              <Link href={`/bets/${userN?.walletPublicKey}`}>
                               View Bets
+                              </Link>
                             </Button>
                           </div>
                         </Card>
@@ -231,7 +238,7 @@ const MessageContainer = ({
     return (
       <div
         className={cn(
-          "max-w-[40%] w-full rounded-xl p-3 bg-gradient-to-br relative group transition-all",
+          "max-w-[40%] w-full rounded-xl p-3 bg-transparent border-none relative group transition-all",
           isCurrentUser
             ? "from-[rgb(1,255,255,0.2)] to-[rgb(1,255,255,0.3)] text-emerald-50"
             : "from-gray-800/90 to-gray-900/90 text-gray-100",
@@ -251,23 +258,16 @@ const MessageContainer = ({
       className={cn(
         "max-w-[70%] rounded-3xl px-4 py-2 relative group transition-all",
         isCurrentUser
-          ? "bg-gradient-to-r from-[rgb(10,255,255,0.8)] to-[rgb(1,255,255,0.8)] text-white" //from-[rgb(28,155,239,0.7)]
+          ? "bg-gradient-to-r from-[rgba(255,10,96,0.6)] to-[rgba(255,1,145,0.6)] text-white" //from-[rgb(28,155,239,0.7)]
           : "bg-[rgb(10,10,10)] text-gray-100",
         "hover:shadow-lg",
       )}
     >
       <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-bold opacity-80">{message.sender?.username || "Unknown User"}</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="opacity-0 group-hover:opacity-100 transition-opacity -mr-2 text-white/50 hover:text-white"
-          >
-            <ThumbsUp className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-between gap-2 py-2">
+          {!isCurrentUser && <span className="text-sm font-bold opacity-80">{message.sender?.username || "Unknown User"}</span>}
         </div>
-        <div className="font-medium tracking-tight break-words whitespace-pre-wrap">
+        <div className={`font-medium tracking-tight break-words whitespace-pre-wrap ${dmsans.className}`}>
           {formatMessageContent(content)}
         </div>
       </div>

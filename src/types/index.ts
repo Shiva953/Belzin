@@ -89,5 +89,8 @@ export interface Bet{
   betAmount: number,
   isResolved: boolean,
   side: "YES" | "NO",
-  finalOutcome: boolean
+  finalOutcome: boolean,
+  totalYes: number,
+  totalNo: number,
+  betResolutionDateInEpochTime: number,
 }
