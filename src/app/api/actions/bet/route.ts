@@ -56,11 +56,12 @@ export const GET = async (req: Request) => {
     // });
 
     //(await uploadGeneratedImage(image)) ||
-    const imageUrl = "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/";
+    const sampleImages = ["https://i.ibb.co/dwsBY3zF/image.jpg", "https://i.ibb.co/r2Xj49mC/image-3.jpg", "https://i.ibb.co/ym03tr8n/image-1.jpg", "https://i.ibb.co/s9FkyRFx/image-2.jpg"]
+    const imageUrl = sampleImages[Math.floor(Math.random()*4)];
 
     let payload: ActionGetResponse = {
       title: betTitle,
-      icon: "",
+      icon: "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/",
       description: `Bet Resolves on ${betResolutionDateString}`,
       label: "Bet",
       links: {
