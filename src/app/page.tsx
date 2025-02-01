@@ -6,11 +6,31 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChatMessages } from '@/hooks/useMessages';
+import { useEffect, useState } from 'react';
+import { ChatBet } from '@/types';
 
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading: profileLoading, error:profileError } = useProfile(publicKey?.toString());
   const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages()
+  const [bets, setBets] = useState<ChatBet[]>([])
+
+  useEffect(() => {
+    async function fetchBets(){
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL!}/api/getAllBets`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          userAddress: publicKey?.toBase58() || ''
+        }),
+      })
+      const bets = await response.json();
+      setBets(bets)
+    }
+    fetchBets();
+  }, [publicKey])
 
     if (!connected) {
       return (
@@ -51,12 +71,13 @@ export default function Home() {
   }
 
   const userId = profile?.id?.toString() || '';
+  console.log(bets)
 
   return (
     <div className="flex h-screen">
     <div className="flex-1 overflow-hidden">
-      {userId && initialMessages && initialMessages.length > 0 && (
-        <PublicChat userId={userId} initialMessages={initialMessages}/>
+      {userId && initialMessages && initialMessages.length > 0 && bets && bets.length>0 && (
+        <PublicChat userId={userId} initialMessages={initialMessages} bets={bets}/>
       )}
     </div>
   </div>

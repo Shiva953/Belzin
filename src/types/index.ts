@@ -107,3 +107,8 @@ Image as a Uint8Array.
    */
   readonly uint8Array: Uint8Array;
 }
+
+export interface ChatBet { 
+  betTitle: string,
+  betPubKey: string,
+}

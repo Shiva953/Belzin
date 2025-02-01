@@ -6,13 +6,14 @@ import { MessageInput } from '@/components/MessageInput';
 import { pusherClient } from '@/lib/pusher';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { WalletProvider } from '@solana/wallet-adapter-react';
-import { Message,ChatMessage } from '@/types';
+import { Message,ChatMessage, ChatBet } from '@/types';
 import { StarsBackground } from "@/components/ui/stars-background";
 import { Badge } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UserAvatar } from '@/components/Messages';
 import { User } from '@prisma/client';
 import { useState,useEffect } from 'react';
+import { CommandSearch } from '@/components/bet/BetSearch';
 
 export function OnlineUsers({ channel, currentUser }: { channel: string; currentUser: User }) {
     const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
@@ -77,13 +78,15 @@ export function OnlineUsers({ channel, currentUser }: { channel: string; current
     );
   }
 
-export function PublicChat({ userId, initialMessages } : { userId: string, initialMessages: Message[] }){
+export function PublicChat({ userId, initialMessages, bets } : { userId: string, initialMessages: Message[], bets: ChatBet[] }){
     return (
     <WalletProvider wallets={[]} autoConnect>
       <WalletModalProvider>
         <div className="flex h-full w-full">
           <div className="flex-1 flex flex-col">
+          <CommandSearch chatBets={bets}/>
             <div className="flex-1 overflow-scroll">
+              
               {initialMessages.length > 0 && userId && (
                 <Messages
                   initialMessages={initialMessages}
