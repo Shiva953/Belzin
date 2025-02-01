@@ -6,7 +6,7 @@ import {
     Transaction,
     sendAndConfirmTransaction,
   } from "@solana/web3.js";
-  import { SolanaAgentKit } from "solana-agent-kit";
+  import { SolanaAgentKit } from "@/lib/solanaKit/";
   import { Program, AnchorProvider, BN } from "@coral-xyz/anchor";
   import * as anchor from "@coral-xyz/anchor";
   import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";

@@ -16,12 +16,6 @@ export * from "./get_token_data";
 export * from "./stake_with_jup";
 export * from "./fetch_price";
 export * from "./send_compressed_airdrop";
-export * from "./orca_close_position";
-export * from "./orca_create_clmm";
-export * from "./orca_create_single_sided_liquidity_pool";
-export * from "./orca_fetch_positions";
-export * from "./orca_open_centered_position_with_liquidity";
-export * from "./orca_open_single_sided_position";
 export * from "./get_all_domains_tlds";
 export * from "./get_all_registered_all_domains";
 export * from "./get_owned_domains_for_tld";
@@ -47,5 +41,4 @@ export * from "./create_gibwork_task";
 export * from "./rock_paper_scissor";
 export * from "./create_tiplinks";
 
-export * from "./tensor_trade";
 export * from "./get_betting_blink";
