@@ -7,11 +7,11 @@ import axios from "axios"
 import { useWallet } from '@solana/wallet-adapter-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Send, Bot } from "lucide-react"
+import { Bot } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAgentStream } from '@/hooks/useAgentStream';
 
-const AGENT_USER = {
+const AGENT = {
   id: 14,
   walletPublicKey: '96a3u1mDA3E1krcgtGgo38hMaewurNc9CJBzaPaWSUc8',
   username: 'PolyAgent',
@@ -42,22 +42,6 @@ export function MessageInput({chatId} : {chatId?: string}){
               isAgent: false 
           });
 
-        //   if (isAgent) {
-        //     await handleAgentStream(optimisticInput.replace('@polyagent', '').trim());
-        // }
-          // if (isAgent) {
-          //     const agentResponse = await axios.post('/api/getAgentRes', { 
-          //         messageContent: optimisticInput.replace('@polyagent', '').trim() 
-          //     });
-
-          //     if (agentResponse.data.response) {
-          //         await axios.post('/api/send', { 
-          //             messageContent: agentResponse.data.response, 
-          //             walletPublicKey: AGENT_USER.walletPublicKey, 
-          //             isAgent: true 
-          //         });
-          //     }
-          // }
           if (isAgent) {
             let accumulatedResponse = '';
             // Stream the agent response
@@ -72,7 +56,7 @@ export function MessageInput({chatId} : {chatId?: string}){
     
             await axios.post('/api/send', {
               messageContent: fullResponse,
-              walletPublicKey: AGENT_USER.walletPublicKey,
+              walletPublicKey: AGENT.walletPublicKey,
               isAgent: true
             });
           }

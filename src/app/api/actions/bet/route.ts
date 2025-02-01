@@ -25,6 +25,10 @@ import {
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
   import { epochToDateString,dateStringToEpoch } from "@/app/lib/utils";
   import { Betting,IDL } from "@/types/betting";
+  import { experimental_generateImage as generateImage } from 'ai';
+  import { openai } from '@ai-sdk/openai';
+  import prisma from "@/lib/prisma";
+
 
 export const GET = async (req: Request) => {
     const requestUrl = new URL(req.url as string);
@@ -53,6 +57,12 @@ export const GET = async (req: Request) => {
     console.log("Total No Bettors: ",betAccountInfo.noBettors.toNumber())
     console.log(reverseTest)
     console.log(betTitle)
+
+    const { image } = await generateImage({
+      model: openai.image('dall-e-3'),
+      prompt: betTitle,
+    });
+    const imageUrl = image
 
     let payload: ActionGetResponse = {
       title: betTitle,
@@ -160,6 +170,15 @@ export const POST = async(req: Request) => {
             recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
             instructions: [ixn],
           }).compileToV0Message())
+          
+          await prisma.user.updateMany({
+            where: {
+              walletPublicKey: bettorAccount.toBase58(),
+            },
+            data: {
+              betAmount: betAccountInfo.betAmount.toNumber().toString(),
+            }
+          })
 
           const payload: ActionPostResponse = await createPostResponse({
             fields: {

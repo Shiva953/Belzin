@@ -8,27 +8,22 @@ import { MemorySaver } from "@langchain/langgraph-checkpoint";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { SolanaAgentKit, createSolanaTools } from "@/lib/solanaKit";
 
-//DONT FORCEFULLY TRY CREATING THE BET WITH SOLANA AGENT KIT IF IT ISN'T HAPPENING
-//JUST WRITE A CUSTOM ACTION FOR THAT TOOL TO GET THE STRING AND RETURN THE JSON, THEN EXEC THE GET_BET_BLINK ON IT
 const llm = new ChatOpenAI({
     model: "gpt-4o",
     temperature: 0.7,
     streaming: true,
 })
 
-
 const solanaKit = new SolanaAgentKit(
     process.env.SOLANA_PRIVATE_KEY!,
     process.env.RPC_URL!,
     process.env.OPENAI_API_KEY!
-);
-console.log("Solana Agent Kit: ",solanaKit)
+)
+
 const tools = createSolanaTools(solanaKit);
 const memory = new MemorySaver();
 const config = { configurable: { thread_id: "Solana Agent Kit!" } };
 
-const blinktool = tools.find(t => t.name==="solana_create_bet")?.name;
-console.log("solana blink tool: ", blinktool)
 
 const agent = createReactAgent({
 llm,
@@ -53,8 +48,6 @@ export async function POST(req: Request) {
         if (!messageContent) {
             return NextResponse.json({ error: "Message content is required" }, { status: 400 });
         }
-
-
 
         const textEncoder = new TextEncoder();
         const transformStream = new ReadableStream({

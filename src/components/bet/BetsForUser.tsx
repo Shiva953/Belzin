@@ -89,7 +89,6 @@ export function BetsPlaced({ bets, userAddress }: { bets: Bet[]; userAddress: st
 }
 
 export default function LoadingText() {
-
   return (
     <div className="bg-[#1C1C1C] p-8 min-h-[100px] flex items-center">
       <button className="group flex items-center gap-4 relative">

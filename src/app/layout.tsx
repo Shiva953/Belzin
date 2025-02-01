@@ -12,8 +12,7 @@ import { GeistMono } from 'geist/font/mono';
 import { WalletLoginInterface } from "@/components/auth/WalletLogin";
 import { Toaster } from 'sonner'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import Sidebar from "@/components/sidebar/sidebar";
+import Sidebar from "@/components/chat/sidebar/sidebar";
 import WalletLoginWrapper from "@/components/auth/WalletLoginWrapper";
 
 export const metadata: Metadata = {

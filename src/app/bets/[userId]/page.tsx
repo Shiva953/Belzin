@@ -4,7 +4,6 @@ import { BetsPlaced } from "@/components/bet/BetsForUser";
 export default async function BetForGivenUser({ params }: { params: Promise<{ userId: string }> }){
     const { userId } = await params;
     const userAddress = userId;
-    console.log(userAddress)
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
                    (process.env.NODE_ENV === 'development' 
                     ? 'http://localhost:3000' 
@@ -19,7 +18,6 @@ export default async function BetForGivenUser({ params }: { params: Promise<{ us
         }),
       })
       const betsForGivenUser = await response.json();
-      console.log("Bets: ",betsForGivenUser)
     
     return(
         <>

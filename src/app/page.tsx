@@ -7,14 +7,10 @@ import { useProfile } from '@/hooks/useProfile';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useChatMessages } from '@/hooks/useMessages';
 
-
 export default function Home() {
   const { connected, publicKey } = useWallet()
   const { profile, loading: profileLoading, error } = useProfile(publicKey?.toString());
   const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages()
-
-    console.log("Initial Messages from route: ", initialMessages)
-
 
     if (!connected) {
       return (

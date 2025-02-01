@@ -1753,7 +1753,7 @@ export class SolanaBetBlinkTool extends Tool {
   name = "solana_create_bet";
   description = `Create a new bet and get the blink url for the bet.
 
-  Inputs (input is a JSON string):
+  Inputs (input is a JSON string, MAKE SURE its a VALID JSON, ensure it follows the below schema):
   title: string, the title of the bet, eg: "Will spain win?" (required)
   amount: number, eg: 1000 (required)
   tokenTicker: string, eg: "USDC" (required)
@@ -1781,7 +1781,7 @@ export class SolanaBetBlinkTool extends Tool {
 
   protected async _call(input: string): Promise<string> {
     try {
-      const cleanInput = input.trim();
+      const cleanInput = input;
       let parsedInput: any;
       
       try {

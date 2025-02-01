@@ -93,4 +93,6 @@ export interface Bet{
   totalYes: number,
   totalNo: number,
   betResolutionDateInEpochTime: number,
+  yesBettors: number,
+  noBettors: number,
 }

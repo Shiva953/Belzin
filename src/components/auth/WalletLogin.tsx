@@ -11,7 +11,7 @@ import { serializeData } from '@/app/lib/utils';
 import CreateUserProfile from '../UserProfile';
 import { UserT } from "@/types";
 import { WelcomePage } from "../WelcomePage";
-import Sidebar from "../sidebar/sidebar";
+import Sidebar from "../chat/sidebar/sidebar";
 import { SidebarProvider } from "../ui/sidebar";
 
 export function WalletLoginInterface({
@@ -46,15 +46,10 @@ export function WalletLoginInterface({
       nonce: nonce,
     }
   
-    // Actual signature by the user through the wallet
-    console.log("Client - Original Input:", input);
     const output: SolanaSignInOutput = await wallet.signIn!(input)
-    console.log("Client - Original Output:", output);
 
     // Serialisation of the input and output data
     const { jsonInput, jsonOutput }: { jsonInput: string, jsonOutput: string } = serializeData(input, output);
-    console.log("Client - Serialized Input:", jsonInput);
-    console.log("Client - Serialized Output:", jsonOutput);
 
     // Signing in the user with NextAuth.js signIn()
     await signInWallet(jsonInput, jsonOutput);
@@ -74,10 +69,8 @@ export function WalletLoginInterface({
           input: jsonInput,
           redirect: false,
       });
-
       console.log(result)
       if(result?.ok == true){
-        console.log("Session when I get apt result: ",session)
         setIsAuthenticated(true); //maintaining the state in the frontend using useState instead of useSession
         const publicKey = wallet.publicKey?.toBase58();
         await fetchUserProfile(publicKey || '');
@@ -131,7 +124,7 @@ export function WalletLoginInterface({
   return (
     <>
       <div className="h-screen flex flex-col">
-        {showProfileCreation && (
+        {showProfileCreation && !userProfile && (
           <CreateUserProfile 
             pubkey={wallet.publicKey?.toString() || ''} 
             onProfileCreated={handleProfileCreated} 

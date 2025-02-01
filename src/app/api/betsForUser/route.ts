@@ -26,6 +26,8 @@ export async function POST(req: Request){
             const betAmount = bet.betAmount
             const isResolved = bet.resolved;
             const finalOutcome = bet.outcome;
+            const yesBettors = bet.yesBettors.toNumber();
+            const noBettors = bet.noBettors.toNumber();
             const resolutionDate = bet.endTime.toNumber();
             const totalYes = bet.totalYesAmount.toNumber();
             const totalNo = bet.totalNoAmount.toNumber();
@@ -42,6 +44,8 @@ export async function POST(req: Request){
                 totalYes: totalYes,
                 totalNo: totalNo,
                 betResolutionDateInEpochTime: resolutionDate,
+                yesBettors: yesBettors,
+                noBettors: noBettors,
             }
         }))
 

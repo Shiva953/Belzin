@@ -84,8 +84,6 @@ export function ChatWindow(props: {
 		},
 	});
 
-    console.log("Agent Messages from frontend", messages)
-
 	async function sendMessage(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		if (messageContainerRef.current) {
@@ -116,13 +114,10 @@ export function ChatWindow(props: {
 					show_intermediate_steps: true,
 				}),
 			});
-            console.log("Is Response coming:", response);
 			const json = await response.json();
 			setIntermediateStepsLoading(false);
 			if (response.status === 200) {
 				const responseMessages: Message[] = json.messages;
-                console.log("Response is indeed coming")
-                console.log(responseMessages)
 				// Represent intermediate steps as system messages for display purposes
 				// TODO: Add proper support for tool messages
 				const toolCallMessages = responseMessages.filter(
@@ -134,7 +129,6 @@ export function ChatWindow(props: {
 						);
 					},
 				);
-                console.log("Does toolCallMessages Work: ", toolCallMessages);
 				const intermediateStepMessages = [];
 				for (let i = 0; i < toolCallMessages.length; i += 2) {
 					const aiMessage = toolCallMessages[i];
@@ -148,7 +142,6 @@ export function ChatWindow(props: {
 						}),
 					});
 				}
-                console.log("Intermediate Step Messages: ", intermediateStepMessages);
 				const newMessages = messagesWithUserReply;
 				for (const message of intermediateStepMessages) {
 					newMessages.push(message);
@@ -165,7 +158,6 @@ export function ChatWindow(props: {
 						role: "assistant",
 					},
 				]);
-                console.log("Messages finally: ", messages)
 			} else {
 				if (json.error) {
 					toast(json.error, {

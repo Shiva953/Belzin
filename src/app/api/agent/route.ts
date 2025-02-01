@@ -27,10 +27,6 @@ function validateEnvironment(): void {
   });
 
   if (missingVars.length > 0) {
-    console.error("Error: Required environment variables are not set");
-    missingVars.forEach((varName) => {
-      console.error(`${varName}=your_${varName.toLowerCase()}_here`);
-    });
     throw new Error("Missing required environment variables.");
   }
 }
@@ -62,7 +58,6 @@ async function initializeAgent() {
 
       return { agent, config };
     } catch (error) {
-      console.error("Failed to initialize agent:", error);
       throw error;
     }
   }
@@ -86,22 +81,16 @@ export async function POST(req: NextRequest) {
 			},
 		);
 
-    // console.log("Agent Stream: ", eventStream)
 		const textEncoder = new TextEncoder();
 		const transformStream = new ReadableStream({
 			async start(controller) {
-        // console.log("stream start")
 				for await (const { event, data } of eventStream) {
-          // console.log("Iteration Start")
-          // console.log("Event: ",event)
-          // console.log("Data: ",data)
 					if (event === "on_chat_model_stream") {
 						if (!!data.chunk.content) {
               console.log("Message Content: ", data.chunk.content)
 							controller.enqueue(textEncoder.encode(data.chunk.content));
 						}
 					}
-          // console.log("Iteration End")
 				}
 				controller.close();
 			},

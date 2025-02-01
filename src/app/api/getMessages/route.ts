@@ -6,7 +6,7 @@ export async function GET(req: Request) {
     try {
         const results = await prisma.message.findMany({
             include: {
-                sender: true // Include the related user data
+                sender: true
             },
             orderBy: {
                 timestamp: 'desc'
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
         
         const messages = results.map((message) => ({
             ...message,
-            sender: message.sender // This will now include the full user object
+            sender: message.sender
         }));
 
         return NextResponse.json(messages, { status: 200 });

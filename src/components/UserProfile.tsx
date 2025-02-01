@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect } from 'react';
+import { uploadImage } from '@/app/lib/utils';
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
 import { useWallet } from '@solana/wallet-adapter-react';
@@ -13,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover,PopoverContent,PopoverTrigger } from './ui/popover';
 import { ChevronDown, Copy, ExternalLink, LogOut } from "lucide-react"
-import {toast} from 'sonner';
+import { toast } from 'sonner';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { UserProfileProps } from '@/types';
@@ -113,6 +114,7 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
   const [imageUrl, setImageUrl] = useState<string>('')
 
   useEffect(() => {
+    //upload to a public endpoint
       if(image){
         const url = URL.createObjectURL(image);
         setImageUrl(url)
@@ -123,6 +125,8 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
     accept: {'image/*': []},
     onDrop: (acceptedFiles) => {
       setImage(acceptedFiles[0])
+      const url = URL.createObjectURL(acceptedFiles[0]);
+      setImageUrl(url)
     }
   })
 
@@ -132,6 +136,20 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
       setError('Username cannot be empty')
       return
     }
+    setIsLoading(true)
+      let uploadedImageUrl = ''
+      
+      if (image) {
+        try {
+          uploadedImageUrl = await uploadImage(image)
+          setImageUrl(uploadedImageUrl)
+        } catch (error) {
+          toast.error('Failed to upload image')
+          return
+        }
+      }
+
+      console.log("UPLOADED IMAGE URL: ", uploadedImageUrl)
 
     try {
       const response = await fetch('/api/createProfile', {
@@ -142,7 +160,7 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
         body: JSON.stringify({ 
           username, 
           walletPublicKey: pubkey,
-          imageUrl: imageUrl
+          imageUrl: uploadedImageUrl
         }),
       })
 
@@ -156,6 +174,16 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
       setError(err instanceof Error ? err.message : 'An error occurred')
     }
   }
+  
+  console.log("IMAGE URL: ", imageUrl)
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (imageUrl) {
+  //       URL.revokeObjectURL(imageUrl)
+  //     }
+  //   }
+  // }, [imageUrl])
 
   return (
     <motion.div

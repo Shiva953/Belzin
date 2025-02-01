@@ -41,29 +41,25 @@ export async function POST(req: NextRequest) {
       }),
     })
     const betsForGivenUser = await response.json();
-    console.log("Bets For Given User: ", betsForGivenUser)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const totalBetVolume = betsForGivenUser.reduce((total: number, bet: any) => total + bet.betAmount, 0) || 0;
-    console.log("Total Bet Volume: ",totalBetVolume)
     const totalBetAmount = totalBetVolume.toFixed(2);
-    console.log("Total Bet Amount: ", totalBetAmount)
     
     //this should be updated when the user places a bet, instead of fetching it while fetching the profile
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        betAmount: totalBetAmount,
-      }
-    })
+    // await prisma.user.update({
+    //   where: {
+    //     id: user.id,
+    //   },
+    //   data: {
+    //     betAmount: totalBetAmount,
+    //   }
+    // })
 
     return NextResponse.json({ 
       exists: true, 
       user: user 
     }, { status: 200 })
   } catch (error) {
-    console.error('Error fetching user profile:', error)
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

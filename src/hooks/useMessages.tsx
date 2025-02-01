@@ -36,7 +36,6 @@ export function useChatMessages(chatId?: string): UseChatMessagesResult {
       setInitialMessages(sortedMessages);
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching messages for given chatid: ", err);
       setError(err instanceof Error ? err : new Error('An unknown error occurred'));
       setLoading(false);
     }

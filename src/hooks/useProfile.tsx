@@ -26,7 +26,6 @@ export function useProfile(pubkey?: string, userId?: number | string) {
         });
 
         const data = await res.json();
-        console.log("Use Profile Check")
         
         if (data.user) {
           setProfile(data.user);
@@ -35,7 +34,6 @@ export function useProfile(pubkey?: string, userId?: number | string) {
         }
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An unknown error occurred'));
-        console.error('Profile fetch error:', err);
       } finally {
         setLoading(false);
       }
