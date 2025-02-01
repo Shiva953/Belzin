@@ -8,7 +8,7 @@ import {
     ACTIONS_CORS_HEADERS,
     ActionGetRequest,
   } from "@solana/actions";
-  import {AnchorProvider, Program} from "@coral-xyz/anchor"
+  import { AnchorProvider, Program } from "@coral-xyz/anchor"
   import * as anchor from "@coral-xyz/anchor";
   import {
     clusterApiUrl,
@@ -50,28 +50,28 @@ export const GET = async (req: Request) => {
     const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
     const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);
 
-    const { image } = await generateImage({
-      model: openai.image('dall-e-3'),
-      prompt: betTitle,
-    });
+    // const { image } = await generateImage({
+    //   model: openai.image('dall-e-3'),
+    //   prompt: betTitle,
+    // });
 
     //(await uploadGeneratedImage(image)) ||
     const imageUrl = "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/";
 
     let payload: ActionGetResponse = {
       title: betTitle,
-      icon: imageUrl,
+      icon: "",
       description: `Bet Resolves on ${betResolutionDateString}`,
       label: "Bet",
       links: {
         actions: [
             {
-              label: `${betAmount} YES`,
+              label: `$${betAmount} YES`,
               type: "post",
               href: `/api/actions/bet?betId=${betAccountId}&side=YES&action=placeBet`,
             },
             {
-                label: `${betAmount} NO`,
+                label: `$${betAmount} NO`,
                 type: "post",
                 href: `/api/actions/bet?betId=${betAccountId}&side=NO&action=placeBet`,
               },
