@@ -1,4 +1,4 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { User, Users, MessageSquare, Bot, TrendingUp, HelpCircle } from "lucide-react"
@@ -46,7 +46,7 @@ const Sidebar = ({
           {[
             { href: `/profile/${user}`, icon: User, label: "Profile", activeCheck: "/profile/", color: "#ff4444" },
             { href: "/", icon: Users, label: "Public Chat", activeCheck: "/" },
-            { href: "/conversations", icon: MessageSquare, label: "Private Chats", activeCheck: "/conversations" },
+            // { href: "/conversations", icon: MessageSquare, label: "Private Chats", activeCheck: "/conversations" },
             { href: "/agent", icon: Bot, label: "Chat With Agent", activeCheck: "/agent" },
             { href: `/bets/${user}`, icon: TrendingUp, label: "View Bets", activeCheck: `/bets/${user}` },
           ].map(({ href, icon: Icon, label, activeCheck, color }) => (

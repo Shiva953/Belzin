@@ -3,9 +3,7 @@
 
 import { SolanaSignInInput, SolanaSignInOutput } from '@solana/wallet-standard-features';
 import { WalletAccount } from '@wallet-standard/base';
-import { MemorySaver } from "@langchain/langgraph";
-import { createReactAgent } from "@langchain/langgraph/prebuilt";
-import { ChatOpenAI } from "@langchain/openai";
+import { GeneratedImage } from '@/types';
 import { format } from "date-fns";
 
 export type SerialisableWalletAccount = {
@@ -180,5 +178,31 @@ export async function uploadImage(file: File): Promise<string> {
   } catch (error) {
     console.error('Error uploading image:', error);
     throw new Error('Failed to upload image');
+  }
+}
+
+export async function uploadGeneratedImage(generatedImage: GeneratedImage): Promise<string> {
+  const IMGBB_API_KEY = process.env.IMGBB_API_KEY;
+  
+  try {
+
+    const formData = new FormData();
+    formData.append('image', generatedImage.base64);
+
+    const uploadResponse = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+      method: 'POST',
+      body: formData,
+    });
+    
+    const data = await uploadResponse.json();
+    
+    if (!uploadResponse.ok) {
+      throw new Error(data.error?.message || 'Failed to upload image');
+    }
+    
+    return data.data.url;
+  } catch (error) {
+    console.error('Error uploading generated image:', error);
+    throw new Error('Failed to upload generated image');
   }
 }

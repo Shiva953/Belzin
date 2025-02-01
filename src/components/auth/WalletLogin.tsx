@@ -124,7 +124,7 @@ export function WalletLoginInterface({
   return (
     <>
       <div className="h-screen flex flex-col">
-        {showProfileCreation && !userProfile && (
+        {!userProfile && showProfileCreation && (
           <CreateUserProfile 
             pubkey={wallet.publicKey?.toString() || ''} 
             onProfileCreated={handleProfileCreated} 

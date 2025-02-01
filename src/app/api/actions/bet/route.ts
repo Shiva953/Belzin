@@ -23,8 +23,9 @@ import {
     VersionedTransaction,
   } from "@solana/web3.js";
   import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
-  import { epochToDateString,dateStringToEpoch } from "@/app/lib/utils";
+  import { epochToDateString,dateStringToEpoch, uploadGeneratedImage } from "@/app/lib/utils";
   import { Betting,IDL } from "@/types/betting";
+  import { GeneratedImage } from "@/types";
   import { experimental_generateImage as generateImage } from 'ai';
   import { openai } from '@ai-sdk/openai';
   import prisma from "@/lib/prisma";
@@ -32,9 +33,7 @@ import {
 
 export const GET = async (req: Request) => {
     const requestUrl = new URL(req.url as string);
-    console.log("Request URL: ",requestUrl)
     const betAccountId = requestUrl.searchParams.get("betId");
-    console.log("Bet Account ID: ",betAccountId)
 
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
     const wallet = { publicKey: new PublicKey("CUdHPZyyuMCzBJEgTZnoopxhp9zjp1pog3Tgx2jEKP7E") } as anchor.Wallet;
@@ -49,30 +48,22 @@ export const GET = async (req: Request) => {
     const isBetResolved = betAccountInfo.resolved;
     const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
     const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);
-    const reverseTest = dateStringToEpoch("31st December, 2025");
-    console.log("Bet Amount: ", betAccountInfo.betAmount.toNumber())
-    console.log("Total Yes Amount: ", betAccountInfo.totalYesAmount.toNumber())
-    console.log("Total No Amount: ", betAccountInfo.totalNoAmount.toNumber())
-    console.log("Total Yes Bettors:", betAccountInfo.yesBettors.toNumber())
-    console.log("Total No Bettors: ",betAccountInfo.noBettors.toNumber())
-    console.log(reverseTest)
-    console.log(betTitle)
 
     const { image } = await generateImage({
       model: openai.image('dall-e-3'),
       prompt: betTitle,
     });
-    const imageUrl = image
+    const imageUrl = (await uploadGeneratedImage(image)) || "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/";
 
     let payload: ActionGetResponse = {
       title: betTitle,
-      icon: 'https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/',
+      icon: imageUrl,
       description: `Bet Resolves on ${betResolutionDateString}`,
       label: "Bet",
       links: {
         actions: [
             {
-              label: "YES",
+              label: `${betAccountInfo.betAmount.toNumber()} YES`,
               type: "post",
               href: `/api/actions/bet?betId=${betAccountId}&side=YES&action=placeBet`,
             },
