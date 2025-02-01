@@ -14,14 +14,6 @@ import { UserAvatar } from '@/components/Messages';
 import { User } from '@prisma/client';
 import { useState,useEffect } from 'react';
 
-interface MessagesProps {
-    initialMessages: Message[] | ChatMessage[];
-    currentUserId: string;
-    channel: string;
-    event: string;
-    currentUser?: User;  // Add this prop
-  }
-
 export function OnlineUsers({ channel, currentUser }: { channel: string; currentUser: User }) {
     const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
   

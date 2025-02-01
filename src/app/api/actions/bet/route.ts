@@ -45,6 +45,7 @@ export const GET = async (req: Request) => {
     const program = new Program<Betting>(IDL as Betting, programId, provider);
     const betAccountInfo = await program.account.bet.fetch(betAccountKey, "confirmed")
     const betTitle = betAccountInfo.title;
+    const betAmount = betAccountInfo.betAmount.toNumber()/(10**9);
     const isBetResolved = betAccountInfo.resolved;
     const betResolutionDateInEpochTimestamp = betAccountInfo.endTime.toNumber();
     const betResolutionDateString = epochToDateString(betResolutionDateInEpochTimestamp);

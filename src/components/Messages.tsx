@@ -224,6 +224,58 @@ export function UserAvatar({ user, size = "default" }: { user: User; size?: "def
   )
 }
 
+// const MessageContainer = ({
+//   message,
+//   isCurrentUser,
+//   hasNextMessageFromSameUser,
+// }: { message: Message; isCurrentUser: boolean; hasNextMessageFromSameUser: boolean }) => {
+//   const betUrlRegex = /https?:\/\/belzin\.vercel\.app\/api\/actions\/bet\?betId=[a-zA-Z0-9_-]+/
+//   const content = message.content || ""
+//   const match = content.match(betUrlRegex)
+
+//   if (match) {
+//     const actionUrl = match[0]
+//     return (
+//       <div
+//         className={cn(
+//           "max-w-[30%] max-h-[80%] w-full rounded-xl p-3 bg-transparent border-none relative group transition-all",
+//           isCurrentUser
+//             ? "from-[rgb(1,255,255,0.2)] to-[rgb(1,255,255,0.3)] text-emerald-50"
+//             : "from-gray-800/90 to-gray-900/90 text-gray-100",
+//           "hover:shadow-lg",
+//         )}
+//       >
+//         <div className="w-full overflow-hidden rounded-lg">
+//           <BlinkComponent actionApiUrl={actionUrl}/>
+//         </div>
+//         <div className="text-xs text-gray-400 mt-2 text-right">{formatTimestamp(Number(message.timestamp))}</div>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div
+//       className={cn(
+//         "max-w-[70%] rounded-3xl px-4 py-2 relative group transition-all",
+//         isCurrentUser
+//           ? "bg-gradient-to-r from-[rgba(255,10,96,0.6)] to-[rgba(255,1,145,0.6)] text-white" //from-[rgb(28,155,239,0.7)]
+//           : "bg-[rgb(10,10,10)] text-gray-100",
+//         "hover:shadow-lg",
+//       )}
+//     >
+//       <div className="flex flex-col gap-1">
+//         <div className="flex items-center justify-between gap-2 py-2">
+//           {!isCurrentUser && <span className="text-sm font-bold opacity-80">{message.sender?.username || "Unknown User"}</span>}
+//         </div>
+//         <div className={`font-medium tracking-tight break-words whitespace-pre-wrap ${dmsans.className}`}>
+//           {formatMessageContent(content)}
+//         </div>
+//       </div>
+//       <div className="text-xs text-white/50 mt-1 text-right">{formatTimestamp(Number(message.timestamp))}</div>
+//     </div>
+//   )
+// }
+
 const MessageContainer = ({
   message,
   isCurrentUser,
@@ -258,20 +310,22 @@ const MessageContainer = ({
       className={cn(
         "max-w-[70%] rounded-3xl px-4 py-2 relative group transition-all",
         isCurrentUser
-          ? "bg-gradient-to-r from-[rgba(255,10,96,0.6)] to-[rgba(255,1,145,0.6)] text-white" //from-[rgb(28,155,239,0.7)]
-          : "bg-[rgb(10,10,10)] text-gray-100",
+          ? "bg-gradient-to-b from-[rgba(28,25,106,0.8)] to-[rgba(50,45,192,0.8)] text-white"
+          : "bg-gradient-to-r from-black/60 to-gray-950/60 text-gray-100",
         "hover:shadow-lg",
       )}
     >
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between gap-2 py-2">
-          {!isCurrentUser && <span className="text-sm font-bold opacity-80">{message.sender?.username || "Unknown User"}</span>}
+          {!isCurrentUser && (
+            <span className="text-sm font-bold text-blue-200">{message.sender?.username || "Unknown User"}</span>
+          )}
         </div>
         <div className={`font-medium tracking-tight break-words whitespace-pre-wrap ${dmsans.className}`}>
           {formatMessageContent(content)}
         </div>
       </div>
-      <div className="text-xs text-white/50 mt-1 text-right">{formatTimestamp(Number(message.timestamp))}</div>
+      <div className="text-xs text-blue-200/70 mt-1 text-right">{formatTimestamp(Number(message.timestamp))}</div>
     </div>
   )
 }

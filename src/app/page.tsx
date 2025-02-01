@@ -9,7 +9,7 @@ import { useChatMessages } from '@/hooks/useMessages';
 
 export default function Home() {
   const { connected, publicKey } = useWallet()
-  const { profile, loading: profileLoading, error } = useProfile(publicKey?.toString());
+  const { profile, loading: profileLoading, error:profileError } = useProfile(publicKey?.toString());
   const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages()
 
     if (!connected) {
@@ -20,7 +20,7 @@ export default function Home() {
       )
     }
 
-    if (messagesLoading) {
+    if (messagesLoading || profileLoading) {
       return (
         <div className="flex h-screen">
           <div className="flex-1 overflow-hidden">
@@ -30,7 +30,7 @@ export default function Home() {
       );
     }
 
-  if (error || !profile) {
+  if (profileError || messagesError) {
     return (
       <div className="flex-1 w-full flex items-center justify-center">
         <p className="text-lg text-destructive">
