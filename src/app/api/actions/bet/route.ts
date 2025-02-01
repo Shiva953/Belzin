@@ -53,7 +53,8 @@ export const GET = async (req: Request) => {
       model: openai.image('dall-e-3'),
       prompt: betTitle,
     });
-    const imageUrl = (await uploadGeneratedImage(image)) || "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/";
+    //(await uploadGeneratedImage(image)) ||
+    const imageUrl = "https://ucarecdn.com/7aa46c85-08a4-4bc7-9376-88ec48bb1f43/-/preview/880x864/-/quality/smart/-/format/auto/";
 
     let payload: ActionGetResponse = {
       title: betTitle,
