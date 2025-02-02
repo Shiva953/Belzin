@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 import { ChevronRight, Search } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
@@ -19,7 +18,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-2xl bg-[#1C1C1E]/95 backdrop-blur-xl backdrop-saturate-150 text-popover-foreground",
+      "flex h-full w-full flex-col overflow-hidden rounded-2xl bg-[#1C1C1E]/95 text-popover-foreground",
       className,
     )}
     {...props}
@@ -82,7 +81,9 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-default select-none items-center rounded-lg px-2 py-2.5 text-sm outline-none aria-selected:bg-accent/50 aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2.5 text-sm outline-none transition-all duration-200 ease-in-out",
+      "hover:bg-accent/50 hover:text-accent-foreground",
+      "group", // Added for child element transitions
       className,
     )}
     {...props}
@@ -117,7 +118,7 @@ export function CommandSearch({ chatBets }: {chatBets: ChatBet[]}) {
     >
       <div className="flex items-center gap-2">
         <Search className="h-4 w-4" />
-        <span className="font-mono text-white/70">Search Bets...</span>
+        <span className="font-mono text-white/70">Recent Bets...</span>
       </div>
       <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border/40 bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
         <span className="text-xs">⌘</span>K
@@ -125,34 +126,24 @@ export function CommandSearch({ chatBets }: {chatBets: ChatBet[]}) {
     </button>
     
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg bg-transparent rounded-2xl border-none">
+      <DialogContent className="overflow-hidden p-0 shadow-lg bg-transparent border-none">
         <div 
-          className="fixed inset-0 z-50 backdrop-blur-xl bg-transparent" 
+          className="fixed inset-0 bg-black/50 backdrop-blur-md"
           aria-hidden="true" 
           onClick={() => setOpen(false)}
         />
-        <Command className="relative z-50 bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground rounded-2xl">
+        <Command className="relative z-50 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground rounded-2xl">
           <CommandInput placeholder="Search Bets..." className="font-mono text-white"/>
           <CommandList>
-            <CommandGroup heading="Bets" className="bg-transparent">
+            <CommandGroup heading="Open Bets">
               {chatBets.map((bet, i) => (
                 <CommandItem key={i} className="flex items-center gap-2 px-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/50">
                     <div className="h-4 w-4 rounded-sm bg-gradient-to-br from-purple-500 to-purple-600" />
                   </div>
-                  <div className="flex flex-row hover:text-white hover:translate-x-1">
-                    <span className="font-mono text-white/70 hover:text-white mx-2">{bet.betTitle}</span>
-                    <ChevronRight className="hover:translate-x-1 h-4 w-4"/>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      {/* <div className="flex items-center gap-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-yellow-500" />
-                        <span>{i} live</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
-                        <span>{i + 1} past</span>
-                      </div> */}
-                    </div>
+                  <div className="flex flex-row items-center group-hover:text-white transition-all duration-200" onClick={() => window.open(`https://dial.to/?action=solana-action:http://belzin.vercel.app/api/actions/bet?betId=${bet.betPubKey}`)}>
+                    <span className="font-mono text-white/70 group-hover:text-white mx-2 transition-opacity duration-200">{bet.betTitle}</span>
+                    <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-200"/>
                   </div>
                 </CommandItem>
               ))}
