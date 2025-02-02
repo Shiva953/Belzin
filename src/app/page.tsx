@@ -15,9 +15,14 @@ export default function Home() {
   const {initialMessages, loading: messagesLoading, error: messagesError} = useChatMessages()
   const [bets, setBets] = useState<ChatBet[]>([])
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
+                   (process.env.NODE_ENV === 'development' 
+                    ? 'http://localhost:3000' 
+                    : 'https://belzin.vercel.app');
+
   useEffect(() => {
     async function fetchBets(){
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL!}/api/getAllBets`, {
+      const response = await fetch(`${baseUrl}/api/getAllBets`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
