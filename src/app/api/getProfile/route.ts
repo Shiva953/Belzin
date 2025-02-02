@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 
                    (process.env.NODE_ENV === 'development' 
                     ? 'http://localhost:3000' 
-                    : 'https://belzin.fun');
+                    : 'https://www.belzin.fun');
 
     const response = await fetch(`${baseUrl}/api/betsForUser`, {
       method: 'POST',
