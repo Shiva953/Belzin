@@ -1,6 +1,17 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ChevronRight } from 'lucide-react'
+import localFont from 'next/font/local'
+
+const supply = localFont({
+  src: '../app/fonts/Supply-Regular.otf',
+  display: 'swap',
+})
+
+// const montreal = localFont({
+//   src: '../app/fonts/NeueMontreal-Regular.otf',
+//   display: 'swap',
+// })
 
 export function WelcomePage({ handleSignIn, buttonText }: { handleSignIn: () => Promise<void>, buttonText: string }) {
   return (
@@ -8,13 +19,13 @@ export function WelcomePage({ handleSignIn, buttonText }: { handleSignIn: () => 
       <NavBar />
       
       <div className="max-w-7xl mx-auto px-6">
-        <div className="pt-24 pb-32 flex flex-col items-center text-center">
-          <h1 className="mt-24 mb-6 text-5xl md:text-7xl font-serif glow-text tracking-tight">
+        <div className={`pt-24 pb-32 flex flex-col items-center text-center`}>
+          <h1 className={`mt-24 mb-6 text-5xl md:text-7xl font-serif glow-text tracking-[-0.25rem] ${supply.className}`}>
             Belzin
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12">
-            Entering SocialFi X Agents, Starting with P2P Bets.
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12">
+            The Agentic P2P Betting Chat, Powered by Blinks
           </p>
           
           <Button 
@@ -40,10 +51,10 @@ export function NavBar() {
             Belzin
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors">
-              Twitter
+            <Link href="https://x.com/belzin" className="text-gray-300 hover:text-white transition-colors">
+              X
             </Link>
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+            <Link href="https://github.com/Shiva953/Belzin" className="text-gray-300 hover:text-white transition-colors">
               Github
             </Link>
           </div>

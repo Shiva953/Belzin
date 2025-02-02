@@ -141,7 +141,7 @@ export function CommandSearch({ chatBets }: {chatBets: ChatBet[]}) {
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/50">
                     <div className="h-4 w-4 rounded-sm bg-gradient-to-br from-purple-500 to-purple-600" />
                   </div>
-                  <div className="flex flex-row items-center group-hover:text-white transition-all duration-200" onClick={() => window.open(`https://dial.to/?action=solana-action:http://belzin.vercel.app/api/actions/bet?betId=${bet.betPubKey}`)}>
+                  <div className="flex flex-row items-center group-hover:text-white transition-all duration-200" onClick={() => window.open(`https://dial.to/?action=solana-action:http://belzin.fun/api/actions/bet?betId=${bet.betPubKey}`)}>
                     <span className="font-mono text-white/70 group-hover:text-white mx-2 transition-opacity duration-200">{bet.betTitle}</span>
                     <ChevronRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform duration-200"/>
                   </div>

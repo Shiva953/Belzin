@@ -73,7 +73,7 @@ import {
         [Buffer.from("vault_token_account"), betAccount.toBuffer()],
         program.programId
       );
-      const actionURL = `http://belzin.vercel.app/api/actions/bet?betId=${betAccount.toBase58()}`;
+      const actionURL = `http://belzin.fun/api/actions/bet?betId=${betAccount.toBase58()}`;
       await program.methods
         .createBet(
           title,
