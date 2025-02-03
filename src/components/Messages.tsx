@@ -282,11 +282,13 @@ const MessageContainer = ({
   hasNextMessageFromSameUser,
 }: { message: Message; isCurrentUser: boolean; hasNextMessageFromSameUser: boolean }) => {
   const betUrlRegex = /https?:\/\/belzin\.vercel\.app\/api\/actions\/bet\?betId=[a-zA-Z0-9_-]+/
+  const altBetUrlRegex = /https?:\/\/belzin\.fun\/api\/actions\/bet\?betId=[a-zA-Z0-9_-]+/
   const content = message.content || ""
-  const match = content.match(betUrlRegex)
+  const matchA = content.match(betUrlRegex)
+  const matchB = content.match(altBetUrlRegex)
+  const actionUrl = matchA?.[0] || matchB?.[0];
 
-  if (match) {
-    const actionUrl = match[0]
+  if (actionUrl) {
     return (
       <div
         className={cn(
