@@ -14,6 +14,8 @@ Note - The project is currently live on DEVNET, don't send mainnet-funds
 Here's the [Live Demo](https://x.com/Neutron975/status/1886384169607160105) on X.
 
 ## Architecture
+![BELZIN_ARCHITECTURE](/public/image.png)
+
 
 
 **Contract Address of the Betting Program(Devnet): `JkF3zxfbf7pvwqbyCvYActhnqYgiw2iCaht5JvKSrVY`**

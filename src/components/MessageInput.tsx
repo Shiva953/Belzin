@@ -44,7 +44,6 @@ export function MessageInput({chatId} : {chatId?: string}){
 
           if (isAgent) {
             let accumulatedResponse = '';
-            // Stream the agent response
             const fullResponse = await streamAgentResponse(
               optimisticInput.replace('@polyagent', '').trim(),
                 (chunk) => {

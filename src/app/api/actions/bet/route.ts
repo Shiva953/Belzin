@@ -142,8 +142,6 @@ export const POST = async(req: Request) => {
         if(action == 'placeBet'){
           const { side } = checkSide(requestUrl);
 
-          console.log("Bettor Account: ", bettorAccount.toBase58())
-
           let betDirection = false;
           if(side){
             betDirection = side === "YES" ? true : false;
