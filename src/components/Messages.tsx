@@ -38,7 +38,6 @@ export function Messages({
   const scrollDownRef = useRef<HTMLDivElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
-  const { toast } = useToast()
 
   const scrollToBottom = () => {
     if (containerRef.current && shouldScrollToBottom) {
@@ -92,24 +91,6 @@ export function Messages({
     }
   }, [channel, event, addMessage])
 
-  const handleStartDM = async (friendId: string | number) => {
-    console.log("Starting DM with user:", friendId)
-
-    const fid = typeof friendId === "string" ? Number(friendId) : friendId
-
-    const res = await fetch(`/api/initiateDM`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        initiatorUserId: Number(currentUserId),
-        friendId: fid,
-      }),
-    })
-    const data = await res.json()
-    if (data) {
-      console.log(data)
-    }
-  }
 
   return (
     <WalletProvider wallets={[]} autoConnect>

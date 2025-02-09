@@ -19,7 +19,6 @@ export function WalletLoginInterface({
 }: {
   children: React.ReactNode
 }){
-  const { data: session, status } = useSession();
   const wallet = useWallet();
   const walletModal = useWalletModal()
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,7 +45,7 @@ export function WalletLoginInterface({
       nonce: nonce,
     }
   
-    const output: SolanaSignInOutput = await wallet.signIn!(input)
+    const output: SolanaSignInOutput = await wallet.signIn(input)
 
     // Serialisation of the input and output data
     const { jsonInput, jsonOutput }: { jsonInput: string, jsonOutput: string } = serializeData(input, output);

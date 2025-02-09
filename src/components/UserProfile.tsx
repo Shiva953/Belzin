@@ -113,45 +113,34 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
   const [isLoading, setIsLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState<string>('')
 
-  useEffect(() => {
-    //upload to a public endpoint
-      if(image){
-        const url = URL.createObjectURL(image);
-        setImageUrl(url)
-      }
-  }, [image])
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {'image/*': []},
     onDrop: (acceptedFiles) => {
       setImage(acceptedFiles[0])
-      const url = URL.createObjectURL(acceptedFiles[0]);
-      setImageUrl(url)
     }
   })
 
   const handleCreateProfile = async () => {
-    // Validation
     if (!username.trim()) {
       setError('Username cannot be empty')
       return
     }
+  
     setIsLoading(true)
-      let uploadedImageUrl = ''
-      
+    let finalImageUrl = imageUrl
+  
+    try {
       if (image) {
         try {
-          uploadedImageUrl = await uploadImage(image)
-          setImageUrl(uploadedImageUrl)
+          finalImageUrl = await uploadImage(image)
+          setImageUrl(finalImageUrl)
         } catch (error) {
           toast.error('Failed to upload image')
+          setIsLoading(false)
           return
         }
       }
-
-      console.log("UPLOADED IMAGE URL: ", uploadedImageUrl)
-
-    try {
+  
       const response = await fetch('/api/createProfile', {
         method: 'POST',
         headers: {
@@ -160,30 +149,24 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
         body: JSON.stringify({ 
           username, 
           walletPublicKey: pubkey,
-          imageUrl: uploadedImageUrl
+          imageUrl: finalImageUrl
         }),
       })
-
+  
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.message || 'Failed to create profile')
       }
-
+  
       onProfileCreated?.()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setIsLoading(false)
     }
   }
   
-  console.log("IMAGE URL: ", imageUrl)
-
-  // useEffect(() => {
-  //   return () => {
-  //     if (imageUrl) {
-  //       URL.revokeObjectURL(imageUrl)
-  //     }
-  //   }
-  // }, [imageUrl])
+  console.log("IMAGE URL FINAL CHECK: ", imageUrl)
 
   return (
     <motion.div
@@ -221,7 +204,7 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
                 {image ? (
                   <div className="flex items-center justify-center">
                     <Avatar className="w-20 h-20">
-                      <AvatarImage src={URL.createObjectURL(image)} alt="Profile" />
+                      <AvatarImage src={imageUrl} alt="Profile" />
                       <AvatarFallback>
                         {username.slice(0, 2).toUpperCase()}
                       </AvatarFallback>

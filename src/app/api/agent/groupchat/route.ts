@@ -22,8 +22,6 @@ const solanaKit = new SolanaAgentKit(
 
 const tools = createSolanaTools(solanaKit);
 const memory = new MemorySaver();
-const config = { configurable: { thread_id: "Solana Agent Kit!" } };
-
 
 const agent = createReactAgent({
 llm,
@@ -41,6 +39,8 @@ messageModifier: `
 `,
 });
 
+
+// User Request → Stream Initialization → Event Generation → Real-time Chunk Processing → Network Transmission → Client Rendering
 export async function POST(req: Request) {
     try {
         const { messageContent } = await req.json();
@@ -72,6 +72,7 @@ export async function POST(req: Request) {
                         console.log("Data: ",data)
                         if (event === 'on_chat_model_stream') {
                             if (data.chunk.content) {
+                                // Immediately sends chunks to client as they're generated
                                 controller.enqueue(textEncoder.encode(data.chunk.content));
                             }
                         }
@@ -92,44 +93,4 @@ export async function POST(req: Request) {
         }
         return NextResponse.json({error: 'Internal Server Error'}, {status: 500})
     }
-}
-
-async function processAgentMessageWithTimeout(messageContent: string): Promise<string> {
-    return new Promise(async (resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-            reject(new Error('Agent processing timeout'));
-        }, 40000);
-
-        try {
-            let agentResponse = '';
-            const eventStream = agent.streamEvents(
-                {
-                    messages: [{
-                        role: 'user',
-                        content: messageContent
-                    }]
-                },
-                {
-                    version: 'v2',
-                    configurable: { thread_id: 'Solana Agent Kit!' }
-                }
-            );
-
-            for await (const { event, data } of eventStream) {
-                console.log("Iteration Start")
-                console.log("Event: ",event)
-                console.log("Data: ",data)
-                if (event === 'on_chat_model_stream' && data.chunk.content) {
-                    agentResponse += data.chunk.content;
-                    console.log("Agent Response: ",agentResponse);
-                }
-            }
-
-            clearTimeout(timeoutId);
-            resolve(agentResponse || 'I apologize, but I was unable to generate a response in time.');
-        } catch (error) {
-            clearTimeout(timeoutId);
-            reject(error);
-        }
-    });
 }
