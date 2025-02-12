@@ -22,7 +22,7 @@ export function BetsPlaced({ bets, userAddress }: { bets: Bet[]; userAddress: st
   }, 0)
 
   return (
-    <div className="min-h-screen w-full p-4 sm:p-6 md:p-8 border-white rounded-2xl transition-all duration-300 ease-in-out">
+    <div className="min-h-screen w-full p-4 sm:p-6 md:p-8 border-white rounded-2xl transition-all duration-300 ease-in-out overflow-y-scroll no-scrollbar">
       <div className="w-full max-w-[1920px] mx-auto transition-all duration-300">
         <div className="flex w-full items-center gap-2 sm:gap-3 mb-4 sm:mb-6 md:mb-8 transition-all duration-300">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white transition-all duration-300">Bets</h1>
@@ -32,11 +32,11 @@ export function BetsPlaced({ bets, userAddress }: { bets: Bet[]; userAddress: st
           </h3>
         </div>
         
-        <div className="flex flex-col lg:flex-row gap-4 transition-all duration-500 ease-in-out scrollbar-hide">
-          <div className="flex-grow lg:max-w-[calc(100%-26rem)] transition-all duration-300 scrollbar-hide">
-            <ScrollArea className="h-[calc(100vh-20rem)] sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-8rem)] transition-all duration-300 scrollbar-hide">
-              <div className="pr-2 sm:pr-4 transition-all duration-300 scrollbar-hide">
-                <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 transition-all duration-300 scrollbar-hide">
+        <div className="flex flex-col lg:flex-row gap-4 transition-all duration-500 ease-in-out no-scrollbar">
+          <div className="flex-grow lg:max-w-[calc(100%-26rem)] transition-all duration-300 no-scrollbar">
+            <ScrollArea className="h-[calc(100vh-20rem)] sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-8rem)] transition-all duration-300 no-scrollbar">
+              <div className="pr-2 sm:pr-4 transition-all duration-300 no-scrollbar">
+                <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 transition-all duration-300 no-scrollbar">
                   {bets.map((bet, index) => (
                     <BetCard key={index} bet={bet} />
                   ))}

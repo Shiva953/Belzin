@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Popover,PopoverContent,PopoverTrigger } from './ui/popover';
-import { ChevronDown, Copy, ExternalLink, LogOut } from "lucide-react"
+import { Copy, ExternalLink, LogOut } from "lucide-react"
 import { toast } from 'sonner';
 import { shortenPublicKey } from '@/app/lib/utils';
 import { clusterApiUrl, Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
@@ -166,7 +166,6 @@ export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUs
     }
   }
   
-  console.log("IMAGE URL FINAL CHECK: ", imageUrl)
 
   return (
     <motion.div

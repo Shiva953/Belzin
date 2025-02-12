@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import { User, Users, MessageSquare, Bot, TrendingUp, HelpCircle } from "lucide-react"
+import { User, Users, MessageSquare, Bot, TrendingUp, HelpCircle, Trophy } from "lucide-react"
 import Link from "next/link"
 import React from "react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -49,6 +49,7 @@ const Sidebar = ({
             // { href: "/conversations", icon: MessageSquare, label: "Private Chats", activeCheck: "/conversations" },
             { href: "/agent", icon: Bot, label: "Chat With Agent", activeCheck: "/agent" },
             { href: `/bets/${user}`, icon: TrendingUp, label: "View Bets", activeCheck: `/bets/${user}` },
+            { href: `/leaderboard`, icon: Trophy, label: "Bet Leaderboard", activeCheck: `/leaderboard` },
           ].map(({ href, icon: Icon, label, activeCheck, color }) => (
             <Tooltip key={href}>
               <TooltipTrigger asChild>
