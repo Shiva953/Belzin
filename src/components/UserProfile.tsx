@@ -6,6 +6,7 @@ import { uploadImage } from '@/app/lib/utils';
 import { motion } from 'framer-motion'
 import { useDropzone } from 'react-dropzone'
 import { useWallet } from '@solana/wallet-adapter-react';
+import { CreateUserProfileProps } from '@/types';
 import { X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -99,11 +100,6 @@ export function UserProfile({ user, onSignOut }: UserProfileProps) {
       </PopoverContent>
     </Popover>
   )
-}
-
-interface CreateUserProfileProps {
-  pubkey: string,
-  onProfileCreated?: () => void
 }
 
 export default function CreateUserProfile({ pubkey, onProfileCreated }: CreateUserProfileProps) {

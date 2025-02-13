@@ -2,21 +2,9 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronRight } from "lucide-react"
+import { Bettor } from "@/types"
 
-export interface Bettor {
-  rank: number
-  address: string
-  totalResolvedBetVolume: number
-  totalBetVolume: number
-  bets: number
-  pnl: number
-}
-
-interface BettorsTableProps {
-  bettors: Bettor[]
-}
-
-export function BettorsTable({ bettors }: BettorsTableProps) {
+export function BettorsTable({ bettors }: { bettors: Bettor[] }) {
   return (
     <div className="border border-[#2a2a2a] bg-[#00000] rounded-xl">
       <Table>

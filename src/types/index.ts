@@ -41,6 +41,11 @@ export interface TLog {
   messageTwo?: string;
 }
 
+export interface CreateUserProfileProps {
+  pubkey: string,
+  onProfileCreated?: () => void
+}
+
 export interface Message{
     id: string | number,
     content: string | null,
@@ -111,4 +116,13 @@ Image as a Uint8Array.
 export interface ChatBet { 
   betTitle: string,
   betPubKey: string,
+}
+
+export interface Bettor {
+  rank: number
+  address: string
+  totalResolvedBetVolume: number
+  totalBetVolume: number
+  bets: number
+  pnl: number
 }

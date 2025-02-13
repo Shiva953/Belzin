@@ -1,8 +1,8 @@
 "use client"
 
 import { Card } from "@/components/ui/card"
+import { Bettor } from "@/types"
 import { Trophy } from "lucide-react"
-import { Bettor } from "./BettorsTable"
 import { ChevronRight } from "lucide-react"
 
 export function BettorCard({ rank, address, totalResolvedBetVolume, totalBetVolume, bets, pnl }: Bettor) {

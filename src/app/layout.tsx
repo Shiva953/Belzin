@@ -1,18 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Metadata } from "next";
 import { SolanaProvider } from "@/components/ContextProvider";
-import { Inter } from "next/font/google"
-import localFont from "next/font/local";
 import "./globals.css";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./lib/auth";
 import { cn } from "@/lib/utils";
 import { GeistSans } from 'geist/font/sans';
-import { GeistMono } from 'geist/font/mono';
-import { WalletLoginInterface } from "@/components/auth/WalletLogin";
-import { Toaster } from 'sonner'
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import Sidebar from "@/components/chat/sidebar/sidebar";
 import WalletLoginWrapper from "@/components/auth/WalletLoginWrapper";
 
 export const metadata: Metadata = {
