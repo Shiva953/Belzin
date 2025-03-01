@@ -1,5 +1,6 @@
 import { BettorCard } from "@/components/leaderboard/BettorCard"
-import { BettorsTable, Bettor } from "@/components/leaderboard/BettorsTable"
+import { BettorsTable } from "@/components/leaderboard/BettorsTable"
+import { Bettor } from "@/types"
 
 async function getTopBettors() {
   try {
