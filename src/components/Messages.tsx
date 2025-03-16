@@ -18,15 +18,12 @@ import { Button } from "./ui/button"
 import { clusterApiUrl, Connection } from "@solana/web3.js"
 import { WalletProvider } from "@solana/wallet-adapter-react"
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui"
-import Image from "next/image"
 import { formatTimestamp } from "@/app/lib/utils"
 import "@dialectlabs/blinks/index.css"
 import { Card } from "./ui/card"
 import {DM_Sans} from "next/font/google"
 
 const dmsans = DM_Sans({style: 'normal', subsets: ["latin"]});
-
-
 
 export function Messages({
   initialMessages,

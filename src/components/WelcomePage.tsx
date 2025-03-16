@@ -8,11 +8,6 @@ const supply = localFont({
   display: 'swap',
 })
 
-// const montreal = localFont({
-//   src: '../app/fonts/NeueMontreal-Regular.otf',
-//   display: 'swap',
-// })
-
 export function WelcomePage({ handleSignIn, buttonText }: { handleSignIn: () => Promise<void>, buttonText: string }) {
   return (
     <main className="min-h-screen text-white overflow-hidden">

@@ -53,9 +53,7 @@ async function initializeAgent() {
         checkpointSaver: memory,
         messageModifier: AGENT_SYSTEM_TEMPLATE,
       });
-
-    
-
+      
       return { agent, config };
     } catch (error) {
       throw error;

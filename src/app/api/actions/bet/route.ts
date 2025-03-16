@@ -1,33 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
     ActionPostResponse,
-    createActionHeaders,
     createPostResponse,
     ActionGetResponse,
     ActionPostRequest,
     ACTIONS_CORS_HEADERS,
-    ActionGetRequest,
   } from "@solana/actions";
   import { AnchorProvider, Program } from "@coral-xyz/anchor"
   import * as anchor from "@coral-xyz/anchor";
   import {
     clusterApiUrl,
     Connection,
-    Keypair,
     PublicKey,
-    SystemProgram,
-    Transaction,
-    TransactionInstruction,
     TransactionMessage,
-    VersionedMessage,
     VersionedTransaction,
   } from "@solana/web3.js";
-  import {getOrCreateAssociatedTokenAccount, getAssociatedTokenAddress} from "@solana/spl-token"
-  import { epochToDateString,dateStringToEpoch, uploadGeneratedImage } from "@/app/lib/utils";
+  import { getAssociatedTokenAddress } from "@solana/spl-token"
+  import { epochToDateString } from "@/app/lib/utils";
   import { Betting,IDL } from "@/types/betting";
-  import { GeneratedImage } from "@/types";
-  import { experimental_generateImage as generateImage } from 'ai';
-  import { openai } from '@ai-sdk/openai';
   import prisma from "@/lib/prisma";
 
 
